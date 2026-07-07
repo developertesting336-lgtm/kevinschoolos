@@ -1,0 +1,439 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 01 Branches / Филиалы
+model Branch {
+  id         String    @id
+  name       String
+  city       String?
+  address    String?
+  phone      String?
+  status     String?
+  notes      String?
+  openedDate DateTime?
+  updatedAt  DateTime  @updatedAt
+}
+
+// 02 Users / Сотрудники
+model User {
+  id              String   @id
+  fullName        String
+  role            String?
+  email           String?
+  phone           String?
+  workingLanguage String?
+  status          String?
+  branchIds       String[]
+  updatedAt       DateTime @updatedAt
+}
+
+// 03 Courses / Курсы
+model Course {
+  id              String   @id
+  courseName      String
+  nameRussian     String?
+  nameKyrgyz      String?
+  stage           String?
+  ageBand         String?
+  lessonsPerWeek  Float?
+  defaultCapacity Float?
+  active          Boolean  @default(false)
+  description     String?
+  updatedAt       DateTime @updatedAt
+}
+
+// 04 Tuition Plans / Тарифные планы
+model TuitionPlan {
+  id            String   @id
+  planName      String
+  amount        Float?
+  billingPeriod String?
+  active        Boolean  @default(false)
+  courseIds     String[]
+  nameRussian   String?
+  nameKyrgyz    String?
+  updatedAt     DateTime @updatedAt
+}
+
+// 05 Terms / Учебные периоды
+model Term {
+  id          String    @id
+  termName    String
+  startDate   DateTime?
+  endDate     DateTime?
+  status      String?
+  nameRussian String?
+  updatedAt   DateTime  @updatedAt
+}
+
+// 06 Rooms / Кабинеты
+model Room {
+  id          String   @id
+  roomName    String
+  capacity    Float?
+  branchIds   String[]
+  nameRussian String?
+  updatedAt   DateTime @updatedAt
+}
+
+// 07 Leads / Лиды
+model Lead {
+  id                String    @id
+  leadName          String
+  inquiryDate       DateTime?
+  channel           String?
+  childAge          Float?
+  preferredLanguage String?
+  status            String?
+  lostReason        String?
+  phone             String?
+  whatsapp          String?
+  notes             String?
+  parentIds         String[]
+  branchIds         String[]
+  ownerIds          String[]
+  lastActivityDate  DateTime?
+  updatedAt         DateTime  @updatedAt
+}
+
+// 08 Trials / Пробные уроки
+model Trial {
+  id                 String    @id
+  trialId            String
+  dateTime           DateTime?
+  outcome            String?
+  notes              String?
+  leadIds            String[]
+  classGroupIds      String[]
+  studentIds         String[]
+  confirmationSent   Boolean   @default(false)
+  confirmationMethod String?
+  confirmationDate   DateTime?
+  levelAssessed      String?
+  teacherIds         String[]
+  enrollmentIds      String[]
+  updatedAt          DateTime  @updatedAt
+}
+
+// 09 Parents / Родители
+model Parent {
+  id                    String   @id
+  parentName            String
+  phone                 String?
+  whatsapp              String?
+  email                 String?
+  preferredLanguage     String?
+  address               String?
+  notes                 String?
+  studentIds            String[]
+  branchIds             String[]
+  whatsappGroupAdded    Boolean  @default(false)
+  whatsappGroupName     String?
+  updatedAt             DateTime @updatedAt
+}
+
+// 10 Students / Ученики
+model Student {
+  id           String    @id
+  studentName  String
+  dateOfBirth  DateTime?
+  gender       String?
+  status       String?
+  notes        String?
+  parentIds    String[]
+  branchIds    String[]
+  medicalNotes String?
+  updatedAt    DateTime  @updatedAt
+}
+
+// 11 Class Groups / Группы
+model ClassGroup {
+  id            String   @id
+  groupName     String
+  weekdays      String[]
+  startTime     String?
+  capacity      Float?
+  status        String?
+  courseIds     String[]
+  teacherIds    String[]
+  roomIds       String[]
+  termIds       String[]
+  branchIds     String[]
+  updatedAt     DateTime @updatedAt
+}
+
+// 12 Enrollments / Зачисления
+model Enrollment {
+  id                            String    @id
+  enrollmentId                  String
+  enrollDate                    DateTime?
+  status                        String?
+  studentIds                    String[]
+  classGroupIds                 String[]
+  tuitionPlanIds                String[]
+  branchIds                     String[]
+  trialFeeDeducted              Boolean   @default(false)
+  contractSigned                Boolean   @default(false)
+  contractDate                  DateTime?
+  hdSystemRegistered            Boolean   @default(false)
+  appCredentialsIssued          Boolean   @default(false)
+  scheduleDelivered             Boolean   @default(false)
+  calendarDelivered             Boolean   @default(false)
+  appInstructionsDelivered      Boolean   @default(false)
+  audioRecommendationsDelivered Boolean   @default(false)
+  firstLessonConfirmed          Boolean   @default(false)
+  firstLessonDate               DateTime?
+  onboardingStatus              String?
+  updatedAt                     DateTime  @updatedAt
+}
+
+// 13 Sessions / Занятия
+model Session {
+  id            String    @id
+  sessionId     String
+  dateTime      DateTime?
+  status        String?
+  classGroupIds String[]
+  teacherIds    String[]
+  branchIds     String[]
+  updatedAt     DateTime  @updatedAt
+}
+
+// 14 Attendance / Посещаемость
+model Attendance {
+  id           String   @id
+  attendanceId String
+  status       String?
+  sessionIds   String[]
+  studentIds   String[]
+  updatedAt    DateTime @updatedAt
+}
+
+// 15 Invoices / Счета
+model Invoice {
+  id            String    @id
+  invoiceNo     String
+  issueDate     DateTime?
+  dueDate       DateTime?
+  amount        Float?
+  status        String?
+  parentIds     String[]
+  studentIds    String[]
+  enrollmentIds String[]
+  branchIds     String[]
+  updatedAt     DateTime  @updatedAt
+}
+
+// 16 Payments / Платежи
+model Payment {
+  id               String    @id
+  paymentRef       String
+  date             DateTime?
+  amount           Float?
+  method           String?
+  invoiceIds       String[]
+  parentIds        String[]
+  branchIds        String[]
+  possibleDuplicate Boolean   @default(false)
+  paymentType      String?
+  updatedAt        DateTime  @updatedAt
+}
+
+// 17 Chart of Accounts / План счетов
+model Account {
+  id          String   @id
+  accountNo   String
+  accountName String
+  nameRussian String?
+  type        String?
+  subType     String?
+  normalSide  String?
+  active      Boolean  @default(false)
+  notes       String?
+  branchIds   String[]
+  updatedAt   DateTime @updatedAt
+}
+
+// 18 Journal Entries / Журнальные записи
+model JournalEntry {
+  id        String    @id
+  entryNo   String
+  date      DateTime?
+  memo      String?
+  source    String?
+  posted    Boolean   @default(false)
+  branchIds String[]
+  updatedAt DateTime  @updatedAt
+}
+
+// 19 Ledger Lines / Проводки
+model LedgerLine {
+  id              String   @id
+  line            String
+  debit           Float?
+  credit          Float?
+  memo            String?
+  journalEntryIds String[]
+  accountIds      String[]
+  branchIds       String[]
+  updatedAt       DateTime @updatedAt
+}
+
+// 20 Vendors / Поставщики
+model Vendor {
+  id          String   @id
+  vendorName  String
+  category    String?
+  phone       String?
+  email       String?
+  notes       String?
+  branchIds   String[]
+  nameRussian String?
+  updatedAt   DateTime @updatedAt
+}
+
+// 21 Expenses / Расходы
+model Expense {
+  id                String    @id
+  expenseNo         String
+  date              DateTime?
+  description       String?
+  amount            Float?
+  paymentMethod     String?
+  paid              Boolean   @default(false)
+  notes             String?
+  vendorIds         String[]
+  expenseAccountIds String[]
+  branchIds         String[]
+  updatedAt         DateTime  @updatedAt
+}
+
+// 22 Franchise Royalties / Роялти франшизы
+model FranchiseRoyalty {
+  id                      String    @id
+  royaltyNo               String
+  period                  DateTime?
+  revenueBase             Float?
+  royaltyPercent          Float?
+  marketingFeePercent     Float?
+  status                  String?
+  studentsReported        Float?
+  activeCoursesReported   Float?
+  notes                   String?
+  branchIds               String[]
+  vendorHQIds             String[]
+  updatedAt               DateTime  @updatedAt
+}
+
+// 23 Teacher Pay / Оплата преподавателям
+model TeacherPay {
+  id            String    @id
+  payRunNo      String
+  period        DateTime?
+  payType       String?
+  hours         Float?
+  rate          Float?
+  grossPay      Float?
+  paymentMethod String?
+  status        String?
+  datePaid      DateTime?
+  notes         String?
+  teacherIds    String[]
+  branchIds     String[]
+  updatedAt     DateTime  @updatedAt
+}
+
+// 24 Teacher Hours / Часы преподавателей
+model TeacherHours {
+  id         String    @id
+  entry      String
+  date       DateTime?
+  hours      Float?
+  type       String?
+  notes      String?
+  teacherIds String[]
+  sessionIds String[]
+  branchIds  String[]
+  payRunIds  String[]
+  updatedAt  DateTime  @updatedAt
+}
+
+// 25 Activities / Действия
+model Activity {
+  id               String    @id
+  activityId       String
+  dateTime         DateTime?
+  type             String?
+  direction        String?
+  outcome          String?
+  notes            String?
+  nextFollowUpDate DateTime?
+  leadIds          String[]
+  ownerIds         String[]
+  updatedAt        DateTime  @updatedAt
+}
+
+// 26 Channel Performance / Эффективность каналов
+model ChannelPerformance {
+  id                    String   @id
+  rowKey                String
+  channel               String?
+  month                 String?
+  branchIds             String[]
+  leads                 Float?
+  trialsBooked          Float?
+  trialsAttended        Float?
+  enrolled              Float?
+  lost                  Float?
+  lostPrice             Float?
+  lostSchedule          Float?
+  lostLocation          Float?
+  lostWentElsewhere     Float?
+  lostNoResponse        Float?
+  lostOther             Float?
+  updatedAt             DateTime @updatedAt
+}
+
+// 27 Notifications Log / Журнал уведомлений
+model NotificationLog {
+  id             String    @id
+  notificationId String
+  type           String?
+  channel        String?
+  status         String?
+  scheduledFor   DateTime?
+  sentAt         DateTime?
+  message        String?
+  leadIds        String[]
+  parentIds      String[]
+  trialIds       String[]
+  invoiceIds     String[]
+  enrollmentIds  String[]
+  branchIds      String[]
+  updatedAt      DateTime  @updatedAt
+}
+
+// Local security credentials and lockout state for Users
+model UserSecret {
+  userId        String    @id
+  passwordHash  String?   
+  loginAttempts Int       @default(0)
+  lockoutUntil  DateTime?
+  updatedAt     DateTime  @updatedAt
+}
+
+// Opaque session tokens (SHA-256 hashed in database)
+model UserSession {
+  id           String   @id 
+  userId       String
+  expiresAt    DateTime 
+  lastActiveAt DateTime 
+  createdAt    DateTime @default(now())
+}
+
