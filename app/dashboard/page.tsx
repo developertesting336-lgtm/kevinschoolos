@@ -1,5 +1,5 @@
 import { validateSession } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { apiFetch } from "@/lib/apiFetch";
 import {
   Card,
   CardHeader,
@@ -9,76 +9,81 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+interface GroupData {
+  id: string;
+  name: string;
+  studentCount: number;
+  capacity: number;
+}
+
+interface StaffData {
+  id: string;
+  fullName: string;
+  workingLanguage: string | null;
+  role: string | null;
+}
+
+interface BranchData {
+  id: string;
+  name: string;
+  city: string | null;
+}
+
+interface CourseData {
+  id: string;
+  courseName: string;
+  nameRussian: string | null;
+  defaultCapacity: number | null;
+}
+
+interface StatsData {
+  activeStudents: number;
+  totalStudents: number;
+  activeGroups: number;
+  totalGroups: number;
+  activeEnrollments: number;
+  totalEnrollments: number;
+  totalStaff: number;
+  teachersCount: number;
+  branchesCount: number;
+  roomsCount: number;
+  parentsCount: number;
+  recentPayments: number;
+}
+
+interface CoursesResponse {
+  count: number;
+  courses: CourseData[];
+}
+
 export default async function DashboardPage() {
   const session = await validateSession();
 
-  // 1. Fetch counts and aggregates from PostgreSQL
-  const activeStudents = await prisma.student.count({
-    where: { status: { equals: "active", mode: "insensitive" } },
-  });
-  const totalStudents = await prisma.student.count();
+  // Fetch all dashboard data from API endpoints in parallel
+  const [stats, groupData, staffList, branchesList, coursesData] = await Promise.all([
+    apiFetch("/api/dashboard/stats"),
+    apiFetch("/api/dashboard/groups"),
+    apiFetch("/api/dashboard/staff"),
+    apiFetch("/api/dashboard/branches"),
+    apiFetch("/api/dashboard/courses"),
+  ]) as [StatsData, GroupData[], StaffData[], BranchData[], CoursesResponse];
 
-  const activeGroups = await prisma.classGroup.count({
-    where: { status: { equals: "active", mode: "insensitive" } },
-  });
-  const totalGroups = await prisma.classGroup.count();
+  const {
+    activeStudents,
+    totalStudents,
+    activeGroups,
+    totalGroups,
+    activeEnrollments,
+    totalEnrollments,
+    totalStaff,
+    teachersCount,
+    branchesCount,
+    roomsCount,
+    parentsCount,
+    recentPayments,
+  } = stats;
 
-  const activeEnrollments = await prisma.enrollment.count({
-    where: { status: { equals: "active", mode: "insensitive" } },
-  });
-  const totalEnrollments = await prisma.enrollment.count();
-
-  const totalStaff = await prisma.user.count();
-  const teachersCount = await prisma.user.count({
-    where: { role: { equals: "teacher", mode: "insensitive" } },
-  });
-
-  const branchesCount = await prisma.branch.count();
-  const roomsCount = await prisma.room.count();
-  const coursesCount = await prisma.course.count();
-  const parentsCount = await prisma.parent.count();
-  const recentPayments = await prisma.payment.count();
-
-  // 2. Fetch Active Groups and calculate student fill rates
-  const dbGroups = await prisma.classGroup.findMany({
-    where: { status: { equals: "active", mode: "insensitive" } },
-    take: 10,
-  });
-
-  const dbEnrollments = await prisma.enrollment.findMany({
-    where: { status: { equals: "active", mode: "insensitive" } },
-  });
-
-  const groupData = dbGroups.map((group) => {
-    // Count enrollments linked to this group ID
-    const studentCount = dbEnrollments.filter((e) =>
-      e.classGroupIds.includes(group.id),
-    ).length;
-
-    return {
-      id: group.id,
-      name: group.groupName,
-      studentCount,
-      capacity: group.capacity || 8,
-    };
-  });
-
-  // 3. Fetch Staff list
-  const staffList = await prisma.user.findMany({
-    take: 8,
-    orderBy: { fullName: "asc" },
-  });
-
-  // 4. Fetch Branches
-  const branchesList = await prisma.branch.findMany({
-    orderBy: { name: "asc" },
-  });
-
-  // 5. Fetch Courses
-  const coursesList = await prisma.course.findMany({
-    take: 6,
-    orderBy: { courseName: "asc" },
-  });
+  const { count: coursesCount, courses: coursesList } = coursesData;
 
   return (
     <div className="space-y-8 select-none animate-in fade-in duration-300">

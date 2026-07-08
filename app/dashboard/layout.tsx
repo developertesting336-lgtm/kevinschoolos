@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { validateSession } from "@/lib/auth";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import prisma from "@/lib/prisma";
+import { apiFetch } from "@/lib/apiFetch";
 
 export default async function DashboardLayout({
   children,
@@ -15,11 +15,13 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  // Fetch the logged-in staff details from Postgres
-  const dbUser = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { fullName: true, email: true },
-  });
+  // Fetch the logged-in staff details from API route
+  let dbUser = null;
+  try {
+    dbUser = await apiFetch("/api/dashboard/user");
+  } catch (error) {
+    console.error("[Dashboard Layout Fetch Error]", error);
+  }
 
   const userProp = {
     name: dbUser?.fullName || "Active Staff",

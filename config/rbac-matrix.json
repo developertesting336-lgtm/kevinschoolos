@@ -1,0 +1,78 @@
+{
+  "roles": {
+    "owner": {
+      "tiers": ["T1", "T2", "T3", "T4", "T4-RO"],
+      "tables": ["*"],
+      "capabilities": ["*"],
+      "genericRenderer": true,
+      "redactions": {}
+    },
+    "finance": {
+      "tiers": ["T1", "T4"],
+      "tables": ["Invoice", "Payment", "Parent"],
+      "capabilities": ["read"],
+      "genericRenderer": false,
+      "redactions": {
+        "Student": ["*"],
+        "Parent": ["phone", "whatsapp", "email", "whatsappGroupAdded", "whatsappGroupName"]
+      }
+    },
+    "office_admin": {
+      "tiers": ["T2", "T3", "T4"],
+      "tables": ["User"],
+      "capabilities": ["read"],
+      "genericRenderer": false,
+      "redactions": {
+        "Account": ["*"],
+        "JournalEntry": ["*"],
+        "LedgerLine": ["*"],
+        "Vendor": ["*"],
+        "Expense": ["*"],
+        "FranchiseRoyalty": ["*"],
+        "TeacherPay": ["*"],
+        "TeacherHours": ["*"]
+      }
+    },
+    "teacher": {
+      "tiers": ["T4"],
+      "tables": ["Student", "ClassGroup", "Session", "Attendance"],
+      "capabilities": ["read"],
+      "genericRenderer": false,
+      "redactions": {
+        "Student": ["dateOfBirth", "medicalNotes"],
+        "Parent": ["phone", "whatsapp", "email", "whatsappGroupAdded", "whatsappGroupName"]
+      }
+    },
+    "smm": {
+      "tiers": ["T4"],
+      "tables": ["Lead", "Trial", "Activity", "ChannelPerformance", "ClassGroup"],
+      "capabilities": ["read"],
+      "genericRenderer": false,
+      "redactions": {
+        "Student": ["medicalNotes"],
+        "Parent": ["phone", "whatsapp", "email", "whatsappGroupAdded", "whatsappGroupName"],
+        "Payment": ["*"]
+      }
+    },
+    "tech_admin": {
+      "tiers": ["T4"],
+      "tables": [],
+      "capabilities": ["read"],
+      "genericRenderer": "break-glass",
+      "redactions": {
+        "Student": ["*"],
+        "Parent": ["*"],
+        "Invoice": ["*"],
+        "Payment": ["*"],
+        "User": ["*"]
+      }
+    }
+  },
+  "tiers": {
+    "T1": ["Account", "JournalEntry", "LedgerLine", "Vendor", "Expense", "FranchiseRoyalty", "TeacherPay", "TeacherHours"],
+    "T2": ["User", "Parent", "Student", "Enrollment", "Invoice", "Payment", "NotificationLog"],
+    "T3": ["Term", "Room", "Lead", "Trial", "ClassGroup", "Session", "Attendance", "Activity"],
+    "T4": ["Branch", "Course", "TuitionPlan"],
+    "T4-RO": ["ChannelPerformance"]
+  }
+}

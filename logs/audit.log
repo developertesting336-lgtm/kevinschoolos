@@ -1,0 +1,117 @@
+{"timestamp":"2026-07-08T06:29:10.543Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"account","status":"DENIED","details":"Teacher is restricted from accessing T1 table 'account'."}
+{"timestamp":"2026-07-08T06:29:11.162Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:29:11.839Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:29:12.689Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:29:13.564Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"parent","status":"DENIED","details":"Teacher is restricted from accessing T2 table 'parent'."}
+{"timestamp":"2026-07-08T06:29:14.142Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"payment","status":"DENIED","details":"Teacher is restricted from accessing T2 table 'payment'."}
+{"timestamp":"2026-07-08T06:29:14.795Z","userId":"user-smm-rbac","role":"smm","action":"read","target":"lead","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:29:15.490Z","userId":"user-smm-rbac","role":"smm","action":"read","target":"payment","status":"DENIED","details":"SMM is restricted from accessing T2 table 'payment'."}
+{"timestamp":"2026-07-08T06:29:16.129Z","userId":"user-smm-rbac","role":"smm","action":"read","target":"teacherPay","status":"DENIED","details":"SMM is restricted from accessing T1 table 'teacherPay'."}
+{"timestamp":"2026-07-08T06:29:16.745Z","userId":"user-finance-rbac","role":"finance","action":"read","target":"account","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:29:17.418Z","userId":"user-finance-rbac","role":"finance","action":"read","target":"student","status":"DENIED","details":"Finance is denied generic student browsing."}
+{"timestamp":"2026-07-08T06:29:17.990Z","userId":"user-admin-rbac","role":"office_admin","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:29:18.656Z","userId":"user-admin-rbac","role":"office_admin","action":"read","target":"lead","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:29:19.313Z","userId":"user-admin-rbac","role":"office_admin","action":"read","target":"account","status":"DENIED","details":"Office Admin is denied access to T1 finance/payroll tables."}
+{"timestamp":"2026-07-08T06:29:19.886Z","userId":"user-tech-rbac","role":"tech_admin","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:29:20.853Z","userId":"user-tech-rbac","role":"tech_admin","action":"read","target":"student","status":"DENIED","details":"Tech Admin is denied standing access to T2 table 'student' without break-glass."}
+{"timestamp":"2026-07-08T06:29:21.415Z","userId":"user-tech-rbac","role":"tech_admin","action":"read","target":"student","status":"BREAK_GLASS_APPROVED","details":"Tech Admin breaking glass to view student table."}
+{"timestamp":"2026-07-08T06:29:22.070Z","userId":"user-owner-rbac","role":"owner","action":"read","target":"account","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:29:22.745Z","userId":"user-owner-rbac","role":"owner","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:23.915Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"account","status":"DENIED","details":"Teacher is restricted from accessing T1 table 'account'."}
+{"timestamp":"2026-07-08T06:30:24.701Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:25.627Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:26.780Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:27.918Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"parent","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:28.809Z","userId":"user-teacher-rbac","role":"teacher","action":"read","target":"payment","status":"DENIED","details":"Teacher is restricted from accessing T2 table 'payment'."}
+{"timestamp":"2026-07-08T06:30:29.567Z","userId":"user-smm-rbac","role":"smm","action":"read","target":"lead","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:30.429Z","userId":"user-smm-rbac","role":"smm","action":"read","target":"payment","status":"DENIED","details":"SMM is restricted from accessing T2 table 'payment'."}
+{"timestamp":"2026-07-08T06:30:31.216Z","userId":"user-smm-rbac","role":"smm","action":"read","target":"teacherPay","status":"DENIED","details":"SMM is restricted from accessing T1 table 'teacherPay'."}
+{"timestamp":"2026-07-08T06:30:31.980Z","userId":"user-finance-rbac","role":"finance","action":"read","target":"account","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:32.874Z","userId":"user-finance-rbac","role":"finance","action":"read","target":"student","status":"DENIED","details":"Finance is denied generic student browsing."}
+{"timestamp":"2026-07-08T06:30:33.637Z","userId":"user-admin-rbac","role":"office_admin","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:34.542Z","userId":"user-admin-rbac","role":"office_admin","action":"read","target":"lead","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:35.403Z","userId":"user-admin-rbac","role":"office_admin","action":"read","target":"account","status":"DENIED","details":"Office Admin is denied access to T1 finance/payroll tables."}
+{"timestamp":"2026-07-08T06:30:36.243Z","userId":"user-tech-rbac","role":"tech_admin","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:37.106Z","userId":"user-tech-rbac","role":"tech_admin","action":"read","target":"student","status":"DENIED","details":"Tech Admin is denied standing access to T2 table 'student' without break-glass."}
+{"timestamp":"2026-07-08T06:30:37.888Z","userId":"user-tech-rbac","role":"tech_admin","action":"read","target":"student","status":"BREAK_GLASS_APPROVED","details":"Tech Admin breaking glass to view student table."}
+{"timestamp":"2026-07-08T06:30:38.818Z","userId":"user-owner-rbac","role":"owner","action":"read","target":"account","status":"APPROVED"}
+{"timestamp":"2026-07-08T06:30:39.700Z","userId":"user-owner-rbac","role":"owner","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:02:26.958Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:02:42.431Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"user","status":"DENIED","details":"Teacher is restricted from accessing T2 table 'user'."}
+{"timestamp":"2026-07-08T07:02:43.038Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:03:05.004Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:03:05.478Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:03:10.694Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:03:11.231Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:03:11.234Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:03:14.597Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:03:15.154Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"invoice","status":"DENIED","details":"Teacher is restricted from accessing T2 table 'invoice'."}
+{"timestamp":"2026-07-08T07:04:36.949Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:04:44.094Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"user","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:04:44.145Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:04:49.891Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:04:49.950Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"student","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:05:59.228Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:05:59.949Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:00.726Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:01.706Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:02.437Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:02.516Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:06.506Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:07.338Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"invoice","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:09.933Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:10.747Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"payment","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:25.458Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T07:06:26.037Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"invoice","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:39:32.304Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:39:32.367Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:39:32.560Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"user","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:39:49.795Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:39:56.909Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"user","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:39:57.553Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:41:40.420Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:41:44.365Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:41:44.396Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"user","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:41:50.805Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:41:51.479Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:41:51.581Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:46:36.226Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:46:36.922Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:46:37.068Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:46:38.506Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:46:39.274Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:46:39.352Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:47:19.279Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:47:23.960Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"user","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:47:23.968Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:47:35.148Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:47:35.898Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:47:36.399Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:47:46.619Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:51:27.148Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"user","status":"APPROVED"}
+{"timestamp":"2026-07-08T09:51:27.648Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:07:09.300Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:07:14.327Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"user","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:07:14.959Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:24:01.406Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:24:02.204Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:24:02.654Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:29:59.090Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:30:10.862Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:30:11.591Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:30:11.604Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:32:59.319Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:33:17.186Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"user","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:33:17.892Z","userId":"recfmWoZl52HLzkOz","role":"Owner","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:04.868Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:10.684Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"user","status":"DENIED","details":"Teacher is restricted from accessing T2 table 'user'."}
+{"timestamp":"2026-07-08T10:44:11.196Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:19.440Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:20.203Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:20.685Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:23.375Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:23.981Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"branch","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:24.168Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:24.892Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"session","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:24.919Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"classGroup","status":"APPROVED"}
+{"timestamp":"2026-07-08T10:44:25.490Z","userId":"recA40IJBv0I2DF8c","role":"Teacher","action":"read","target":"classGroup","status":"APPROVED"}
