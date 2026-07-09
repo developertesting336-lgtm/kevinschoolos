@@ -437,3 +437,18 @@ model UserSession {
   createdAt    DateTime @default(now())
 }
 
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  actorEmail String   @map("actor_email")  // NOT NULL in DB; use empty string as fallback
+  actorRole  String   @map("actor_role")   // NOT NULL in DB
+  action     String
+  tableName  String   @map("table_name")   // NOT NULL in DB
+  recordIds  String?  @map("record_ids")
+  fields     String?
+  result     String?
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("audit_log")
+}

@@ -13,12 +13,13 @@ export async function GET() {
 
     const dbUser = await prisma.user.findUnique({
       where: { id: session.userId },
-      select: { fullName: true, email: true },
+      select: { fullName: true, email: true, role: true },
     });
     console.log("user info ", dbUser);
     return NextResponse.json({
       fullName: dbUser?.fullName || null,
       email: dbUser?.email || null,
+      role: dbUser?.role || null,
     });
   } catch (error) {
     console.error("[Dashboard User API Error]", error);

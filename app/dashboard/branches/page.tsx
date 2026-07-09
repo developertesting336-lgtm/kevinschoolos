@@ -5,6 +5,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Building2, ArrowLeft, ShieldAlert } from "lucide-react";
+import { SearchInput } from "@/components/dashboard/SearchInput";
+import { PaginationControls } from "@/components/dashboard/PaginationControls";
 
 interface BranchData {
   id: string;
@@ -17,15 +19,35 @@ interface BranchData {
   openedDate: string | null;
 }
 
-export default async function BranchesPage() {
+interface PaginatedResponse {
+  data: BranchData[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export default async function BranchesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; search?: string }>;
+}) {
   const session = await validateSession();
+  const params = await searchParams;
+  const currentPage = params.page || "1";
+  const search = params.search || "";
 
   let branchesList: BranchData[] = [];
+  let pagination = { total: 0, page: 1, limit: 10, totalPages: 1 };
   let errorMsg = null;
   let isForbidden = false;
 
   try {
-    branchesList = await apiFetch("/api/data/branch");
+    const branchesResponse = await apiFetch(`/api/data/branch?page=${currentPage}&search=${encodeURIComponent(search)}`);
+    branchesList = (branchesResponse as PaginatedResponse).data;
+    pagination = (branchesResponse as PaginatedResponse).pagination;
   } catch (error: any) {
     console.error("[Dashboard Branches Fetch Error]", error);
     errorMsg = error.message || "Failed to load branches data.";
@@ -104,10 +126,11 @@ export default async function BranchesPage() {
         </Card>
       ) : (
         <Card className="bg-card border-border shadow-md overflow-hidden">
-          <CardHeader className="border-b border-border py-4 px-6 bg-muted/10">
+          <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle className="text-sm font-bold text-foreground">
-              ALL BRANCHES ({branchesList.length})
+              ALL BRANCHES ({pagination.total})
             </CardTitle>
+            <SearchInput placeholder="Search branches..." />
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -167,6 +190,12 @@ export default async function BranchesPage() {
                 )}
               </TableBody>
             </Table>
+            <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
+              <PaginationControls
+                totalPages={pagination.totalPages}
+                currentPage={parseInt(currentPage, 10)}
+              />
+            </div>
           </CardContent>
         </Card>
       )}

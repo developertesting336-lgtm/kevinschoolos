@@ -5,6 +5,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Receipt, ArrowLeft, ShieldAlert, FileText, CreditCard, AlertCircle } from "lucide-react";
+import { SearchInput } from "@/components/dashboard/SearchInput";
+import { PaginationControls } from "@/components/dashboard/PaginationControls";
 
 interface InvoiceData {
   id: string;
@@ -32,32 +34,49 @@ interface BranchData {
   name: string;
 }
 
+interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export default async function BillingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; page?: string; search?: string }>;
 }) {
   const session = await validateSession();
-  const { tab } = await searchParams;
-  const activeTab = tab || "invoices";
+  const params = await searchParams;
+  const activeTab = params.tab || "invoices";
+  const currentPage = params.page || "1";
+  const search = params.search || "";
 
   let invoicesList: InvoiceData[] = [];
   let paymentsList: PaymentData[] = [];
   let branchesList: BranchData[] = [];
+  let pagination = { total: 0, page: 1, limit: 10, totalPages: 1 };
   let errorMsg = null;
   let isForbidden = false;
 
   try {
-    // We always fetch branches for mapping
+    // We always fetch branches for mapping (unpaginated)
     branchesList = await apiFetch("/api/data/branch").catch((e) => {
       console.error("Could not fetch branches", e);
       return [];
     });
 
     if (activeTab === "invoices") {
-      invoicesList = await apiFetch("/api/data/invoice");
+      const invoicesResponse = await apiFetch(`/api/data/invoice?page=${currentPage}&search=${encodeURIComponent(search)}`);
+      invoicesList = (invoicesResponse as PaginatedResponse<InvoiceData>).data;
+      pagination = (invoicesResponse as PaginatedResponse<InvoiceData>).pagination;
     } else {
-      paymentsList = await apiFetch("/api/data/payment");
+      const paymentsResponse = await apiFetch(`/api/data/payment?page=${currentPage}&search=${encodeURIComponent(search)}`);
+      paymentsList = (paymentsResponse as PaginatedResponse<PaymentData>).data;
+      pagination = (paymentsResponse as PaginatedResponse<PaymentData>).pagination;
     }
   } catch (error: any) {
     console.error(`[Dashboard Billing Fetch Error] Tab: ${activeTab}`, error);
@@ -212,10 +231,11 @@ export default async function BillingPage({
       ) : activeTab === "invoices" ? (
         /* Invoices Table */
         <Card className="bg-card border-border shadow-md overflow-hidden">
-          <CardHeader className="border-b border-border py-4 px-6 bg-muted/10">
+          <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle className="text-sm font-bold text-foreground">
-              ALL INVOICES ({invoicesList.length})
+              ALL INVOICES ({pagination.total})
             </CardTitle>
+            <SearchInput placeholder="Search invoices..." />
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -279,15 +299,22 @@ export default async function BillingPage({
                 )}
               </TableBody>
             </Table>
+            <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
+              <PaginationControls
+                totalPages={pagination.totalPages}
+                currentPage={parseInt(currentPage, 10)}
+              />
+            </div>
           </CardContent>
         </Card>
       ) : (
         /* Payments Table */
         <Card className="bg-card border-border shadow-md overflow-hidden">
-          <CardHeader className="border-b border-border py-4 px-6 bg-muted/10">
+          <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle className="text-sm font-bold text-foreground">
-              ALL TRANSACTIONS ({paymentsList.length})
+              ALL TRANSACTIONS ({pagination.total})
             </CardTitle>
+            <SearchInput placeholder="Search payments..." />
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -352,6 +379,12 @@ export default async function BillingPage({
                 )}
               </TableBody>
             </Table>
+            <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
+              <PaginationControls
+                totalPages={pagination.totalPages}
+                currentPage={parseInt(currentPage, 10)}
+              />
+            </div>
           </CardContent>
         </Card>
       )}

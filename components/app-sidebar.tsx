@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { normalizeRole } from "@/lib/roles";
 import {
   LayoutDashboard,
   Building2,
@@ -63,12 +64,28 @@ interface AppSidebarProps {
   user: {
     name: string;
     email: string;
+    role?: string | null;
   };
 }
 
 export function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname();
   const initial = user.name ? user.name.charAt(0).toUpperCase() : "U";
+
+  const userRole = normalizeRole(user.role || "staff");
+
+  // Define allowed nav items per role
+  const rolePermissions: Record<string, string[]> = {
+    owner: ["Overview", "Branches", "Staff & Users", "Students", "Schedule", "Billing"],
+    finance: ["Overview", "Billing"],
+    office_admin: ["Overview", "Branches", "Staff & Users", "Students", "Schedule", "Billing"],
+    teacher: ["Overview", "Branches", "Students", "Schedule"],
+    smm: ["Overview", "Branches", "Students", "Schedule"],
+    tech_admin: ["Overview"],
+  };
+
+  const allowedTitles = rolePermissions[userRole] || ["Overview"];
+  const filteredNavItems = navItems.filter((item) => allowedTitles.includes(item.title));
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-card">
@@ -93,7 +110,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => {
+              {filteredNavItems.map((item) => {
                 const isActive = pathname === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>

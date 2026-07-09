@@ -5,16 +5,18 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { GraduationCap, ArrowLeft, ShieldAlert } from "lucide-react";
+import { SearchInput } from "@/components/dashboard/SearchInput";
+import { PaginationControls } from "@/components/dashboard/PaginationControls";
 
 interface StudentData {
   id: string;
   studentName: string;
-  dateOfBirth?: string | null; // Optional because it might be redacted
+  dateOfBirth?: string | null;
   gender: string | null;
   status: string | null;
   notes: string | null;
   branchIds: string[];
-  medicalNotes?: string | null; // Optional because it might be redacted
+  medicalNotes?: string | null;
 }
 
 interface BranchData {
@@ -22,23 +24,42 @@ interface BranchData {
   name: string;
 }
 
-export default async function StudentsPage() {
+interface PaginatedResponse {
+  data: StudentData[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export default async function StudentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; search?: string }>;
+}) {
   const session = await validateSession();
+  const params = await searchParams;
+  const currentPage = params.page || "1";
+  const search = params.search || "";
 
   let studentsList: StudentData[] = [];
   let branchesList: BranchData[] = [];
+  let pagination = { total: 0, page: 1, limit: 10, totalPages: 1 };
   let errorMsg = null;
   let isForbidden = false;
 
   try {
     const [studentsResponse, branchesResponse] = await Promise.all([
-      apiFetch("/api/data/student"),
+      apiFetch(`/api/data/student?page=${currentPage}&search=${encodeURIComponent(search)}`),
       apiFetch("/api/data/branch").catch((e) => {
         console.error("Could not fetch branches, returning empty list", e);
         return [];
       }),
     ]);
-    studentsList = studentsResponse;
+    studentsList = (studentsResponse as PaginatedResponse).data;
+    pagination = (studentsResponse as PaginatedResponse).pagination;
     branchesList = branchesResponse;
   } catch (error: any) {
     console.error("[Dashboard Students Fetch Error]", error);
@@ -120,10 +141,11 @@ export default async function StudentsPage() {
         </Card>
       ) : (
         <Card className="bg-card border-border shadow-md overflow-hidden">
-          <CardHeader className="border-b border-border py-4 px-6 bg-muted/10">
+          <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle className="text-sm font-bold text-foreground">
-              ALL STUDENTS ({studentsList.length})
+              ALL STUDENTS ({pagination.total})
             </CardTitle>
+            <SearchInput placeholder="Search students by name..." />
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -193,6 +215,12 @@ export default async function StudentsPage() {
                 )}
               </TableBody>
             </Table>
+            <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
+              <PaginationControls
+                totalPages={pagination.totalPages}
+                currentPage={parseInt(currentPage, 10)}
+              />
+            </div>
           </CardContent>
         </Card>
       )}

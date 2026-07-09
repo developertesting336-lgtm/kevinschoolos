@@ -4,9 +4,9 @@ dotenv.config();
 async function registerWebhook() {
   const baseId = process.env.AIRTABLE_BASE_ID;
   const pat = process.env.AIRTABLE_PAT;
-  
+
   // Replace this with your active ngrok public URL (must end with /api/sync)
-  const notificationUrl = 'https://steering-lapdog-giveaway.ngrok-free.dev/api/sync';
+  const notificationUrl = 'https://kevinschoolos.vercel.app/api/sync';
 
   if (!baseId || !pat) {
     console.error("Missing AIRTABLE_BASE_ID or AIRTABLE_PAT in .env");

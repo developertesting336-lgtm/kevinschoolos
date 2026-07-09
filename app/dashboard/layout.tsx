@@ -26,6 +26,7 @@ export default async function DashboardLayout({
   const userProp = {
     name: dbUser?.fullName || "Active Staff",
     email: dbUser?.email || "staff@school.os",
+    role: dbUser?.role || "staff",
   };
 
   return (

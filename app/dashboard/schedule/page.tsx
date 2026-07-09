@@ -5,6 +5,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Calendar, ArrowLeft, ShieldAlert, Clock, Layers } from "lucide-react";
+import { SearchInput } from "@/components/dashboard/SearchInput";
+import { PaginationControls } from "@/components/dashboard/PaginationControls";
 
 interface SessionData {
   id: string;
@@ -35,39 +37,55 @@ interface BranchData {
   name: string;
 }
 
+interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export default async function SchedulePage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; page?: string; search?: string }>;
 }) {
   const session = await validateSession();
-  const { tab } = await searchParams;
-  const activeTab = tab || "sessions";
+  const params = await searchParams;
+  const activeTab = params.tab || "sessions";
+  const currentPage = params.page || "1";
+  const search = params.search || "";
 
   let sessionsList: SessionData[] = [];
   let classGroupsList: ClassGroupData[] = [];
   let branchesList: BranchData[] = [];
+  let pagination = { total: 0, page: 1, limit: 10, totalPages: 1 };
   let errorMsg = null;
   let isForbidden = false;
 
   try {
-    // We always fetch branches for mapping
+    // We always fetch branches for mapping (unpaginated)
     branchesList = await apiFetch("/api/data/branch").catch((e) => {
       console.error("Could not fetch branches", e);
       return [];
     });
 
     if (activeTab === "sessions") {
-      // For Sessions tab, fetch sessions and classGroups (for name resolution) in parallel
+      // For Sessions tab, fetch sessions (paginated) and classGroups (for name resolution - unpaginated) in parallel
       const [sessionsRes, groupsRes] = await Promise.all([
-        apiFetch("/api/data/session"),
+        apiFetch(`/api/data/session?page=${currentPage}&search=${encodeURIComponent(search)}`),
         apiFetch("/api/data/classgroup").catch(() => []),
       ]);
-      sessionsList = sessionsRes;
-      classGroupsList = groupsRes;
+      sessionsList = (sessionsRes as PaginatedResponse<SessionData>).data;
+      pagination = (sessionsRes as PaginatedResponse<SessionData>).pagination;
+      classGroupsList = Array.isArray(groupsRes) ? groupsRes : (groupsRes.data || []);
     } else {
-      // For Class Groups tab, only fetch class groups
-      classGroupsList = await apiFetch("/api/data/classgroup");
+      // For Class Groups tab, fetch class groups paginated
+      const groupsRes = await apiFetch(`/api/data/classgroup?page=${currentPage}&search=${encodeURIComponent(search)}`);
+      classGroupsList = (groupsRes as PaginatedResponse<ClassGroupData>).data;
+      pagination = (groupsRes as PaginatedResponse<ClassGroupData>).pagination;
     }
   } catch (error: any) {
     console.error(`[Dashboard Schedule Fetch Error] Tab: ${activeTab}`, error);
@@ -84,7 +102,7 @@ export default async function SchedulePage({
   if (isForbidden) {
     return (
       <div className="space-y-8 select-none animate-in fade-in duration-300">
-        {/* Header (still show basic header & tab selectors so user can switch tabs) */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1.5">
@@ -223,10 +241,11 @@ export default async function SchedulePage({
       ) : activeTab === "sessions" ? (
         /* Sessions Table */
         <Card className="bg-card border-border shadow-md overflow-hidden">
-          <CardHeader className="border-b border-border py-4 px-6 bg-muted/10">
+          <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle className="text-sm font-bold text-foreground">
-              ALL SESSIONS ({sessionsList.length})
+              ALL SESSIONS ({pagination.total})
             </CardTitle>
+            <SearchInput placeholder="Search sessions..." />
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -294,15 +313,22 @@ export default async function SchedulePage({
                 )}
               </TableBody>
             </Table>
+            <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
+              <PaginationControls
+                totalPages={pagination.totalPages}
+                currentPage={parseInt(currentPage, 10)}
+              />
+            </div>
           </CardContent>
         </Card>
       ) : (
         /* Class Groups Table */
         <Card className="bg-card border-border shadow-md overflow-hidden">
-          <CardHeader className="border-b border-border py-4 px-6 bg-muted/10">
+          <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle className="text-sm font-bold text-foreground">
-              ALL CLASS GROUPS ({classGroupsList.length})
+              ALL CLASS GROUPS ({pagination.total})
             </CardTitle>
+            <SearchInput placeholder="Search class groups..." />
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -365,6 +391,12 @@ export default async function SchedulePage({
                 )}
               </TableBody>
             </Table>
+            <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
+              <PaginationControls
+                totalPages={pagination.totalPages}
+                currentPage={parseInt(currentPage, 10)}
+              />
+            </div>
           </CardContent>
         </Card>
       )}

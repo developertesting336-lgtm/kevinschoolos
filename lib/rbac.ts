@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import prisma from "./prisma";
+import { normalizeRole } from "./roles";
+export { normalizeRole };
 
 // Load RBAC Matrix
 const matrixPath = path.join(process.cwd(), "config", "rbac-matrix.json");
@@ -21,7 +23,7 @@ export function checkRBAC(
   action: string, // "read" or "write"
   isBreakGlass: boolean = false
 ): { allowed: boolean; reason: string } {
-  const normRole = role.toLowerCase();
+  const normRole = normalizeRole(role);
 
   // Phase 1 is strictly read-only for all production data routes.
   if (action !== "read") {
@@ -128,7 +130,7 @@ export async function getScopingFilter(
   user: UserContext,
   tableName: string
 ): Promise<Record<string, unknown>> {
-  const normRole = user.role.toLowerCase();
+  const normRole = normalizeRole(user.role);
   const where: Record<string, unknown> = {};
 
   // 1. Branch Scoping: Apply to all roles except Owner (which has all access)
@@ -194,7 +196,7 @@ export function applyRedactions(
   paymentContext: boolean = false
 ): unknown {
   if (!data) return data;
-  const normRole = role.toLowerCase();
+  const normRole = normalizeRole(role);
 
   // If array, map over each item
   if (Array.isArray(data)) {

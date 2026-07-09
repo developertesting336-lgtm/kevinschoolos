@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { validateSession } from "@/lib/auth";
 import {
   syncAllTables,
   syncTable,
@@ -10,6 +11,11 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
+  const session = await validateSession();
+  if (!session || !["owner", "tech_admin"].includes(session.role.toLowerCase())) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const { searchParams } = new URL(request.url);
   const targetTable = searchParams.get("table");
 
@@ -61,6 +67,14 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+
+    const isWebhook = body.webhook && body.webhook.id;
+    if (!isWebhook) {
+      const session = await validateSession();
+      if (!session || !["owner", "tech_admin"].includes(session.role.toLowerCase())) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    }
 
     // 1. Check if it's an official Airtable Base Webhook Ping
     if (body.webhook && body.webhook.id) {
