@@ -8,6 +8,22 @@ Implement deny-by-default role-based access control using `config/rbac-matrix.js
 
 Phase 1 must remain read-only for every role.
 
+- [x] SMM Scoped Access & Dashboard Integration
+  - [x] Update `config/rbac-matrix.json` SMM configuration to the 7 permitted tables
+  - [x] Modify `lib/rbac.ts` SMM checkRBAC rule to allow T4-RO tier (for ChannelPerformance)
+  - [x] Add SMM sidebar items `smmGroups` inside `components/app-sidebar.tsx`
+  - [x] Create `components/dashboard/SmmDashboardClient.tsx` with stats cards and database folders
+  - [x] Integrate the new client in `components/dashboard/DashboardClient.tsx`
+  - [x] Verify compilation and run build checks
+
+- [x] Finance Scoped Access & Dashboard Integration
+  - [x] Update `config/rbac-matrix.json` Finance configuration to the 15 permitted tables
+  - [x] Modify `lib/rbac.ts` Finance checkRBAC rules to allow full T1, T2 and T4 access
+  - [x] Add Finance sidebar items `financeGroups` inside `components/app-sidebar.tsx`
+  - [x] Create `components/dashboard/FinanceDashboardClient.tsx` with stats cards and database folders
+  - [x] Integrate the new client in `components/dashboard/DashboardClient.tsx`
+  - [x] Verify compilation and run build checks
+
 ---
 
 ## 1. Create RBAC Matrix

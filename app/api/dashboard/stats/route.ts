@@ -174,6 +174,25 @@ export async function GET() {
       const roomsCount = await prisma.room.count({ where: branchScopedFilter });
       const coursesCount = await prisma.course.count();
       const parentsCount = await prisma.parent.count({ where: branchScopedFilter });
+      const recentPayments = await prisma.payment.count({ where: branchScopedFilter });
+      const invoicesCount = await prisma.invoice.count({ where: branchScopedFilter });
+      const leadsCount = await prisma.lead.count({ where: branchScopedFilter });
+
+      const allTrials = await prisma.trial.findMany({
+        select: { leadIds: true },
+      });
+      const trialLeadIds = Array.from(new Set(allTrials.flatMap((t: any) => t.leadIds || [])));
+      const matchingTrialLeads = await prisma.lead.findMany({
+        where: {
+          id: { in: trialLeadIds },
+          branchIds: { hasSome: userBranchIds },
+        },
+        select: { id: true },
+      });
+      const allowedTrialLeadIds = new Set(matchingTrialLeads.map((l: any) => l.id));
+      const trialsCount = allTrials.filter((t: any) =>
+        t.leadIds.some((id: string) => allowedTrialLeadIds.has(id))
+      ).length;
 
       logAudit({
         userId: dbUser.id,
@@ -197,7 +216,10 @@ export async function GET() {
         roomsCount,
         coursesCount,
         parentsCount,
-        recentPayments: 0,
+        recentPayments,
+        invoicesCount,
+        leadsCount,
+        trialsCount,
       });
     }
 
@@ -242,10 +264,25 @@ export async function GET() {
     }
 
     if (role === "smm") {
-      const activeGroups = await prisma.classGroup.count({
-        where: { AND: [{ status: { equals: "active", mode: "insensitive" } }, branchScopedFilter] },
+      const branchesCount = await prisma.branch.count({ where: { id: { in: userBranchIds } } });
+      const coursesCount = await prisma.course.count();
+      const leadsCount = await prisma.lead.count({ where: branchScopedFilter });
+
+      const allTrials = await prisma.trial.findMany({
+        select: { leadIds: true },
       });
-      const totalGroups = await prisma.classGroup.count({ where: branchScopedFilter });
+      const trialLeadIds = Array.from(new Set(allTrials.flatMap((t: any) => t.leadIds || [])));
+      const matchingTrialLeads = await prisma.lead.findMany({
+        where: {
+          id: { in: trialLeadIds },
+          branchIds: { hasSome: userBranchIds },
+        },
+        select: { id: true },
+      });
+      const allowedTrialLeadIds = new Set(matchingTrialLeads.map((l: any) => l.id));
+      const trialsCount = allTrials.filter((t: any) =>
+        t.leadIds.some((id: string) => allowedTrialLeadIds.has(id))
+      ).length;
 
       logAudit({
         userId: dbUser.id,
@@ -259,17 +296,73 @@ export async function GET() {
       return NextResponse.json({
         activeStudents: 0,
         totalStudents: 0,
-        activeGroups,
-        totalGroups,
+        activeGroups: 0,
+        totalGroups: 0,
         activeEnrollments: 0,
         totalEnrollments: 0,
         totalStaff: 0,
         teachersCount: 0,
-        branchesCount: await prisma.branch.count({ where: { id: { in: userBranchIds } } }),
+        branchesCount,
         roomsCount: 0,
-        coursesCount: 0,
+        coursesCount,
         parentsCount: 0,
         recentPayments: 0,
+        leadsCount,
+        trialsCount,
+      });
+    }
+
+    if (role === "finance") {
+      const branchScopedFilter = { branchIds: { hasSome: userBranchIds } };
+
+      const [
+        activeStudents,
+        totalStudents,
+        activeEnrollments,
+        totalEnrollments,
+        invoicesCount,
+        paymentsCount,
+        branchesCount,
+        coursesCount,
+      ] = await Promise.all([
+        prisma.student.count({
+          where: { AND: [{ status: { equals: "active", mode: "insensitive" } }, branchScopedFilter] },
+        }),
+        prisma.student.count({ where: branchScopedFilter }),
+        prisma.enrollment.count({
+          where: { AND: [{ status: { equals: "active", mode: "insensitive" } }, branchScopedFilter] },
+        }),
+        prisma.enrollment.count({ where: branchScopedFilter }),
+        prisma.invoice.count({ where: branchScopedFilter }),
+        prisma.payment.count({ where: branchScopedFilter }),
+        prisma.branch.count({ where: { id: { in: userBranchIds } } }),
+        prisma.course.count(),
+      ]);
+
+      logAudit({
+        userId: dbUser.id,
+        role: dbUser.role || "staff",
+        action: "read",
+        target: "DashboardStats",
+        status: "APPROVED",
+        details: `Finance loaded stats scoped to branches: ${JSON.stringify(userBranchIds)}`,
+      });
+
+      return NextResponse.json({
+        activeStudents,
+        totalStudents,
+        activeGroups: 0,
+        totalGroups: 0,
+        activeEnrollments,
+        totalEnrollments,
+        totalStaff: 0,
+        teachersCount: 0,
+        branchesCount,
+        roomsCount: 0,
+        coursesCount,
+        parentsCount: 0,
+        recentPayments: paymentsCount,
+        invoicesCount,
       });
     }
 

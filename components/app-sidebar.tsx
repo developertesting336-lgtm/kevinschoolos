@@ -10,8 +10,27 @@ import {
   GraduationCap,
   Calendar,
   Receipt,
-  RefreshCw,
   LogOut,
+  Landmark,
+  BookOpen,
+  ListTodo,
+  Truck,
+  CreditCard,
+  Percent,
+  DollarSign,
+  Clock,
+  UserCheck,
+  UserPlus,
+  FileText,
+  Wallet,
+  CalendarRange,
+  DoorOpen,
+  PhoneCall,
+  Play,
+  FileCheck,
+  Activity,
+  TrendingUp,
+  Award,
 } from "lucide-react";
 
 import {
@@ -60,6 +79,174 @@ const navItems = [
   },
 ];
 
+const ownerGroups = [
+  {
+    label: "PII Data (T2)",
+    items: [
+      { title: "Users", url: "/dashboard/owner/user", icon: Users },
+      { title: "Parents", url: "/dashboard/owner/parent", icon: UserCheck },
+      { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
+      { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
+      { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
+      { title: "Payments", url: "/dashboard/owner/payment", icon: Wallet },
+    ],
+  },
+  {
+    label: "Operations (T3)",
+    items: [
+      { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
+      { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
+      { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
+      { title: "Trials", url: "/dashboard/owner/trial", icon: Play },
+      { title: "Classes", url: "/dashboard/owner/classgroup", icon: Users },
+      { title: "Sessions", url: "/dashboard/owner/session", icon: Calendar },
+      { title: "Attendance", url: "/dashboard/owner/attendance", icon: FileCheck },
+      { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
+    ],
+  },
+  {
+    label: "Financial Data (T1)",
+    items: [
+      { title: "Chart of Accounts", url: "/dashboard/owner/account", icon: Landmark },
+      { title: "Journal Entries", url: "/dashboard/owner/journalentry", icon: BookOpen },
+      { title: "Ledger Lines", url: "/dashboard/owner/ledgerline", icon: ListTodo },
+      { title: "Vendors", url: "/dashboard/owner/vendor", icon: Truck },
+      { title: "Expenses", url: "/dashboard/owner/expense", icon: CreditCard },
+      { title: "Franchise Royalties", url: "/dashboard/owner/franchiseroyalty", icon: Percent },
+      { title: "Teacher Pay", url: "/dashboard/owner/teacherpay", icon: DollarSign },
+      { title: "Teacher Hours", url: "/dashboard/owner/teacherhours", icon: Clock },
+    ],
+  },
+  {
+    label: "Reference & Analytics (T4)",
+    items: [
+      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Courses", url: "/dashboard/owner/course", icon: Award },
+      { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
+      { title: "Channel Performance", url: "/dashboard/owner/channelperformance", icon: TrendingUp },
+    ],
+  },
+];
+
+const teacherGroups = [
+  {
+    label: "My Students & CRM",
+    items: [
+      { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
+      { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
+      { title: "Assigned Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
+    ],
+  },
+  {
+    label: "Academic & Scheduling",
+    items: [
+      { title: "Classes", url: "/dashboard/owner/classgroup", icon: Users },
+      { title: "Sessions", url: "/dashboard/owner/session", icon: Calendar },
+      { title: "Attendance", url: "/dashboard/owner/attendance", icon: FileCheck },
+      { title: "Trials", url: "/dashboard/owner/trial", icon: Play },
+      { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
+    ],
+  },
+  {
+    label: "School & Directory",
+    items: [
+      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Courses", url: "/dashboard/owner/course", icon: Award },
+      { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
+      { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
+    ],
+  },
+];
+
+const officeAdminGroups = [
+  {
+    label: "PII Data (T2)",
+    items: [
+      { title: "Users", url: "/dashboard/owner/user", icon: Users },
+      { title: "Parents", url: "/dashboard/owner/parent", icon: UserCheck },
+      { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
+      { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
+      { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
+      { title: "Payments", url: "/dashboard/owner/payment", icon: Wallet },
+    ],
+  },
+  {
+    label: "Operations (T3)",
+    items: [
+      { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
+      { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
+      { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
+      { title: "Trials", url: "/dashboard/owner/trial", icon: Play },
+      { title: "Classes", url: "/dashboard/owner/classgroup", icon: Users },
+      { title: "Sessions", url: "/dashboard/owner/session", icon: Calendar },
+      { title: "Attendance", url: "/dashboard/owner/attendance", icon: FileCheck },
+      { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
+    ],
+  },
+  {
+    label: "Reference & Analytics (T4)",
+    items: [
+      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Courses", url: "/dashboard/owner/course", icon: Award },
+      { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
+      { title: "Channel Performance", url: "/dashboard/owner/channelperformance", icon: TrendingUp },
+    ],
+  },
+];
+
+const smmGroups = [
+  {
+    label: "CRM & Operations",
+    items: [
+      { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
+      { title: "Trials", url: "/dashboard/owner/trial", icon: Play },
+      { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
+    ],
+  },
+  {
+    label: "Reference & Analytics",
+    items: [
+      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Courses", url: "/dashboard/owner/course", icon: Award },
+      { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
+      { title: "Channel Performance", url: "/dashboard/owner/channelperformance", icon: TrendingUp },
+    ],
+  },
+];
+
+const financeGroups = [
+  {
+    label: "Financial Registry (T1)",
+    items: [
+      { title: "Chart of Accounts", url: "/dashboard/owner/account", icon: Landmark },
+      { title: "Journal Entries", url: "/dashboard/owner/journalentry", icon: BookOpen },
+      { title: "Ledger Lines", url: "/dashboard/owner/ledgerline", icon: ListTodo },
+      { title: "Vendors", url: "/dashboard/owner/vendor", icon: Truck },
+      { title: "Expenses", url: "/dashboard/owner/expense", icon: CreditCard },
+      { title: "Franchise Royalties", url: "/dashboard/owner/franchiseroyalty", icon: Percent },
+      { title: "Teacher Pay", url: "/dashboard/owner/teacherpay", icon: DollarSign },
+      { title: "Teacher Hours", url: "/dashboard/owner/teacherhours", icon: Clock },
+    ],
+  },
+  {
+    label: "Student & Billing (T2)",
+    items: [
+      { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
+      { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
+      { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
+      { title: "Payments", url: "/dashboard/owner/payment", icon: Wallet },
+    ],
+  },
+  {
+    label: "Academic & Reference (T4)",
+    items: [
+      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Courses", url: "/dashboard/owner/course", icon: Award },
+      { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
+    ],
+  },
+];
+
 interface AppSidebarProps {
   user: {
     name: string;
@@ -71,7 +258,6 @@ interface AppSidebarProps {
 export function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname();
   const initial = user.name ? user.name.charAt(0).toUpperCase() : "U";
-
   const userRole = normalizeRole(user.role || "staff");
 
   // Define allowed nav items per role
@@ -104,63 +290,107 @@ export function AppSidebar({ user }: AppSidebarProps) {
       </SidebarHeader>
 
       <SidebarContent className="py-2">
-        <SidebarGroup>
-          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden px-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/75 mb-2">
-            Platform
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {filteredNavItems.map((item) => {
-                const isActive = pathname === item.url;
-                return (
-                  <SidebarMenuItem key={item.title}>
+        {userRole === "owner" || userRole === "teacher" || userRole === "office_admin" || userRole === "smm" || userRole === "finance" ? (
+          <>
+            {/* Overview Item */}
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
                     <SidebarMenuButton
-                      isActive={isActive}
-                      tooltip={item.title}
+                      isActive={pathname === "/dashboard"}
+                      tooltip="Overview"
                       render={
-                        <Link href={item.url}>
-                          <item.icon className="h-4 w-4 shrink-0" />
+                        <Link href="/dashboard">
+                          <LayoutDashboard className="h-4 w-4 shrink-0" />
                           <span className="group-data-[collapsible=icon]:hidden truncate">
-                            {item.title}
+                            Overview
                           </span>
                         </Link>
                       }
                       className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${
-                        isActive
+                        pathname === "/dashboard"
                           ? "bg-primary/10 text-primary font-semibold"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     />
                   </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-        {/* <SidebarGroup className="mt-auto">
-          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden px-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/75 mb-2">
-            Maintenance
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  tooltip="Sync Data"
-                  render={
-                    <Link href="/api/sync" target="_blank">
-                      <RefreshCw className="h-4 w-4 shrink-0" />
-                      <span className="group-data-[collapsible=icon]:hidden truncate">
-                        Airtable Sync
-                      </span>
-                    </Link>
-                  }
-                  className="w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                />
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup> */}
+            {/* Loop through Groups */}
+            {(userRole === "owner" ? ownerGroups : userRole === "office_admin" ? officeAdminGroups : userRole === "smm" ? smmGroups : userRole === "finance" ? financeGroups : teacherGroups).map((group) => (
+              <SidebarGroup key={group.label} className="py-1">
+                <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden px-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/75 mb-1.5 mt-1">
+                  {group.label}
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {group.items.map((item) => {
+                      const isActive = pathname === item.url;
+                      return (
+                        <SidebarMenuItem key={item.title}>
+                          <SidebarMenuButton
+                            isActive={isActive}
+                            tooltip={item.title}
+                            render={
+                              <Link href={item.url}>
+                                <item.icon className="h-4 w-4 shrink-0" />
+                                <span className="group-data-[collapsible=icon]:hidden truncate">
+                                  {item.title}
+                                </span>
+                              </Link>
+                            }
+                            className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${
+                              isActive
+                                ? "bg-primary/10 text-primary font-semibold"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            }`}
+                          />
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            ))}
+          </>
+        ) : (
+          <SidebarGroup>
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden px-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/75 mb-2">
+              Platform
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filteredNavItems.map((item) => {
+                  const isActive = pathname === item.url;
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        tooltip={item.title}
+                        render={
+                          <Link href={item.url}>
+                            <item.icon className="h-4 w-4 shrink-0" />
+                            <span className="group-data-[collapsible=icon]:hidden truncate">
+                              {item.title}
+                            </span>
+                          </Link>
+                        }
+                        className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${
+                          isActive
+                            ? "bg-primary/10 text-primary font-semibold"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        }`}
+                      />
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border p-4 group-data-[collapsible=icon]:p-2 flex flex-row items-center justify-between gap-2 group-data-[collapsible=icon]:justify-center">

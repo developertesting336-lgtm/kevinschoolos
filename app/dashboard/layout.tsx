@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { validateSession } from "@/lib/auth";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { apiFetch } from "@/lib/apiFetch";
+import prisma from "@/lib/prisma";
 
 export default async function DashboardLayout({
   children,
@@ -15,10 +15,13 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  // Fetch the logged-in staff details from API route
+  // Fetch user details directly via Prisma (no HTTP round-trip)
   let dbUser = null;
   try {
-    dbUser = await apiFetch("/api/dashboard/user");
+    dbUser = await prisma.user.findUnique({
+      where: { id: session.userId },
+      select: { fullName: true, email: true, role: true },
+    });
   } catch (error) {
     console.error("[Dashboard Layout Fetch Error]", error);
   }

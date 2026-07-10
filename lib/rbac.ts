@@ -64,10 +64,10 @@ export function checkRBAC(
     return { allowed: false, reason: `Tech Admin is denied standing access to ${tableTier} table '${tableName}' without break-glass.` };
   }
 
-  // 3. SMM: Leads, Trials, Activities, Channel Performance, Class Groups, T4. Deny payments/payroll/ledger.
+  // 3. SMM: Branch, Course, TuitionPlan, Lead, Trial, Activity, ChannelPerformance. Deny payments/payroll/ledger.
   if (normRole === "smm") {
-    const allowedTables = ["Lead", "Trial", "Activity", "ChannelPerformance", "ClassGroup"];
-    const isT4 = tableTier === "T4";
+    const allowedTables = ["Branch", "Course", "TuitionPlan", "Lead", "Trial", "Activity", "ChannelPerformance"];
+    const isT4 = tableTier === "T4" || tableTier === "T4-RO";
     const isAllowedTable = allowedTables.some(t => t.toLowerCase() === tableName.toLowerCase());
     
     if (isT4 || isAllowedTable) {
@@ -76,45 +76,35 @@ export function checkRBAC(
     return { allowed: false, reason: `SMM is restricted from accessing ${tableTier} table '${tableName}'.` };
   }
 
-  // 4. Teacher: own classes, own sessions, own attendance, own students, T4 read.
+  // 4. Teacher: own classes, own sessions, own attendance, own students, T4 read, and newly assigned scoped tables.
   if (normRole === "teacher") {
-    const allowedT3Tables = ["ClassGroup", "Session", "Attendance", "Student"];
-    const allowedT2Tables = ["Parent"];
-    const isT4 = tableTier === "T4";
-    const isAllowedT3Table = allowedT3Tables.some(t => t.toLowerCase() === tableName.toLowerCase());
-    const isAllowedT2Table = allowedT2Tables.some(t => t.toLowerCase() === tableName.toLowerCase());
+    const allowedTables = [
+      "Branch", "Course", "TuitionPlan", "Term", "Room", "Lead", "Trial",
+      "Student", "Enrollment", "Session", "Attendance", "Activity", "Parent",
+      "ClassGroup"
+    ];
+    const isAllowed = allowedTables.some(t => t.toLowerCase() === tableName.toLowerCase());
 
-    if (isT4 || isAllowedT3Table || isAllowedT2Table) {
+    if (isAllowed) {
       return { allowed: true, reason: "Teacher allowed scoped read access." };
     }
     return { allowed: false, reason: `Teacher is restricted from accessing ${tableTier} table '${tableName}'.` };
   }
 
-  // 5. Finance: T1 allowed, T2 finance-linked read (Invoices, Payments, Parents, Enrollments, Users), T4 allowed. No generic student browsing.
+  // 5. Finance: T1, T2, T4 allowed. Denied T3.
   if (normRole === "finance") {
-    if (tableTier === "T1") {
-      return { allowed: true, reason: "Finance allowed full access to T1 financial tables." };
-    }
-    if (tableTier === "T4") {
-      return { allowed: true, reason: "Finance allowed read access to T4 reference tables." };
-    }
-    if (tableTier === "T2") {
-      // Deny generic student browsing
-      if (tableName.toLowerCase() === "student") {
-        return { allowed: false, reason: "Finance is denied generic student browsing." };
-      }
-      // Allow other T2 tables
-      return { allowed: true, reason: "Finance allowed access to finance-linked T2 tables." };
+    if (tableTier === "T1" || tableTier === "T2" || tableTier === "T4") {
+      return { allowed: true, reason: "Finance allowed read access." };
     }
     return { allowed: false, reason: `Finance is restricted from accessing ${tableTier} table '${tableName}'.` };
   }
 
-  // 6. Office Admin: T2, T3, T4. Denied T1 (finance/payroll).
+  // 6. Office Admin: T2, T3, T4, T4-RO. Denied T1 (finance/payroll).
   if (normRole === "office_admin") {
     if (tableTier === "T1") {
       return { allowed: false, reason: "Office Admin is denied access to T1 finance/payroll tables." };
     }
-    if (tableTier === "T2" || tableTier === "T3" || tableTier === "T4") {
+    if (tableTier === "T2" || tableTier === "T3" || tableTier === "T4" || tableTier === "T4-RO") {
       return { allowed: true, reason: "Office Admin allowed read access." };
     }
     return { allowed: false, reason: `Office Admin is restricted from accessing ${tableTier} table '${tableName}'.` };
@@ -137,6 +127,20 @@ export async function getScopingFilter(
   if (normRole !== "owner") {
     if (tableName.toLowerCase() === "branch") {
       where.id = { in: user.branchIds };
+    } else if (tableName.toLowerCase() === "activity" && normRole !== "teacher") {
+      const branchLeads = await prisma.lead.findMany({
+        where: { branchIds: { hasSome: user.branchIds } },
+        select: { id: true },
+      });
+      const leadIds = branchLeads.map((l: any) => l.id);
+      where.leadIds = { hasSome: leadIds };
+    } else if (tableName.toLowerCase() === "trial" && normRole !== "teacher") {
+      const branchLeads = await prisma.lead.findMany({
+        where: { branchIds: { hasSome: user.branchIds } },
+        select: { id: true },
+      });
+      const leadIds = branchLeads.map((l: any) => l.id);
+      where.leadIds = { hasSome: leadIds };
     } else {
       const modelsWithBranchIds = [
         "user", "room", "lead", "parent", "student", "classgroup",
@@ -151,12 +155,26 @@ export async function getScopingFilter(
     }
   }
 
-  // 2. Role-specific Scoping (e.g. Teacher's own classes / own students / own sessions / own attendance)
+  // 2. Role-specific Scoping (e.g. Teacher's own classes / own students / own sessions / own attendance / assigned leads & trials)
   if (normRole === "teacher") {
     if (tableName.toLowerCase() === "classgroup") {
       where.teacherIds = { has: user.id };
     } else if (tableName.toLowerCase() === "session") {
       where.teacherIds = { has: user.id };
+    } else if (tableName.toLowerCase() === "trial") {
+      where.teacherIds = { has: user.id };
+    } else if (tableName.toLowerCase() === "lead") {
+      where.ownerIds = { has: user.id };
+    } else if (tableName.toLowerCase() === "activity") {
+      const teacherLeads = await prisma.lead.findMany({
+        where: { ownerIds: { has: user.id } },
+        select: { id: true },
+      });
+      const leadIds = teacherLeads.map(l => l.id);
+      where.OR = [
+        { ownerIds: { has: user.id } },
+        { leadIds: { hasSome: leadIds } }
+      ];
     } else if (tableName.toLowerCase() === "attendance") {
       const sessions = await prisma.session.findMany({
         where: { teacherIds: { has: user.id } },
@@ -164,7 +182,7 @@ export async function getScopingFilter(
       });
       const sessionIds = sessions.map(s => s.id);
       where.sessionIds = { hasSome: sessionIds };
-    } else if (tableName.toLowerCase() === "student") {
+    } else if (tableName.toLowerCase() === "student" || tableName.toLowerCase() === "parent" || tableName.toLowerCase() === "enrollment") {
       const teacherGroups = await prisma.classGroup.findMany({
         where: { teacherIds: { has: user.id } },
         select: { id: true },
@@ -179,7 +197,14 @@ export async function getScopingFilter(
         select: { studentIds: true },
       });
       const studentIds = Array.from(new Set(enrollments.flatMap(e => e.studentIds)));
-      where.id = { in: studentIds };
+      
+      if (tableName.toLowerCase() === "student") {
+        where.id = { in: studentIds };
+      } else if (tableName.toLowerCase() === "parent") {
+        where.studentIds = { hasSome: studentIds };
+      } else if (tableName.toLowerCase() === "enrollment") {
+        where.studentIds = { hasSome: studentIds };
+      }
     }
   }
 

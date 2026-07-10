@@ -8,8 +8,8 @@
       "redactions": {}
     },
     "finance": {
-      "tiers": ["T1", "T4"],
-      "tables": ["Invoice", "Payment", "Parent"],
+      "tiers": ["T1", "T2", "T4"],
+      "tables": ["Branch", "Course", "TuitionPlan", "Student", "Enrollment", "Invoice", "Payment", "Account", "JournalEntry", "LedgerLine", "Vendor", "Expense", "FranchiseRoyalty", "TeacherPay", "TeacherHours"],
       "capabilities": ["read"],
       "genericRenderer": false,
       "redactions": {
@@ -18,8 +18,8 @@
       }
     },
     "office_admin": {
-      "tiers": ["T2", "T3", "T4"],
-      "tables": ["User"],
+      "tiers": ["T2", "T3", "T4", "T4-RO"],
+      "tables": ["User", "Parent", "Student", "Enrollment", "Invoice", "Payment", "Term", "Room", "Lead", "Trial", "ClassGroup", "Branch", "Course", "TuitionPlan", "Session", "Attendance", "Activity", "ChannelPerformance"],
       "capabilities": ["read"],
       "genericRenderer": false,
       "redactions": {
@@ -35,7 +35,7 @@
     },
     "teacher": {
       "tiers": ["T4"],
-      "tables": ["Student", "ClassGroup", "Session", "Attendance"],
+      "tables": ["Student", "ClassGroup", "Session", "Attendance", "Trial", "Activity", "Branch", "Course", "TuitionPlan", "Term", "Room", "Lead", "Enrollment", "Parent"],
       "capabilities": ["read"],
       "genericRenderer": false,
       "redactions": {
@@ -44,8 +44,8 @@
       }
     },
     "smm": {
-      "tiers": ["T4"],
-      "tables": ["Lead", "Trial", "Activity", "ChannelPerformance", "ClassGroup"],
+      "tiers": ["T3", "T4", "T4-RO"],
+      "tables": ["Branch", "Course", "TuitionPlan", "Lead", "Trial", "Activity", "ChannelPerformance"],
       "capabilities": ["read"],
       "genericRenderer": false,
       "redactions": {
