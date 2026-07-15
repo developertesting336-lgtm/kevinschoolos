@@ -1,0 +1,1879 @@
+{
+  "baseId": "appT1VyuwHzKGhOId",
+  "generatedAt": "2026-07-15T08:55:38.269Z",
+  "schemaVersion": "1.0.0",
+  "schemaHash": "44bb45e22634576c6fd30278219db0be4608ca76f61a43ef9ce4a70b67adc71a",
+  "totalTables": 27,
+  "totalFields": 336,
+  "tables": [
+    {
+      "tableId": "tbl0A506K9OVCorYv",
+      "tableName": "19 Ledger Lines / Проводки",
+      "fieldCount": 8,
+      "fields": [
+        {
+          "fieldId": "fld3IioZDzgMRWTMJ",
+          "fieldName": "Credit (KGS) / Кредит (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldAWBH3eOpp1XMyP",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldJlDJdWvxeLQQMv",
+          "fieldName": "Memo / Назначение",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldUhVBX0AVaVj1X6",
+          "fieldName": "Account",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldY5mi0w7NNTTtWd",
+          "fieldName": "Journal Entry",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldcnvYSMp1fgjQRe",
+          "fieldName": "Debit (KGS) / Дебет (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldfFrbrl6dWvF8sJ",
+          "fieldName": "Line / Проводка",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldzZKbOMN2HakwPt",
+          "fieldName": "Amount (signed) / Сумма (со знаком)",
+          "fieldType": "formula"
+        }
+      ]
+    },
+    {
+      "tableId": "tbl2YiFYDq00gJIrF",
+      "tableName": "22 Franchise Royalties / Роялти франшизы",
+      "fieldCount": 15,
+      "fields": [
+        {
+          "fieldId": "fld0h1a9Ft4YZ144b",
+          "fieldName": "Vendor (HQ)",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld5rg9qzLWUGzPAW",
+          "fieldName": "Active Courses Reported / Активных курсов в отчёте",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fld9QhA5Wxyd3rzZC",
+          "fieldName": "Royalty Amount (KGS) / Сумма роялти (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldGFKJtr8KtrD7OP",
+          "fieldName": "Students Reported / Учеников в отчёте",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldLdvNZruotiqXNP",
+          "fieldName": "Royalty % / Роялти %",
+          "fieldType": "percent"
+        },
+        {
+          "fieldId": "fldNMTTOpiFuA2cBA",
+          "fieldName": "Royalty No / Номер роялти",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldOkHNxjOAlWwJxZ",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldYq1yXbNxHE4ps4",
+          "fieldName": "Total Due HQ (KGS) / Итого к оплате HQ (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "flddGjnyp6XXTqhjC",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldfpaWrgjNb790iw",
+          "fieldName": "Period / Период",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldhvU6YUKN2prQxt",
+          "fieldName": "Marketing Amount (KGS) / Сумма маркетинга (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldlmx6Xd50eWq6ek",
+          "fieldName": "Journal Entry",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldmrPs9dSPepfXL0",
+          "fieldName": "Revenue Base (KGS) / База выручки (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldn8kJzBXtJ1rYxl",
+          "fieldName": "Marketing Fee % / Маркетинговый сбор %",
+          "fieldType": "percent"
+        },
+        {
+          "fieldId": "fldnIfCGj9gKH6uBA",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tbl2utdNdP9usMXLf",
+      "tableName": "01 Branches / Филиалы",
+      "fieldCount": 28,
+      "fields": [
+        {
+          "fieldId": "fld0JlE09kRgxbduQ",
+          "fieldName": "Chart of Accounts",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld1EgnxsfXOIi1j1",
+          "fieldName": "Expenses",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld4Di2PlErMdGRfw",
+          "fieldName": "Ledger Lines",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld6ccSBR16tGHDxK",
+          "fieldName": "Address / Адрес",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fld6iikgvqKQdb2GS",
+          "fieldName": "City / Город",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fld7CPaiS6K96VOhU",
+          "fieldName": "Rooms",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld9a7TOUQ1921e66",
+          "fieldName": "Parents",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldEM2yAuxm03pZaY",
+          "fieldName": "Sessions",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldJwVLFwIqvZnU7b",
+          "fieldName": "Leads",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldLRpPyZOG3tojQU",
+          "fieldName": "Students",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldLpn9yhrdmRFmgP",
+          "fieldName": "Invoices",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldMzEqqX3idoZV1x",
+          "fieldName": "Teacher Hours",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldNFVnSoifEBuAoG",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldOSx76SK1oCsHwq",
+          "fieldName": "Name (Russian) / Название",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldT5JlLwUIMonS3W",
+          "fieldName": "Opened Date / Дата открытия",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldayTBVerCCLXvs0",
+          "fieldName": "Franchise Royalties",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldbNpTFimMXkXjGm",
+          "fieldName": "Journal Entries",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "flddNGdHHvaLSrv7H",
+          "fieldName": "Branch Name / Название филиала",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "flddgYD4UykVlk5UJ",
+          "fieldName": "Vendors",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldg0ctfDCgqTeCaX",
+          "fieldName": "Users",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldgcWNNWM7Z5Ln8h",
+          "fieldName": "Teacher Pay",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldpWUoqTZGKcfZsY",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldstr7xhKppw0U7f",
+          "fieldName": "26 Channel Performance / Эффективность каналов",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "flduLe3Zed3ZA4Cig",
+          "fieldName": "Class Groups",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldveGFpJJsF0TrpE",
+          "fieldName": "Payments",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldwwnWkQ7YcCGXdO",
+          "fieldName": "Enrollments",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldyNWAwhZ2ZJ9GEi",
+          "fieldName": "Phone / Телефон",
+          "fieldType": "phoneNumber"
+        },
+        {
+          "fieldId": "fldyuvm7pjpfHE9fw",
+          "fieldName": "27 Notifications Log / Журнал уведомлений",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tbl9Ddw4uRQ3i6e1B",
+      "tableName": "10 Students / Ученики",
+      "fieldCount": 13,
+      "fields": [
+        {
+          "fieldId": "fld5mAXd41sVpQzlp",
+          "fieldName": "Attendance",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldTeS3Yg44gCGB90",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldU1OfNXoTt92Yu1",
+          "fieldName": "Gender / Пол",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldY0norcWBqukttE",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "flddPunThQwHvRVkF",
+          "fieldName": "Age / Возраст",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldfYXrdppjO16EcQ",
+          "fieldName": "Medical Notes / Медицинские заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldkfzzCiudEa0bQd",
+          "fieldName": "Date of Birth / Дата рождения",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldqCvnVj9WoNh2iH",
+          "fieldName": "Student Name / ФИО ученика",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldr31XeTbyvJjFdj",
+          "fieldName": "Enrollments",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "flds3q5fTrCiMHf7B",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldtiQ79UoWb9C045",
+          "fieldName": "Invoices",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldwzFCeLGUPaZovG",
+          "fieldName": "Parent",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldxSWZkOB3asgNkP",
+          "fieldName": "Trials",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblAu08dz4NZJ5HDs",
+      "tableName": "20 Vendors / Поставщики",
+      "fieldCount": 9,
+      "fields": [
+        {
+          "fieldId": "fld1ESQQ52ldthXxZ",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fld2EnmZikhFgWu7V",
+          "fieldName": "Expenses",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld2It0tGuGAVcDHo",
+          "fieldName": "Email / Эл. почта",
+          "fieldType": "email"
+        },
+        {
+          "fieldId": "fldLw7vxkQtZkpSdx",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldRfwq0NoTuKQQSl",
+          "fieldName": "Phone / Телефон",
+          "fieldType": "phoneNumber"
+        },
+        {
+          "fieldId": "fldbeK1OH5EWpmOdO",
+          "fieldName": "Name (Russian) / Название",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldrUAaCEBNxGMyx5",
+          "fieldName": "Vendor Name / Поставщик",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldv1qOQjihrhVW0x",
+          "fieldName": "Category / Категория",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldvMafCcYRRdjy2t",
+          "fieldName": "Franchise Royalties",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblGVA0enM9oxS9C0",
+      "tableName": "23 Teacher Pay / Оплата преподавателям",
+      "fieldCount": 15,
+      "fields": [
+        {
+          "fieldId": "fldB5lN65eMtTeL4n",
+          "fieldName": "Pay Run No / Номер выплаты",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldBoXhWuU6cCKSZY",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldFk2lhXA6hiDGze",
+          "fieldName": "Computed Pay (KGS) / Расчётная оплата (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldJAjYoa4t5BvGF9",
+          "fieldName": "Journal Entry",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldJOfszdvJczMqrp",
+          "fieldName": "Pay Type / Тип оплаты",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldMrOoD74xoLjfmt",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldQMUw8FXYdNWmCP",
+          "fieldName": "Gross Pay (KGS) / Начислено (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldTfIdi9QNbbK2pP",
+          "fieldName": "Teacher",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldVmd0aCzGeMDKG5",
+          "fieldName": "Date Paid / Дата выплаты",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldYvb8tUOa7nRZEt",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldhLllLgDhMO2Bfk",
+          "fieldName": "Rate (KGS) / Ставка (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldmudyERr4jqoZTw",
+          "fieldName": "Payment Method / Способ оплаты",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldv7gRIK4beCmHwJ",
+          "fieldName": "Hours / Часы",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldvAvsMNJ3WF77dL",
+          "fieldName": "Teacher Hours",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldwHAgLQsZtRZ9P8",
+          "fieldName": "Period / Период",
+          "fieldType": "date"
+        }
+      ]
+    },
+    {
+      "tableId": "tblItZ3B7d4YRO9ih",
+      "tableName": "07 Leads / Лиды",
+      "fieldCount": 19,
+      "fields": [
+        {
+          "fieldId": "fld0JO43zpFkf6N4M",
+          "fieldName": "Lost Reason / Причина отказа",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldCmaAEjCR6Q2wvH",
+          "fieldName": "Phone / Телефон",
+          "fieldType": "phoneNumber"
+        },
+        {
+          "fieldId": "fldFHzM6cRc4osvzB",
+          "fieldName": "Inquiry Date / Дата обращения",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldN2dt6yL3FzUNIu",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldQ2mKZIpH5J7E7D",
+          "fieldName": "Preferred Language / Предпочитаемый язык",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldQdXoeN8lnIv8sP",
+          "fieldName": "Days Since Last Activity",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldRfaY8uVmBMdnMZ",
+          "fieldName": "Child Age / Возраст ребёнка",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldUfDRXRPnW3mIoD",
+          "fieldName": "Owner",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldVNaPVuDC4E8M8I",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldW3ZCVk3Sn0g2xA",
+          "fieldName": "WhatsApp / WhatsApp",
+          "fieldType": "phoneNumber"
+        },
+        {
+          "fieldId": "fldWQCM1qCCL0r7eK",
+          "fieldName": "Channel / Канал",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldaUzGhIrNglIlbF",
+          "fieldName": "25 Activities / Действия",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldeas819jz863u7f",
+          "fieldName": "Lead Name / Имя лида",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldeeR0kpjhzIRkUW",
+          "fieldName": "Stale Flag",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldgkqtYg9wHE0iw4",
+          "fieldName": "Last Activity Date",
+          "fieldType": "rollup"
+        },
+        {
+          "fieldId": "fldniFwDuY2W54Ty8",
+          "fieldName": "27 Notifications Log / Журнал уведомлений",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldsDtVrfTDLwaCn4",
+          "fieldName": "Trials",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldt5ssP2Ax0Fo4Zj",
+          "fieldName": "Parent",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldtqwoAM6vOeQhVr",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblJQ9zndF47zIBVg",
+      "tableName": "26 Channel Performance / Эффективность каналов",
+      "fieldCount": 18,
+      "fields": [
+        {
+          "fieldId": "fld1X31Tnt093tEDF",
+          "fieldName": "Lost – Went Elsewhere",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldBxaNJhtIwB8icu",
+          "fieldName": "Lost – Schedule",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldHN2DvHWXngGYoB",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldJWXPXzHbAUvbYE",
+          "fieldName": "Lost – Price",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldXIMzpBVzjdOxLb",
+          "fieldName": "Show Rate",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldXhJQ8uRRj4FrNW",
+          "fieldName": "Lost – Other",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldZEPYtlVq5t9BeW",
+          "fieldName": "Row Key",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldc4oY5iPSb7wyAZ",
+          "fieldName": "Lost – Location",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldcO2Rie57r50CNy",
+          "fieldName": "Month",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "flddurNEqmVuru2hd",
+          "fieldName": "Channel",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldguSNJhSfzFbKa9",
+          "fieldName": "Lost – No Response",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldjqZaLUYoRYrJYJ",
+          "fieldName": "Leads",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldlaNsZsYJl17gsa",
+          "fieldName": "Trial Booked Rate",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldm7PYOVLtXRKh6m",
+          "fieldName": "Close Rate",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldmTD6HBTanGx8p7",
+          "fieldName": "Trials Attended",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldpJcyZHMSmZhQim",
+          "fieldName": "Enrolled",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldt02Ck80E4pYP0f",
+          "fieldName": "Lost",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldyJdpI4v8VXEnCA",
+          "fieldName": "Trials Booked",
+          "fieldType": "number"
+        }
+      ]
+    },
+    {
+      "tableId": "tblLkuBm7zVJKpzzu",
+      "tableName": "17 Chart of Accounts / План счетов",
+      "fieldCount": 11,
+      "fields": [
+        {
+          "fieldId": "fld2mqd9QfmRkTgxs",
+          "fieldName": "Normal Side / Нормальная сторона",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldFGNTJdcuv9pJc9",
+          "fieldName": "Name (Russian)",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldPFo8Bpn2h7GjhH",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldVoF4U2Wv6eXthn",
+          "fieldName": "Ledger Lines",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "flddGtZRBYoC2rWin",
+          "fieldName": "Expenses",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldg5vMJ4S2dt4qNM",
+          "fieldName": "Active / Активен",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldpTAyVttb9KTjI2",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldsI2kXM3Sz9L3gJ",
+          "fieldName": "Sub-type / Подтип",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "flduueVpbzU9Zi3Lz",
+          "fieldName": "Type / Тип",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldzaMxKxPt9rmkFi",
+          "fieldName": "Account Name / Название счёта",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldzahTGpZDOiZwcN",
+          "fieldName": "Account No / Номер счёта",
+          "fieldType": "singleLineText"
+        }
+      ]
+    },
+    {
+      "tableId": "tblMsyDxS6ltliuU1",
+      "tableName": "27 Notifications Log / Журнал уведомлений",
+      "fieldCount": 13,
+      "fields": [
+        {
+          "fieldId": "fld8QNzZkvw8FKemr",
+          "fieldName": "Trial / Пробный урок",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldD7GPwIWaQJsmQD",
+          "fieldName": "Type / Тип",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldDLq6PSWWxvVXDu",
+          "fieldName": "Branch / Филиал",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldLamSrxr6yAoQpF",
+          "fieldName": "Lead / Лид",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldRBIuP7b7JKf72J",
+          "fieldName": "Parent / Родитель",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldRH9XSz8wgIBubm",
+          "fieldName": "Channel / Канал",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldTOgOuPO0cxotRD",
+          "fieldName": "Notification ID / ID уведомления",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldVqWHc8M9FDXbmt",
+          "fieldName": "Enrollment / Зачисление",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldjbuRE0T1t8Ilft",
+          "fieldName": "Sent At / Отправлено",
+          "fieldType": "dateTime"
+        },
+        {
+          "fieldId": "fldkUrOowRBmMGX01",
+          "fieldName": "Invoice / Счёт",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldqoZQnZofGgamDN",
+          "fieldName": "Message / Сообщение",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldwqVbQLvU1L9lcu",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldzUL5yntIyaY9KY",
+          "fieldName": "Scheduled For / Запланировано на",
+          "fieldType": "dateTime"
+        }
+      ]
+    },
+    {
+      "tableId": "tblRJNw4S6o1WPjBI",
+      "tableName": "09 Parents / Родители",
+      "fieldCount": 15,
+      "fields": [
+        {
+          "fieldId": "fld5dinv8NWVXzDTv",
+          "fieldName": "Email / Эл. почта",
+          "fieldType": "email"
+        },
+        {
+          "fieldId": "fld9vjtKdybgtN3Qw",
+          "fieldName": "WhatsApp Group Added / Добавлен в группу",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldBziCmPC26d5GmQ",
+          "fieldName": "Preferred Language / Предпочитаемый язык",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldEKqzIcFh3mj7ce",
+          "fieldName": "WhatsApp Group Name / Название группы",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldHNtvxCAxWatC1Q",
+          "fieldName": "Payments",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldRLXGPc9Ew8iR3a",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldS3gNn17SXrm4B0",
+          "fieldName": "Leads",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldY9jSQvnXH8cmCe",
+          "fieldName": "27 Notifications Log / Журнал уведомлений",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "flddmO9P8vfEtOETO",
+          "fieldName": "WhatsApp / WhatsApp",
+          "fieldType": "phoneNumber"
+        },
+        {
+          "fieldId": "fldhXjSQ1OK84qBA2",
+          "fieldName": "Phone / Телефон",
+          "fieldType": "phoneNumber"
+        },
+        {
+          "fieldId": "fldjxCkq3H83tl2Ai",
+          "fieldName": "Students",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldkSDgRlVjUHPUTd",
+          "fieldName": "Invoices",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldlQ21VINxCwAnWS",
+          "fieldName": "Parent Name / ФИО родителя",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldlwZtlcDEPR9rx3",
+          "fieldName": "Address / Адрес",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldscHRaf8yjx8Y9C",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblRf3mdeZmzp2mnf",
+      "tableName": "18 Journal Entries / Журнальные записи",
+      "fieldCount": 12,
+      "fields": [
+        {
+          "fieldId": "fld2OPToscmtytOhJ",
+          "fieldName": "Expenses",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldBGfyt6xbhx17IX",
+          "fieldName": "Posted / Проведено",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldMHUDO2IdD35980",
+          "fieldName": "Memo / Назначение",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldNMKiGrB0LdElYN",
+          "fieldName": "Franchise Royalties",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldbYkzLl4EgOzgo5",
+          "fieldName": "Teacher Pay",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldffqBvi4ncVZb1t",
+          "fieldName": "Payments",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldgcbUNdIvRUGhad",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldks0py4VjRj57YX",
+          "fieldName": "Ledger Lines",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldnV5JMpmeqxtXSF",
+          "fieldName": "Source / Источник",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldpStiRtD6fFRHI8",
+          "fieldName": "Invoices",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldqPoazkusrbYqQf",
+          "fieldName": "Date / Дата",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldu9Nus6mibMGB6y",
+          "fieldName": "Entry No / Номер записи",
+          "fieldType": "singleLineText"
+        }
+      ]
+    },
+    {
+      "tableId": "tblTB6N6jNqSFvEER",
+      "tableName": "15 Invoices / Счета",
+      "fieldCount": 12,
+      "fields": [
+        {
+          "fieldId": "fld9gBMYbKHjrloEs",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldAzvJxxt46d7oi5",
+          "fieldName": "Parent",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldFxmjRydUNqrs1f",
+          "fieldName": "Journal Entry",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldJqNHYliWVxveD4",
+          "fieldName": "Enrollment",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldKVRsr1Hdd1uPnf",
+          "fieldName": "27 Notifications Log / Журнал уведомлений",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldNNE3i257SnDb0c",
+          "fieldName": "Invoice No / Номер счёта",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldRiqHHe5aqGoyif",
+          "fieldName": "Amount (KGS) / Сумма (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldZ2vfOggiAbm0fC",
+          "fieldName": "Issue Date / Дата выставления",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldgkxO5Yu98qW3wi",
+          "fieldName": "Student",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldj95LOGimRgZ4Vj",
+          "fieldName": "Due Date / Срок оплаты",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldoKdm7xI7859dfL",
+          "fieldName": "Payments",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldqJey7ciPEqd59k",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        }
+      ]
+    },
+    {
+      "tableId": "tblUE4gfr8en6lfUS",
+      "tableName": "13 Sessions / Занятия",
+      "fieldCount": 8,
+      "fields": [
+        {
+          "fieldId": "fld4yXmapYbpqSiGG",
+          "fieldName": "Teacher",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld6XW4HoqfLPpKVw",
+          "fieldName": "Attendance",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldNsZ1ZqsBjoLrBL",
+          "fieldName": "Session ID / ID занятия",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldUvECWZHq4GtqW7",
+          "fieldName": "Date/Time / Дата/время",
+          "fieldType": "dateTime"
+        },
+        {
+          "fieldId": "fldWgOxg9fD9QJU0A",
+          "fieldName": "Teacher Hours",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldgrGJWXUCjxhXpT",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldqDJoUvxYzgG8iX",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "flduqKWGTffHWfUNj",
+          "fieldName": "Class Group",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblUkEhqFJBFTvRN5",
+      "tableName": "02 Users / Сотрудники",
+      "fieldCount": 14,
+      "fields": [
+        {
+          "fieldId": "fld6cRQ0hWQ7eoJxl",
+          "fieldName": "Teacher Hours",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldBQj0DH9vw7eGiu",
+          "fieldName": "Role / Роль",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldEHvzfg1t5j5LHb",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldEzRbCBDmjzZ9m1",
+          "fieldName": "Full Name / ФИО",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldO0dXiGejfosngj",
+          "fieldName": "25 Activities / Действия",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldPDnXM1aCwXc7Bk",
+          "fieldName": "Working Language / Рабочий язык",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldoxjXB6LlfBLbAA",
+          "fieldName": "Sessions",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldrTg8YwFmZXz5Ex",
+          "fieldName": "Teacher Pay",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldsj0eFf9lvCwt15",
+          "fieldName": "Email / Эл. почта",
+          "fieldType": "email"
+        },
+        {
+          "fieldId": "fldtYNT0ZmIg9dkCg",
+          "fieldName": "Leads",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldtcpukcdFqHp8wi",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "flduERFE3kVUMjrfX",
+          "fieldName": "08 Trials / Пробные уроки",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldwkrWYdKF4dO6Y8",
+          "fieldName": "Class Groups",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldzowV5r6HHYqMVZ",
+          "fieldName": "Phone / Телефон",
+          "fieldType": "phoneNumber"
+        }
+      ]
+    },
+    {
+      "tableId": "tblVA5O7fnBx5cAnJ",
+      "tableName": "12 Enrollments / Зачисления",
+      "fieldCount": 23,
+      "fields": [
+        {
+          "fieldId": "fld0tk6w9UAtCKrWA",
+          "fieldName": "Class Group",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld0vvw0hpO2FZr3F",
+          "fieldName": "First Lesson Confirmed / Первый урок подтверждён",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fld1Mc0uYqz7w4NqP",
+          "fieldName": "Enroll Date / Дата зачисления",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fld1RmaZD4oSBFSIe",
+          "fieldName": "Enrollment ID / ID зачисления",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fld5ngZOAsR4qF7R7",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldF5fb9UFQNHmObG",
+          "fieldName": "Schedule Delivered / Расписание передано",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldIESu0tEeFvUiuA",
+          "fieldName": "Tuition Plan",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldIQFs4P3c5TzdfM",
+          "fieldName": "08 Trials / Пробные уроки",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldMIiRIiEkU32lGv",
+          "fieldName": "First Lesson Date / Дата первого урока",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldV0VR7E7xehetvI",
+          "fieldName": "Onboarding Status / Статус адаптации",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldV9CDG6hTBsoPyP",
+          "fieldName": "Student",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldWj3sCWbxwJnzNq",
+          "fieldName": "Audio Recommendations Delivered / Аудио-рекомендации переданы",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldaLd0966SrwZDJv",
+          "fieldName": "App Instructions Delivered / Инструкции переданы",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldb4YxItQuVlFnN7",
+          "fieldName": "Trial Fee Deducted / Пробный зачтён",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldblwDp8eo6EwKGB",
+          "fieldName": "Contract Signed / Договор подписан",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldgQdBDRMGXJ2OUH",
+          "fieldName": "Contract File / Файл договора",
+          "fieldType": "multipleAttachments"
+        },
+        {
+          "fieldId": "fldhH2aL9TJzK7bVR",
+          "fieldName": "Calendar Delivered / Календарь передан",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldi8KyGXRj5tuhoH",
+          "fieldName": "Contract Date / Дата договора",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldizhbx0mB0Xuhnf",
+          "fieldName": "Invoices",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldm9VVVEVGgSsBOM",
+          "fieldName": "27 Notifications Log / Журнал уведомлений",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldtgJU9259Sf78x9",
+          "fieldName": "App Credentials Issued / Доступ выдан",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldwtRAb9ZXRe3ekD",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldz8xpBExqXB546O",
+          "fieldName": "HD System Registered / Зарегистрирован в HD",
+          "fieldType": "checkbox"
+        }
+      ]
+    },
+    {
+      "tableId": "tblVSaneGtUOq5Xzr",
+      "tableName": "05 Terms / Учебные периоды",
+      "fieldCount": 6,
+      "fields": [
+        {
+          "fieldId": "fldBq6BpHIbUk4Z6S",
+          "fieldName": "Term Name / Учебный период",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldmWWpSTWJGFIaQJ",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldobz60hxw6UDwTd",
+          "fieldName": "End Date / Дата окончания",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldqllNPMAPHDshLy",
+          "fieldName": "Name (Russian) / Название",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldrWS56mbctboVeo",
+          "fieldName": "Start Date / Дата начала",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldxd9MNhTV5O9rrh",
+          "fieldName": "Class Groups",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblZPcDPnzTxp0sol",
+      "tableName": "21 Expenses / Расходы",
+      "fieldCount": 11,
+      "fields": [
+        {
+          "fieldId": "fld6ps8NBgIa48a4i",
+          "fieldName": "Expense Account",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldGjqThQ37a4z9fl",
+          "fieldName": "Payment Method / Способ оплаты",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldINJS8KF6Ov6ZnV",
+          "fieldName": "Journal Entry",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldJc78XmxkOrUd4u",
+          "fieldName": "Expense No / Номер расхода",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldLv6BNV3WrJVjSZ",
+          "fieldName": "Amount (KGS) / Сумма (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldTdMu8Si7mJ7oB2",
+          "fieldName": "Paid / Оплачено",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldVS53LAjlqd4cIa",
+          "fieldName": "Date / Дата",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldXaco0O6sIvFb3V",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldcbXhKHHUF8uMEY",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldm0uNTuKoeLHhny",
+          "fieldName": "Description / Описание",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldmATbX0cz4GGO2c",
+          "fieldName": "Vendor",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblbGzoGxZVLRPB7k",
+      "tableName": "25 Activities / Действия",
+      "fieldCount": 9,
+      "fields": [
+        {
+          "fieldId": "fldK1Qiak0WKVApyF",
+          "fieldName": "Type",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldMGTRhCVX51eii5",
+          "fieldName": "Direction",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldTzMvnpw3jRPVLi",
+          "fieldName": "Lead",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldWvDv570YdNJDbv",
+          "fieldName": "Outcome",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldZ8Z9ZlzA6Slv8g",
+          "fieldName": "Next Follow-up Date",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "flddCRQoHzWfkL4uy",
+          "fieldName": "Owner",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldgsOoOJLKM1XWv5",
+          "fieldName": "Notes",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldoau73AEa6wab3u",
+          "fieldName": "Activity ID",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldu5wzalKwiwzvxm",
+          "fieldName": "Date/Time",
+          "fieldType": "dateTime"
+        }
+      ]
+    },
+    {
+      "tableId": "tblbOAIuMZHgtsjEP",
+      "tableName": "14 Attendance / Посещаемость",
+      "fieldCount": 4,
+      "fields": [
+        {
+          "fieldId": "fld3eZM0egp7xsq7Y",
+          "fieldName": "Session",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldOP511IijW9upZQ",
+          "fieldName": "Attendance ID / ID посещаемости",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldTdGs2iLe0cL5RW",
+          "fieldName": "Student",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldcZrerDfUIXphLv",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        }
+      ]
+    },
+    {
+      "tableId": "tblcOJdLkCBXXJ3AL",
+      "tableName": "24 Teacher Hours / Часы преподавателей",
+      "fieldCount": 9,
+      "fields": [
+        {
+          "fieldId": "fld3b4u9q9yNK9OxX",
+          "fieldName": "Hours / Часы",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fld6wbhMUYG1Bx64t",
+          "fieldName": "Entry / Запись",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldEI4WLvWSx33PVM",
+          "fieldName": "Session",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldM7A0izGJBMebrZ",
+          "fieldName": "Type / Тип",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldNXpP5UJ0NHeeIW",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldYwU89ANpW9x4wN",
+          "fieldName": "Date / Дата",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldZ9Ky01Gl9pYCF2",
+          "fieldName": "Pay Run",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldZAYRlIyx7fnWR6",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldtOlMiMgBc3klqy",
+          "fieldName": "Teacher",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tbldiIHLyH7bup2XG",
+      "tableName": "04 Tuition Plans / Тарифные планы",
+      "fieldCount": 8,
+      "fields": [
+        {
+          "fieldId": "fldJah9AdenE3lzDY",
+          "fieldName": "Name (Kyrgyz) / Аталышы",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldKF5YqGYLUaP20e",
+          "fieldName": "Enrollments",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldOm9NbQvNikr7e5",
+          "fieldName": "Amount (KGS) / Сумма (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldUmXiXvDOqVevAy",
+          "fieldName": "Course",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldXIJDEPCkEqA2UZ",
+          "fieldName": "Active / Активен",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldXQbeiCiTAeC8Q5",
+          "fieldName": "Plan Name / Тарифный план",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldzJoaYdz7VwF6r2",
+          "fieldName": "Billing Period / Период оплаты",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldzWFoNsJ4Fva7IR",
+          "fieldName": "Name (Russian) / Название",
+          "fieldType": "singleLineText"
+        }
+      ]
+    },
+    {
+      "tableId": "tblfvl5TjmWtr24Yp",
+      "tableName": "08 Trials / Пробные уроки",
+      "fieldCount": 16,
+      "fields": [
+        {
+          "fieldId": "fld7qKBZvQj5sRjgW",
+          "fieldName": "Enrollment / Зачисление",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld7yy1pPPTqXkphS",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldDsWJSbmU9lHWTc",
+          "fieldName": "Lead",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldGIxMvvMpf96UoR",
+          "fieldName": "Outcome / Результат",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldQ4C7b6C3P81TOY",
+          "fieldName": "Level Assessed / Оцененный уровень",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldSOxL4SPN7xXuHs",
+          "fieldName": "From field: Rescheduled To / Перенесён на",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldfIgfAJxGloYaW3",
+          "fieldName": "27 Notifications Log / Журнал уведомлений",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldgDLfpjpPKeTZzw",
+          "fieldName": "Confirmation Method / Способ подтверждения",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldh1ixyvOL4Le4nZ",
+          "fieldName": "Confirmation Date / Дата подтверждения",
+          "fieldType": "dateTime"
+        },
+        {
+          "fieldId": "fldiq4WuWIkCtVj1J",
+          "fieldName": "Trial ID / ID пробного",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldo1WQXaLhCpRss0",
+          "fieldName": "Student (if enrolled)",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldpBUB8zEEqWmRzG",
+          "fieldName": "Class Group",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldvnLeHapzr4TSyB",
+          "fieldName": "Teacher / Преподаватель",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldwVnsZrJkmpJ9cQ",
+          "fieldName": "Confirmation Sent / Подтверждение отправлено",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldzCGpZO8q3iNw3K",
+          "fieldName": "Date/Time / Дата/время",
+          "fieldType": "dateTime"
+        },
+        {
+          "fieldId": "fldztNueUrFXmtRo1",
+          "fieldName": "Rescheduled To / Перенесён на",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblgvltY5JtmMZs1q",
+      "tableName": "03 Courses / Курсы",
+      "fieldCount": 11,
+      "fields": [
+        {
+          "fieldId": "fld5bNKycikf0OTpd",
+          "fieldName": "Age Band / Возраст",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldGLUjh1RmyLup72",
+          "fieldName": "Name (Russian)",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldIlrzmDuVOLthx6",
+          "fieldName": "Stage / Ступень",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldP5Ey4jUDSEpMeR",
+          "fieldName": "Tuition Plans",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldQ9qPJoS3te6Vyh",
+          "fieldName": "Lessons per Week / Уроков в неделю",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldUnBT5gd5bS8ckM",
+          "fieldName": "Active / Активен",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldY4H9ImDoVecarr",
+          "fieldName": "Class Groups",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldbYYFQOqbeTdebb",
+          "fieldName": "Course Name / Название курса",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldpKeNW3MuF8uIlF",
+          "fieldName": "Name (Kyrgyz)",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldqLd0VIJmKiIpu9",
+          "fieldName": "Default Capacity / Вместимость по умолчанию",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldsc3wRXOvoSyzA5",
+          "fieldName": "Description / Описание",
+          "fieldType": "multilineText"
+        }
+      ]
+    },
+    {
+      "tableId": "tbliFcGpMbqnMaD9S",
+      "tableName": "16 Payments / Платежи",
+      "fieldCount": 11,
+      "fields": [
+        {
+          "fieldId": "fld1dSpRaL2A6EK6Q",
+          "fieldName": "Payment Type / Тип платежа",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fld22tf9Mn0HGsmzN",
+          "fieldName": "Invoice",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldBtNTeQVfZk1sWL",
+          "fieldName": "Date / Дата",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldDnizwU7z0uRSk8",
+          "fieldName": "Month / Месяц",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldNRFTgAgktyLZ4V",
+          "fieldName": "Amount (KGS) / Сумма (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldNVXBMA6RO2Xovb",
+          "fieldName": "Parent",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldQY10Fca4H0LzbY",
+          "fieldName": "Journal Entry",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldTkBn9cMAnnA0YF",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldXYyFJX04FtXzE2",
+          "fieldName": "Possible Duplicate / Возможный дубль",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldm73NgmVL0vFOuF",
+          "fieldName": "Payment Ref / Назначение платежа",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldvC8KDDOXvuavro",
+          "fieldName": "Method / Способ оплаты",
+          "fieldType": "singleSelect"
+        }
+      ]
+    },
+    {
+      "tableId": "tblpUJni7tMvO2QBs",
+      "tableName": "11 Class Groups / Группы",
+      "fieldCount": 13,
+      "fields": [
+        {
+          "fieldId": "fld0hugbTJfWykog6",
+          "fieldName": "Group Name / Название группы",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fld1JBoWGWKKzZGm5",
+          "fieldName": "Start Time / Время начала",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fld9eJXsGYEu11Xcp",
+          "fieldName": "Enrollments",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldAn13Aw3EIk07kU",
+          "fieldName": "Capacity / Вместимость",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldEzlnrYrwTk3UTC",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldKzRPTpW0EUqfUF",
+          "fieldName": "Sessions",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldNvOvFWxIjQ7Xu2",
+          "fieldName": "Trials",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldO5MP5ijTdm7lGv",
+          "fieldName": "Course",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldPvtA1ugZitmSkT",
+          "fieldName": "Teacher",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldT6sSsiyMfzeVbl",
+          "fieldName": "Weekdays / Дни недели",
+          "fieldType": "multipleSelects"
+        },
+        {
+          "fieldId": "fldVRgnzmNG4SWcAS",
+          "fieldName": "Room",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldzQWsTvAK9VkcxC",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldzmR8v8uue3Ce0Q",
+          "fieldName": "Term",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblunCF2EX30onveH",
+      "tableName": "06 Rooms / Кабинеты",
+      "fieldCount": 5,
+      "fields": [
+        {
+          "fieldId": "fld49qkIdrHdxGeD1",
+          "fieldName": "Class Groups",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldRoVbOvTWdb5Pxs",
+          "fieldName": "Name (Russian) / Название",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldSspiuBDXAeHxgS",
+          "fieldName": "Capacity / Вместимость",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldZ72by3okuB2raf",
+          "fieldName": "Room Name / Кабинет",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldnUe4DwO8wd7HKQ",
+          "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    }
+  ]
+}

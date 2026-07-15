@@ -550,7 +550,7 @@ export function OwnerTableClient({
             </div>
           </div>
 
-          <DialogFooter showCloseButton={true} className="border-t border-border pt-3">
+          <DialogFooter className="border-t border-border pt-3">
             <Button
               variant="outline"
               onClick={() => setSelectedRow(null)}
