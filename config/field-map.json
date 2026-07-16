@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-07-15T08:55:38.251Z",
+    "generatedAt": "2026-07-16T08:27:43.628Z",
     "baseId": "appT1VyuwHzKGhOId",
     "totalTables": 27
   },
@@ -22,7 +22,8 @@
           "fieldId": "fldAWBH3eOpp1XMyP",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldJlDJdWvxeLQQMv": {
           "fieldId": "fldJlDJdWvxeLQQMv",
@@ -34,13 +35,15 @@
           "fieldId": "fldUhVBX0AVaVj1X6",
           "fieldName": "Account",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblLkuBm7zVJKpzzu"
         },
         "fldY5mi0w7NNTTtWd": {
           "fieldId": "fldY5mi0w7NNTTtWd",
           "fieldName": "Journal Entry",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRf3mdeZmzp2mnf"
         },
         "fldcnvYSMp1fgjQRe": {
           "fieldId": "fldcnvYSMp1fgjQRe",
@@ -75,7 +78,8 @@
           "fieldId": "fld0h1a9Ft4YZ144b",
           "fieldName": "Vendor (HQ)",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblAu08dz4NZJ5HDs"
         },
         "fld5rg9qzLWUGzPAW": {
           "fieldId": "fld5rg9qzLWUGzPAW",
@@ -144,7 +148,8 @@
           "fieldId": "fldlmx6Xd50eWq6ek",
           "fieldName": "Journal Entry",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRf3mdeZmzp2mnf"
         },
         "fldmrPs9dSPepfXL0": {
           "fieldId": "fldmrPs9dSPepfXL0",
@@ -163,7 +168,8 @@
           "fieldId": "fldnIfCGj9gKH6uBA",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         }
       }
     },
@@ -178,19 +184,22 @@
           "fieldId": "fld0JlE09kRgxbduQ",
           "fieldName": "Chart of Accounts",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblLkuBm7zVJKpzzu"
         },
         "fld1EgnxsfXOIi1j1": {
           "fieldId": "fld1EgnxsfXOIi1j1",
           "fieldName": "Expenses",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblZPcDPnzTxp0sol"
         },
         "fld4Di2PlErMdGRfw": {
           "fieldId": "fld4Di2PlErMdGRfw",
           "fieldName": "Ledger Lines",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl0A506K9OVCorYv"
         },
         "fld6ccSBR16tGHDxK": {
           "fieldId": "fld6ccSBR16tGHDxK",
@@ -208,43 +217,50 @@
           "fieldId": "fld7CPaiS6K96VOhU",
           "fieldName": "Rooms",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblunCF2EX30onveH"
         },
         "fld9a7TOUQ1921e66": {
           "fieldId": "fld9a7TOUQ1921e66",
           "fieldName": "Parents",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRJNw4S6o1WPjBI"
         },
         "fldEM2yAuxm03pZaY": {
           "fieldId": "fldEM2yAuxm03pZaY",
           "fieldName": "Sessions",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUE4gfr8en6lfUS"
         },
         "fldJwVLFwIqvZnU7b": {
           "fieldId": "fldJwVLFwIqvZnU7b",
           "fieldName": "Leads",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblItZ3B7d4YRO9ih"
         },
         "fldLRpPyZOG3tojQU": {
           "fieldId": "fldLRpPyZOG3tojQU",
           "fieldName": "Students",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl9Ddw4uRQ3i6e1B"
         },
         "fldLpn9yhrdmRFmgP": {
           "fieldId": "fldLpn9yhrdmRFmgP",
           "fieldName": "Invoices",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblTB6N6jNqSFvEER"
         },
         "fldMzEqqX3idoZV1x": {
           "fieldId": "fldMzEqqX3idoZV1x",
           "fieldName": "Teacher Hours",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblcOJdLkCBXXJ3AL"
         },
         "fldNFVnSoifEBuAoG": {
           "fieldId": "fldNFVnSoifEBuAoG",
@@ -269,13 +285,15 @@
           "fieldId": "fldayTBVerCCLXvs0",
           "fieldName": "Franchise Royalties",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2YiFYDq00gJIrF"
         },
         "fldbNpTFimMXkXjGm": {
           "fieldId": "fldbNpTFimMXkXjGm",
           "fieldName": "Journal Entries",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRf3mdeZmzp2mnf"
         },
         "flddNGdHHvaLSrv7H": {
           "fieldId": "flddNGdHHvaLSrv7H",
@@ -287,19 +305,22 @@
           "fieldId": "flddgYD4UykVlk5UJ",
           "fieldName": "Vendors",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblAu08dz4NZJ5HDs"
         },
         "fldg0ctfDCgqTeCaX": {
           "fieldId": "fldg0ctfDCgqTeCaX",
           "fieldName": "Users",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUkEhqFJBFTvRN5"
         },
         "fldgcWNNWM7Z5Ln8h": {
           "fieldId": "fldgcWNNWM7Z5Ln8h",
           "fieldName": "Teacher Pay",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblGVA0enM9oxS9C0"
         },
         "fldpWUoqTZGKcfZsY": {
           "fieldId": "fldpWUoqTZGKcfZsY",
@@ -312,25 +333,29 @@
           "fieldId": "fldstr7xhKppw0U7f",
           "fieldName": "26 Channel Performance / Эффективность каналов",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblJQ9zndF47zIBVg"
         },
         "flduLe3Zed3ZA4Cig": {
           "fieldId": "flduLe3Zed3ZA4Cig",
           "fieldName": "Class Groups",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblpUJni7tMvO2QBs"
         },
         "fldveGFpJJsF0TrpE": {
           "fieldId": "fldveGFpJJsF0TrpE",
           "fieldName": "Payments",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbliFcGpMbqnMaD9S"
         },
         "fldwwnWkQ7YcCGXdO": {
           "fieldId": "fldwwnWkQ7YcCGXdO",
           "fieldName": "Enrollments",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblVA5O7fnBx5cAnJ"
         },
         "fldyNWAwhZ2ZJ9GEi": {
           "fieldId": "fldyNWAwhZ2ZJ9GEi",
@@ -342,7 +367,8 @@
           "fieldId": "fldyuvm7pjpfHE9fw",
           "fieldName": "27 Notifications Log / Журнал уведомлений",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblMsyDxS6ltliuU1"
         }
       }
     },
@@ -357,13 +383,15 @@
           "fieldId": "fld5mAXd41sVpQzlp",
           "fieldName": "Attendance",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblbOAIuMZHgtsjEP"
         },
         "fldTeS3Yg44gCGB90": {
           "fieldId": "fldTeS3Yg44gCGB90",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldU1OfNXoTt92Yu1": {
           "fieldId": "fldU1OfNXoTt92Yu1",
@@ -408,7 +436,8 @@
           "fieldId": "fldr31XeTbyvJjFdj",
           "fieldName": "Enrollments",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblVA5O7fnBx5cAnJ"
         },
         "flds3q5fTrCiMHf7B": {
           "fieldId": "flds3q5fTrCiMHf7B",
@@ -420,19 +449,22 @@
           "fieldId": "fldtiQ79UoWb9C045",
           "fieldName": "Invoices",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblTB6N6jNqSFvEER"
         },
         "fldwzFCeLGUPaZovG": {
           "fieldId": "fldwzFCeLGUPaZovG",
           "fieldName": "Parent",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRJNw4S6o1WPjBI"
         },
         "fldxSWZkOB3asgNkP": {
           "fieldId": "fldxSWZkOB3asgNkP",
           "fieldName": "Trials",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblfvl5TjmWtr24Yp"
         }
       }
     },
@@ -453,7 +485,8 @@
           "fieldId": "fld2EnmZikhFgWu7V",
           "fieldName": "Expenses",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblZPcDPnzTxp0sol"
         },
         "fld2It0tGuGAVcDHo": {
           "fieldId": "fld2It0tGuGAVcDHo",
@@ -465,7 +498,8 @@
           "fieldId": "fldLw7vxkQtZkpSdx",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldRfwq0NoTuKQQSl": {
           "fieldId": "fldRfwq0NoTuKQQSl",
@@ -497,7 +531,8 @@
           "fieldId": "fldvMafCcYRRdjy2t",
           "fieldName": "Franchise Royalties",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2YiFYDq00gJIrF"
         }
       }
     },
@@ -533,7 +568,8 @@
           "fieldId": "fldJAjYoa4t5BvGF9",
           "fieldName": "Journal Entry",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRf3mdeZmzp2mnf"
         },
         "fldJOfszdvJczMqrp": {
           "fieldId": "fldJOfszdvJczMqrp",
@@ -559,7 +595,8 @@
           "fieldId": "fldTfIdi9QNbbK2pP",
           "fieldName": "Teacher",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUkEhqFJBFTvRN5"
         },
         "fldVmd0aCzGeMDKG5": {
           "fieldId": "fldVmd0aCzGeMDKG5",
@@ -571,7 +608,8 @@
           "fieldId": "fldYvb8tUOa7nRZEt",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldhLllLgDhMO2Bfk": {
           "fieldId": "fldhLllLgDhMO2Bfk",
@@ -596,7 +634,8 @@
           "fieldId": "fldvAvsMNJ3WF77dL",
           "fieldName": "Teacher Hours",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblcOJdLkCBXXJ3AL"
         },
         "fldwHAgLQsZtRZ9P8": {
           "fieldId": "fldwHAgLQsZtRZ9P8",
@@ -663,7 +702,8 @@
           "fieldId": "fldUfDRXRPnW3mIoD",
           "fieldName": "Owner",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUkEhqFJBFTvRN5"
         },
         "fldVNaPVuDC4E8M8I": {
           "fieldId": "fldVNaPVuDC4E8M8I",
@@ -688,7 +728,8 @@
           "fieldId": "fldaUzGhIrNglIlbF",
           "fieldName": "25 Activities / Действия",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblbGzoGxZVLRPB7k"
         },
         "fldeas819jz863u7f": {
           "fieldId": "fldeas819jz863u7f",
@@ -714,25 +755,29 @@
           "fieldId": "fldniFwDuY2W54Ty8",
           "fieldName": "27 Notifications Log / Журнал уведомлений",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblMsyDxS6ltliuU1"
         },
         "fldsDtVrfTDLwaCn4": {
           "fieldId": "fldsDtVrfTDLwaCn4",
           "fieldName": "Trials",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblfvl5TjmWtr24Yp"
         },
         "fldt5ssP2Ax0Fo4Zj": {
           "fieldId": "fldt5ssP2Ax0Fo4Zj",
           "fieldName": "Parent",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRJNw4S6o1WPjBI"
         },
         "fldtqwoAM6vOeQhVr": {
           "fieldId": "fldtqwoAM6vOeQhVr",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         }
       }
     },
@@ -761,7 +806,8 @@
           "fieldId": "fldHN2DvHWXngGYoB",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldJWXPXzHbAUvbYE": {
           "fieldId": "fldJWXPXzHbAUvbYE",
@@ -884,19 +930,22 @@
           "fieldId": "fldPFo8Bpn2h7GjhH",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldVoF4U2Wv6eXthn": {
           "fieldId": "fldVoF4U2Wv6eXthn",
           "fieldName": "Ledger Lines",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl0A506K9OVCorYv"
         },
         "flddGtZRBYoC2rWin": {
           "fieldId": "flddGtZRBYoC2rWin",
           "fieldName": "Expenses",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblZPcDPnzTxp0sol"
         },
         "fldg5vMJ4S2dt4qNM": {
           "fieldId": "fldg5vMJ4S2dt4qNM",
@@ -952,6 +1001,7 @@
           "fieldName": "Trial / Пробный урок",
           "type": "multipleRecordLinks",
           "readOnly": false,
+          "linkedTableId": "tblfvl5TjmWtr24Yp",
           "description": "Related trial (08 Trials), for trial reminders."
         },
         "fldD7GPwIWaQJsmQD": {
@@ -966,6 +1016,7 @@
           "fieldName": "Branch / Филиал",
           "type": "multipleRecordLinks",
           "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf",
           "description": "Branch (01 Branches)."
         },
         "fldLamSrxr6yAoQpF": {
@@ -973,6 +1024,7 @@
           "fieldName": "Lead / Лид",
           "type": "multipleRecordLinks",
           "readOnly": false,
+          "linkedTableId": "tblItZ3B7d4YRO9ih",
           "description": "Related lead (07 Leads), if any."
         },
         "fldRBIuP7b7JKf72J": {
@@ -980,6 +1032,7 @@
           "fieldName": "Parent / Родитель",
           "type": "multipleRecordLinks",
           "readOnly": false,
+          "linkedTableId": "tblRJNw4S6o1WPjBI",
           "description": "Recipient parent (09 Parents)."
         },
         "fldRH9XSz8wgIBubm": {
@@ -1001,6 +1054,7 @@
           "fieldName": "Enrollment / Зачисление",
           "type": "multipleRecordLinks",
           "readOnly": false,
+          "linkedTableId": "tblVA5O7fnBx5cAnJ",
           "description": "Related enrollment (12 Enrollments), for onboarding/first-lesson notifications."
         },
         "fldjbuRE0T1t8Ilft": {
@@ -1015,6 +1069,7 @@
           "fieldName": "Invoice / Счёт",
           "type": "multipleRecordLinks",
           "readOnly": false,
+          "linkedTableId": "tblTB6N6jNqSFvEER",
           "description": "Related invoice (15 Invoices), for payment reminders."
         },
         "fldqoZQnZofGgamDN": {
@@ -1078,7 +1133,8 @@
           "fieldId": "fldHNtvxCAxWatC1Q",
           "fieldName": "Payments",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbliFcGpMbqnMaD9S"
         },
         "fldRLXGPc9Ew8iR3a": {
           "fieldId": "fldRLXGPc9Ew8iR3a",
@@ -1090,13 +1146,15 @@
           "fieldId": "fldS3gNn17SXrm4B0",
           "fieldName": "Leads",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblItZ3B7d4YRO9ih"
         },
         "fldY9jSQvnXH8cmCe": {
           "fieldId": "fldY9jSQvnXH8cmCe",
           "fieldName": "27 Notifications Log / Журнал уведомлений",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblMsyDxS6ltliuU1"
         },
         "flddmO9P8vfEtOETO": {
           "fieldId": "flddmO9P8vfEtOETO",
@@ -1114,13 +1172,15 @@
           "fieldId": "fldjxCkq3H83tl2Ai",
           "fieldName": "Students",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl9Ddw4uRQ3i6e1B"
         },
         "fldkSDgRlVjUHPUTd": {
           "fieldId": "fldkSDgRlVjUHPUTd",
           "fieldName": "Invoices",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblTB6N6jNqSFvEER"
         },
         "fldlQ21VINxCwAnWS": {
           "fieldId": "fldlQ21VINxCwAnWS",
@@ -1138,7 +1198,8 @@
           "fieldId": "fldscHRaf8yjx8Y9C",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         }
       }
     },
@@ -1153,7 +1214,8 @@
           "fieldId": "fld2OPToscmtytOhJ",
           "fieldName": "Expenses",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblZPcDPnzTxp0sol"
         },
         "fldBGfyt6xbhx17IX": {
           "fieldId": "fldBGfyt6xbhx17IX",
@@ -1171,31 +1233,36 @@
           "fieldId": "fldNMKiGrB0LdElYN",
           "fieldName": "Franchise Royalties",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2YiFYDq00gJIrF"
         },
         "fldbYkzLl4EgOzgo5": {
           "fieldId": "fldbYkzLl4EgOzgo5",
           "fieldName": "Teacher Pay",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblGVA0enM9oxS9C0"
         },
         "fldffqBvi4ncVZb1t": {
           "fieldId": "fldffqBvi4ncVZb1t",
           "fieldName": "Payments",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbliFcGpMbqnMaD9S"
         },
         "fldgcbUNdIvRUGhad": {
           "fieldId": "fldgcbUNdIvRUGhad",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldks0py4VjRj57YX": {
           "fieldId": "fldks0py4VjRj57YX",
           "fieldName": "Ledger Lines",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl0A506K9OVCorYv"
         },
         "fldnV5JMpmeqxtXSF": {
           "fieldId": "fldnV5JMpmeqxtXSF",
@@ -1208,7 +1275,8 @@
           "fieldId": "fldpStiRtD6fFRHI8",
           "fieldName": "Invoices",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblTB6N6jNqSFvEER"
         },
         "fldqPoazkusrbYqQf": {
           "fieldId": "fldqPoazkusrbYqQf",
@@ -1236,31 +1304,36 @@
           "fieldId": "fld9gBMYbKHjrloEs",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldAzvJxxt46d7oi5": {
           "fieldId": "fldAzvJxxt46d7oi5",
           "fieldName": "Parent",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRJNw4S6o1WPjBI"
         },
         "fldFxmjRydUNqrs1f": {
           "fieldId": "fldFxmjRydUNqrs1f",
           "fieldName": "Journal Entry",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRf3mdeZmzp2mnf"
         },
         "fldJqNHYliWVxveD4": {
           "fieldId": "fldJqNHYliWVxveD4",
           "fieldName": "Enrollment",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblVA5O7fnBx5cAnJ"
         },
         "fldKVRsr1Hdd1uPnf": {
           "fieldId": "fldKVRsr1Hdd1uPnf",
           "fieldName": "27 Notifications Log / Журнал уведомлений",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblMsyDxS6ltliuU1"
         },
         "fldNNE3i257SnDb0c": {
           "fieldId": "fldNNE3i257SnDb0c",
@@ -1284,7 +1357,8 @@
           "fieldId": "fldgkxO5Yu98qW3wi",
           "fieldName": "Student",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl9Ddw4uRQ3i6e1B"
         },
         "fldj95LOGimRgZ4Vj": {
           "fieldId": "fldj95LOGimRgZ4Vj",
@@ -1296,7 +1370,8 @@
           "fieldId": "fldoKdm7xI7859dfL",
           "fieldName": "Payments",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbliFcGpMbqnMaD9S"
         },
         "fldqJey7ciPEqd59k": {
           "fieldId": "fldqJey7ciPEqd59k",
@@ -1318,13 +1393,15 @@
           "fieldId": "fld4yXmapYbpqSiGG",
           "fieldName": "Teacher",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUkEhqFJBFTvRN5"
         },
         "fld6XW4HoqfLPpKVw": {
           "fieldId": "fld6XW4HoqfLPpKVw",
           "fieldName": "Attendance",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblbOAIuMZHgtsjEP"
         },
         "fldNsZ1ZqsBjoLrBL": {
           "fieldId": "fldNsZ1ZqsBjoLrBL",
@@ -1342,13 +1419,15 @@
           "fieldId": "fldWgOxg9fD9QJU0A",
           "fieldName": "Teacher Hours",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblcOJdLkCBXXJ3AL"
         },
         "fldgrGJWXUCjxhXpT": {
           "fieldId": "fldgrGJWXUCjxhXpT",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldqDJoUvxYzgG8iX": {
           "fieldId": "fldqDJoUvxYzgG8iX",
@@ -1361,7 +1440,8 @@
           "fieldId": "flduqKWGTffHWfUNj",
           "fieldName": "Class Group",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblpUJni7tMvO2QBs"
         }
       }
     },
@@ -1376,7 +1456,8 @@
           "fieldId": "fld6cRQ0hWQ7eoJxl",
           "fieldName": "Teacher Hours",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblcOJdLkCBXXJ3AL"
         },
         "fldBQj0DH9vw7eGiu": {
           "fieldId": "fldBQj0DH9vw7eGiu",
@@ -1402,7 +1483,8 @@
           "fieldId": "fldO0dXiGejfosngj",
           "fieldName": "25 Activities / Действия",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblbGzoGxZVLRPB7k"
         },
         "fldPDnXM1aCwXc7Bk": {
           "fieldId": "fldPDnXM1aCwXc7Bk",
@@ -1415,13 +1497,15 @@
           "fieldId": "fldoxjXB6LlfBLbAA",
           "fieldName": "Sessions",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUE4gfr8en6lfUS"
         },
         "fldrTg8YwFmZXz5Ex": {
           "fieldId": "fldrTg8YwFmZXz5Ex",
           "fieldName": "Teacher Pay",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblGVA0enM9oxS9C0"
         },
         "fldsj0eFf9lvCwt15": {
           "fieldId": "fldsj0eFf9lvCwt15",
@@ -1433,25 +1517,29 @@
           "fieldId": "fldtYNT0ZmIg9dkCg",
           "fieldName": "Leads",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblItZ3B7d4YRO9ih"
         },
         "fldtcpukcdFqHp8wi": {
           "fieldId": "fldtcpukcdFqHp8wi",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "flduERFE3kVUMjrfX": {
           "fieldId": "flduERFE3kVUMjrfX",
           "fieldName": "08 Trials / Пробные уроки",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblfvl5TjmWtr24Yp"
         },
         "fldwkrWYdKF4dO6Y8": {
           "fieldId": "fldwkrWYdKF4dO6Y8",
           "fieldName": "Class Groups",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblpUJni7tMvO2QBs"
         },
         "fldzowV5r6HHYqMVZ": {
           "fieldId": "fldzowV5r6HHYqMVZ",
@@ -1472,7 +1560,8 @@
           "fieldId": "fld0tk6w9UAtCKrWA",
           "fieldName": "Class Group",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblpUJni7tMvO2QBs"
         },
         "fld0vvw0hpO2FZr3F": {
           "fieldId": "fld0vvw0hpO2FZr3F",
@@ -1511,13 +1600,15 @@
           "fieldId": "fldIESu0tEeFvUiuA",
           "fieldName": "Tuition Plan",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbldiIHLyH7bup2XG"
         },
         "fldIQFs4P3c5TzdfM": {
           "fieldId": "fldIQFs4P3c5TzdfM",
           "fieldName": "08 Trials / Пробные уроки",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblfvl5TjmWtr24Yp"
         },
         "fldMIiRIiEkU32lGv": {
           "fieldId": "fldMIiRIiEkU32lGv",
@@ -1537,7 +1628,8 @@
           "fieldId": "fldV9CDG6hTBsoPyP",
           "fieldName": "Student",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl9Ddw4uRQ3i6e1B"
         },
         "fldWj3sCWbxwJnzNq": {
           "fieldId": "fldWj3sCWbxwJnzNq",
@@ -1592,13 +1684,15 @@
           "fieldId": "fldizhbx0mB0Xuhnf",
           "fieldName": "Invoices",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblTB6N6jNqSFvEER"
         },
         "fldm9VVVEVGgSsBOM": {
           "fieldId": "fldm9VVVEVGgSsBOM",
           "fieldName": "27 Notifications Log / Журнал уведомлений",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblMsyDxS6ltliuU1"
         },
         "fldtgJU9259Sf78x9": {
           "fieldId": "fldtgJU9259Sf78x9",
@@ -1611,7 +1705,8 @@
           "fieldId": "fldwtRAb9ZXRe3ekD",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldz8xpBExqXB546O": {
           "fieldId": "fldz8xpBExqXB546O",
@@ -1665,7 +1760,8 @@
           "fieldId": "fldxd9MNhTV5O9rrh",
           "fieldName": "Class Groups",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblpUJni7tMvO2QBs"
         }
       }
     },
@@ -1680,7 +1776,8 @@
           "fieldId": "fld6ps8NBgIa48a4i",
           "fieldName": "Expense Account",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblLkuBm7zVJKpzzu"
         },
         "fldGjqThQ37a4z9fl": {
           "fieldId": "fldGjqThQ37a4z9fl",
@@ -1693,7 +1790,8 @@
           "fieldId": "fldINJS8KF6Ov6ZnV",
           "fieldName": "Journal Entry",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRf3mdeZmzp2mnf"
         },
         "fldJc78XmxkOrUd4u": {
           "fieldId": "fldJc78XmxkOrUd4u",
@@ -1730,7 +1828,8 @@
           "fieldId": "fldcbXhKHHUF8uMEY",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldm0uNTuKoeLHhny": {
           "fieldId": "fldm0uNTuKoeLHhny",
@@ -1742,7 +1841,8 @@
           "fieldId": "fldmATbX0cz4GGO2c",
           "fieldName": "Vendor",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblAu08dz4NZJ5HDs"
         }
       }
     },
@@ -1769,7 +1869,8 @@
           "fieldId": "fldTzMvnpw3jRPVLi",
           "fieldName": "Lead",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblItZ3B7d4YRO9ih"
         },
         "fldWvDv570YdNJDbv": {
           "fieldId": "fldWvDv570YdNJDbv",
@@ -1787,7 +1888,8 @@
           "fieldId": "flddCRQoHzWfkL4uy",
           "fieldName": "Owner",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUkEhqFJBFTvRN5"
         },
         "fldgsOoOJLKM1XWv5": {
           "fieldId": "fldgsOoOJLKM1XWv5",
@@ -1821,7 +1923,8 @@
           "fieldId": "fld3eZM0egp7xsq7Y",
           "fieldName": "Session",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUE4gfr8en6lfUS"
         },
         "fldOP511IijW9upZQ": {
           "fieldId": "fldOP511IijW9upZQ",
@@ -1833,7 +1936,8 @@
           "fieldId": "fldTdGs2iLe0cL5RW",
           "fieldName": "Student",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl9Ddw4uRQ3i6e1B"
         },
         "fldcZrerDfUIXphLv": {
           "fieldId": "fldcZrerDfUIXphLv",
@@ -1868,7 +1972,8 @@
           "fieldId": "fldEI4WLvWSx33PVM",
           "fieldName": "Session",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUE4gfr8en6lfUS"
         },
         "fldM7A0izGJBMebrZ": {
           "fieldId": "fldM7A0izGJBMebrZ",
@@ -1881,7 +1986,8 @@
           "fieldId": "fldNXpP5UJ0NHeeIW",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldYwU89ANpW9x4wN": {
           "fieldId": "fldYwU89ANpW9x4wN",
@@ -1893,7 +1999,8 @@
           "fieldId": "fldZ9Ky01Gl9pYCF2",
           "fieldName": "Pay Run",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblGVA0enM9oxS9C0"
         },
         "fldZAYRlIyx7fnWR6": {
           "fieldId": "fldZAYRlIyx7fnWR6",
@@ -1905,7 +2012,8 @@
           "fieldId": "fldtOlMiMgBc3klqy",
           "fieldName": "Teacher",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUkEhqFJBFTvRN5"
         }
       }
     },
@@ -1927,7 +2035,8 @@
           "fieldId": "fldKF5YqGYLUaP20e",
           "fieldName": "Enrollments",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblVA5O7fnBx5cAnJ"
         },
         "fldOm9NbQvNikr7e5": {
           "fieldId": "fldOm9NbQvNikr7e5",
@@ -1939,7 +2048,8 @@
           "fieldId": "fldUmXiXvDOqVevAy",
           "fieldName": "Course",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblgvltY5JtmMZs1q"
         },
         "fldXIJDEPCkEqA2UZ": {
           "fieldId": "fldXIJDEPCkEqA2UZ",
@@ -1981,6 +2091,7 @@
           "fieldName": "Enrollment / Зачисление",
           "type": "multipleRecordLinks",
           "readOnly": false,
+          "linkedTableId": "tblVA5O7fnBx5cAnJ",
           "description": "The enrollment this trial converted into, for full trial→revenue conversion tracing (Build 9)."
         },
         "fld7yy1pPPTqXkphS": {
@@ -1993,7 +2104,8 @@
           "fieldId": "fldDsWJSbmU9lHWTc",
           "fieldName": "Lead",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblItZ3B7d4YRO9ih"
         },
         "fldGIxMvvMpf96UoR": {
           "fieldId": "fldGIxMvvMpf96UoR",
@@ -2013,13 +2125,15 @@
           "fieldId": "fldSOxL4SPN7xXuHs",
           "fieldName": "From field: Rescheduled To / Перенесён на",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblfvl5TjmWtr24Yp"
         },
         "fldfIgfAJxGloYaW3": {
           "fieldId": "fldfIgfAJxGloYaW3",
           "fieldName": "27 Notifications Log / Журнал уведомлений",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblMsyDxS6ltliuU1"
         },
         "fldgDLfpjpPKeTZzw": {
           "fieldId": "fldgDLfpjpPKeTZzw",
@@ -2045,19 +2159,22 @@
           "fieldId": "fldo1WQXaLhCpRss0",
           "fieldName": "Student (if enrolled)",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl9Ddw4uRQ3i6e1B"
         },
         "fldpBUB8zEEqWmRzG": {
           "fieldId": "fldpBUB8zEEqWmRzG",
           "fieldName": "Class Group",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblpUJni7tMvO2QBs"
         },
         "fldvnLeHapzr4TSyB": {
           "fieldId": "fldvnLeHapzr4TSyB",
           "fieldName": "Teacher / Преподаватель",
           "type": "multipleRecordLinks",
           "readOnly": false,
+          "linkedTableId": "tblUkEhqFJBFTvRN5",
           "description": "Teacher (from 02 Users) who conducted the trial and made the level assessment (Build 8)."
         },
         "fldwVnsZrJkmpJ9cQ": {
@@ -2078,6 +2195,7 @@
           "fieldName": "Rescheduled To / Перенесён на",
           "type": "multipleRecordLinks",
           "readOnly": false,
+          "linkedTableId": "tblfvl5TjmWtr24Yp",
           "description": "Self-link to the new Trial record when this trial is rescheduled, preserving the audit trail (Build 7)."
         }
       }
@@ -2113,7 +2231,8 @@
           "fieldId": "fldP5Ey4jUDSEpMeR",
           "fieldName": "Tuition Plans",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbldiIHLyH7bup2XG"
         },
         "fldQ9qPJoS3te6Vyh": {
           "fieldId": "fldQ9qPJoS3te6Vyh",
@@ -2131,7 +2250,8 @@
           "fieldId": "fldY4H9ImDoVecarr",
           "fieldName": "Class Groups",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblpUJni7tMvO2QBs"
         },
         "fldbYYFQOqbeTdebb": {
           "fieldId": "fldbYYFQOqbeTdebb",
@@ -2177,7 +2297,8 @@
           "fieldId": "fld22tf9Mn0HGsmzN",
           "fieldName": "Invoice",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblTB6N6jNqSFvEER"
         },
         "fldBtNTeQVfZk1sWL": {
           "fieldId": "fldBtNTeQVfZk1sWL",
@@ -2202,19 +2323,22 @@
           "fieldId": "fldNVXBMA6RO2Xovb",
           "fieldName": "Parent",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRJNw4S6o1WPjBI"
         },
         "fldQY10Fca4H0LzbY": {
           "fieldId": "fldQY10Fca4H0LzbY",
           "fieldName": "Journal Entry",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblRf3mdeZmzp2mnf"
         },
         "fldTkBn9cMAnnA0YF": {
           "fieldId": "fldTkBn9cMAnnA0YF",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldXYyFJX04FtXzE2": {
           "fieldId": "fldXYyFJX04FtXzE2",
@@ -2261,7 +2385,8 @@
           "fieldId": "fld9eJXsGYEu11Xcp",
           "fieldName": "Enrollments",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblVA5O7fnBx5cAnJ"
         },
         "fldAn13Aw3EIk07kU": {
           "fieldId": "fldAn13Aw3EIk07kU",
@@ -2280,25 +2405,29 @@
           "fieldId": "fldKzRPTpW0EUqfUF",
           "fieldName": "Sessions",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUE4gfr8en6lfUS"
         },
         "fldNvOvFWxIjQ7Xu2": {
           "fieldId": "fldNvOvFWxIjQ7Xu2",
           "fieldName": "Trials",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblfvl5TjmWtr24Yp"
         },
         "fldO5MP5ijTdm7lGv": {
           "fieldId": "fldO5MP5ijTdm7lGv",
           "fieldName": "Course",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblgvltY5JtmMZs1q"
         },
         "fldPvtA1ugZitmSkT": {
           "fieldId": "fldPvtA1ugZitmSkT",
           "fieldName": "Teacher",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblUkEhqFJBFTvRN5"
         },
         "fldT6sSsiyMfzeVbl": {
           "fieldId": "fldT6sSsiyMfzeVbl",
@@ -2311,19 +2440,22 @@
           "fieldId": "fldVRgnzmNG4SWcAS",
           "fieldName": "Room",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblunCF2EX30onveH"
         },
         "fldzQWsTvAK9VkcxC": {
           "fieldId": "fldzQWsTvAK9VkcxC",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         },
         "fldzmR8v8uue3Ce0Q": {
           "fieldId": "fldzmR8v8uue3Ce0Q",
           "fieldName": "Term",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblVSaneGtUOq5Xzr"
         }
       }
     },
@@ -2338,7 +2470,8 @@
           "fieldId": "fld49qkIdrHdxGeD1",
           "fieldName": "Class Groups",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tblpUJni7tMvO2QBs"
         },
         "fldRoVbOvTWdb5Pxs": {
           "fieldId": "fldRoVbOvTWdb5Pxs",
@@ -2363,7 +2496,8 @@
           "fieldId": "fldnUe4DwO8wd7HKQ",
           "fieldName": "Branch",
           "type": "multipleRecordLinks",
-          "readOnly": false
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
         }
       }
     }

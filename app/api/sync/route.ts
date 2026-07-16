@@ -119,13 +119,13 @@ export async function POST(request: Request) {
     }
 
     if (recordId) {
-      const { airtableBase } = await import("../../../lib/airtable");
+      const airtableProxy = await import("../../../lib/airtableProxy");
       const prisma = (await import("../../../lib/prisma")).default;
 
       console.log(
         `[Webhook] Syncing single record "${recordId}" from table "${config.airtableTable}"...`,
       );
-      const record = await airtableBase(config.airtableTable).find(recordId);
+      const record = await airtableProxy.readRecord(config.airtableTableId, recordId);
       const data = config.mapFields(record.id, record.fields);
 
       const modelClient = (prisma as any)[config.prismaModel];

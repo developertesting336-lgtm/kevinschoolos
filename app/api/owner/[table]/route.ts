@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { auditService } from "@/lib/audit";
+import { auditService, getVisibleFieldIds } from "@/lib/audit";
 import { ownerTablesConfig } from "@/lib/owner-schema";
 
 export const dynamic = "force-dynamic";
@@ -30,49 +30,71 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ table: string }> }
 ) {
+  const { table } = await params;
+  let dbUser: any = null;
+  let prismaModelName = "";
+
   try {
     // 1. Resolve User session & Authenticate
     const session = await validateSession();
     if (!session) {
+      auditService.logFailure(
+        undefined,
+        "PERMISSION_DENIED",
+        table,
+        "No active session found.",
+        request
+      );
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // 2. Fetch user role
-    const dbUser = await prisma.user.findUnique({
+    dbUser = await prisma.user.findUnique({
       where: { id: session.userId },
       select: { id: true, email: true, role: true, branchIds: true },
     });
 
     if (!dbUser) {
+      auditService.logFailure(
+        undefined,
+        "PERMISSION_DENIED",
+        table,
+        `User ID ${session.userId} not found in database.`,
+        request
+      );
       return NextResponse.json({ error: "User not found" }, { status: 401 });
     }
 
     const userRole = dbUser.role || "staff";
     const userBranchIds = dbUser.branchIds || [];
 
-    const { table } = await params;
     const normalizedTable = table.toLowerCase();
     const config = ownerTablesConfig[normalizedTable];
 
     if (!config) {
+      auditService.logFailure(
+        { id: dbUser.id, email: dbUser.email, role: userRole },
+        "PERMISSION_DENIED",
+        table,
+        `Table '${table}' not recognized in owner schema configuration.`,
+        request
+      );
       return NextResponse.json({ error: `Table '${table}' not found.` }, { status: 404 });
     }
 
     // Prisma dynamic model mapping
-    const prismaModelName = config.modelName;
+    prismaModelName = config.modelName;
 
     // Check RBAC permission for the role and table
     const rbacCheck = checkRBAC(userRole, prismaModelName, "read", false);
     if (!rbacCheck.allowed) {
-      auditService.log({
-        actorId: dbUser.id,
-        actorEmail: dbUser.email,
-        role: userRole,
-        action: "PERMISSION_DENIED",
-        tableName: prismaModelName,
-        result: "FAIL",
-        details: rbacCheck.reason,
-      }, request);
+      auditService.logFailure(
+        { id: dbUser.id, email: dbUser.email, role: userRole },
+        "PERMISSION_DENIED",
+        prismaModelName,
+        rbacCheck.reason,
+        request
+      );
       return NextResponse.json({ error: rbacCheck.reason }, { status: 403 });
     }
 
@@ -148,6 +170,13 @@ export async function GET(
         prismaModelName
       );
     } catch (err: any) {
+      auditService.logFailure(
+        { id: dbUser.id, email: dbUser.email, role: userRole },
+        "PERMISSION_DENIED",
+        prismaModelName,
+        `Scoping resolution error: ${err.message || String(err)}`,
+        request
+      );
       return NextResponse.json({ error: "Failed to resolve data scope." }, { status: 500 });
     }
     whereConditions.push(scopingFilter);
@@ -183,17 +212,22 @@ export async function GET(
     const isSensitive = SENSITIVE_TABLES.some(
       (t) => t.toLowerCase() === prismaModelName.toLowerCase()
     );
-    if (isSensitive) {
-      auditService.log({
-        actorId: dbUser.id,
-        actorEmail: dbUser.email,
-        role: dbUser.role,
-        action: "SENSITIVE_ACCESS",
-        tableName: prismaModelName,
-        result: "SUCCESS",
-        details: `Owner accessed sensitive table ${prismaModelName} (page ${page}, limit ${limit}, search "${search}").`,
-      }, request);
-    }
+    const action = isSensitive ? "SENSITIVE_ACCESS" : "VIEW";
+    const recordIds = records.map((r: any) => r.id).filter(Boolean);
+    const fieldIds = getVisibleFieldIds(userRole, prismaModelName, false);
+
+    auditService.log({
+      actorId: dbUser.id,
+      actorEmail: dbUser.email,
+      role: userRole,
+      branchIds: userBranchIds,
+      action,
+      tableName: prismaModelName,
+      recordIds,
+      fieldIds,
+      result: "SUCCESS",
+      details: `Owner accessed sensitive table ${prismaModelName} (page ${page}, limit ${limit}, search "${search}").`,
+    }, request);
 
     return NextResponse.json({
       data: records,
@@ -204,8 +238,17 @@ export async function GET(
         totalPages: Math.ceil(total / limit),
       },
     });
-  } catch (error) {
-    console.error(`[Owner API GET Error] Table: ${request.url}`, error);
+  } catch (error: any) {
+    console.error(`[Owner API GET Error] Table: ${table}`, error);
+    if (dbUser) {
+      auditService.logFailure(
+        { id: dbUser.id, email: dbUser.email, role: dbUser.role },
+        "VIEW",
+        prismaModelName || table,
+        `Internal server error: ${error.message || String(error)}`,
+        request
+      );
+    }
     return NextResponse.json(
       { error: "Internal server error." },
       { status: 500 }

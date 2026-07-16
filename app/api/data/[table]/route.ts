@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { checkRBAC, getScopingFilter, applyRedactions, normalizeRole } from "@/lib/rbac";
-import { auditService } from "@/lib/audit";
+import { auditService, getVisibleFieldIds } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -89,12 +89,13 @@ export async function GET(
   // 1. Resolve User session
   const session = await validateSession();
   if (!session) {
-    auditService.log({
-      action: "PERMISSION_DENIED",
-      tableName: table,
-      result: "FAIL",
-      details: "No active session found.",
-    }, request);
+    auditService.logFailure(
+      undefined,
+      "PERMISSION_DENIED",
+      table,
+      "No active session found.",
+      request
+    );
 
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -105,12 +106,13 @@ export async function GET(
   });
 
   if (!dbUser) {
-    auditService.log({
-      action: "PERMISSION_DENIED",
-      tableName: table,
-      result: "FAIL",
-      details: `User ID ${session.userId} not found in database.`,
-    }, request);
+    auditService.logFailure(
+      undefined,
+      "PERMISSION_DENIED",
+      table,
+      `User ID ${session.userId} not found in database.`,
+      request
+    );
 
     return NextResponse.json({ error: "User not found" }, { status: 401 });
   }
@@ -123,16 +125,13 @@ export async function GET(
   const prismaModelName = modelMapping[normalizedTable];
 
   if (!prismaModelName) {
-    auditService.log({
-      actorId: dbUser.id,
-      actorEmail: dbUser.email,
-      role: userRole,
-      branchIds: userBranchIds,
-      action: "PERMISSION_DENIED",
-      tableName: table,
-      result: "FAIL",
-      details: `Table '${table}' not recognized in schema.`,
-    }, request);
+    auditService.logFailure(
+      { id: dbUser.id, email: dbUser.email, role: userRole },
+      "PERMISSION_DENIED",
+      table,
+      `Table '${table}' not recognized in schema.`,
+      request
+    );
 
     return NextResponse.json({ error: `Table '${table}' not found.` }, { status: 404 });
   }
@@ -140,16 +139,13 @@ export async function GET(
   // 2. RBAC Access check
   const rbacCheck = checkRBAC(userRole, prismaModelName, "read", isBreakGlass);
   if (!rbacCheck.allowed) {
-    auditService.log({
-      actorId: dbUser.id,
-      actorEmail: dbUser.email,
-      role: userRole,
-      branchIds: userBranchIds,
-      action: "PERMISSION_DENIED",
-      tableName: prismaModelName,
-      result: "FAIL",
-      details: rbacCheck.reason,
-    }, request);
+    auditService.logFailure(
+      { id: dbUser.id, email: dbUser.email, role: userRole },
+      "PERMISSION_DENIED",
+      prismaModelName,
+      rbacCheck.reason,
+      request
+    );
 
     return NextResponse.json({ error: rbacCheck.reason }, { status: 403 });
   }
@@ -162,48 +158,15 @@ export async function GET(
       prismaModelName
     );
   } catch (err: any) {
-    auditService.log({
-      actorId: dbUser.id,
-      actorEmail: dbUser.email,
-      role: userRole,
-      branchIds: userBranchIds,
-      action: "PERMISSION_DENIED",
-      tableName: prismaModelName,
-      result: "FAIL",
-      details: `Scoping resolution error: ${err.message || String(err)}`,
-    }, request);
+    auditService.logFailure(
+      { id: dbUser.id, email: dbUser.email, role: userRole },
+      "PERMISSION_DENIED",
+      prismaModelName,
+      `Scoping resolution error: ${err.message || String(err)}`,
+      request
+    );
 
     return NextResponse.json({ error: "Failed to resolve data scope." }, { status: 500 });
-  }
-
-  // 4. Audit step (executed after Authentication -> RBAC -> Branch Scoping)
-  const T1_TABLES = ["Account", "JournalEntry", "LedgerLine", "Vendor", "Expense", "FranchiseRoyalty", "TeacherPay", "TeacherHours"];
-  const T2_TABLES = ["User", "Parent", "Student", "Enrollment", "Invoice", "Payment", "NotificationLog"];
-  const isSensitive = T1_TABLES.includes(prismaModelName) || T2_TABLES.includes(prismaModelName);
-  const action = isSensitive ? "SENSITIVE_ACCESS" : "VIEW";
-
-  if (normalizeRole(userRole) === "tech_admin" && isBreakGlass) {
-    auditService.log({
-      actorId: dbUser.id,
-      actorEmail: dbUser.email,
-      role: userRole,
-      branchIds: userBranchIds,
-      action,
-      tableName: prismaModelName,
-      result: "SUCCESS",
-      details: `Tech Admin breaking glass to view ${prismaModelName} table. Scoped to ${JSON.stringify(whereFilter)}.`,
-    }, request);
-  } else {
-    auditService.log({
-      actorId: dbUser.id,
-      actorEmail: dbUser.email,
-      role: userRole,
-      branchIds: userBranchIds,
-      action,
-      tableName: prismaModelName,
-      result: "SUCCESS",
-      details: `Viewed table. Scoped query filter: ${JSON.stringify(whereFilter)}`,
-    }, request);
   }
 
   try {
@@ -245,6 +208,12 @@ export async function GET(
       }
     >;
 
+    // Define sensitive tables for action classification
+    const T1_TABLES = ["Account", "JournalEntry", "LedgerLine", "Vendor", "Expense", "FranchiseRoyalty", "TeacherPay", "TeacherHours"];
+    const T2_TABLES = ["User", "Parent", "Student", "Enrollment", "Invoice", "Payment", "NotificationLog"];
+    const isSensitive = T1_TABLES.includes(prismaModelName) || T2_TABLES.includes(prismaModelName);
+    const action = isSensitive ? "SENSITIVE_ACCESS" : "VIEW";
+
     if (pageStr) {
       const page = parseInt(pageStr, 10) || 1;
       const limit = parseInt(limitStr, 10) || 10;
@@ -262,6 +231,27 @@ export async function GET(
 
       const redactedRecords = applyRedactions(userRole, prismaModelName, records, paymentContext);
 
+      // Audit after query is executed
+      const recordIds = (records as any[]).map((r: any) => r.id).filter(Boolean);
+      const fieldIds = getVisibleFieldIds(userRole, prismaModelName, paymentContext);
+      let details = `Viewed table ${prismaModelName}. Scoped query filter: ${JSON.stringify(whereFilter)}`;
+      if (normalizeRole(userRole) === "tech_admin" && isBreakGlass) {
+        details = `Tech Admin breaking glass to view ${prismaModelName} table. Scoped to ${JSON.stringify(whereFilter)}.`;
+      }
+
+      auditService.log({
+        actorId: dbUser.id,
+        actorEmail: dbUser.email,
+        role: userRole,
+        branchIds: userBranchIds,
+        action,
+        tableName: prismaModelName,
+        recordIds,
+        fieldIds,
+        result: "SUCCESS",
+        details,
+      }, request);
+
       return NextResponse.json({
         data: redactedRecords,
         pagination: {
@@ -278,10 +268,39 @@ export async function GET(
       });
 
       const redactedRecords = applyRedactions(userRole, prismaModelName, records, paymentContext);
+
+      // Audit after query is executed
+      const recordIds = (records as any[]).map((r: any) => r.id).filter(Boolean);
+      const fieldIds = getVisibleFieldIds(userRole, prismaModelName, paymentContext);
+      let details = `Viewed table ${prismaModelName}. Scoped query filter: ${JSON.stringify(whereFilter)}`;
+      if (normalizeRole(userRole) === "tech_admin" && isBreakGlass) {
+        details = `Tech Admin breaking glass to view ${prismaModelName} table. Scoped to ${JSON.stringify(whereFilter)}.`;
+      }
+
+      auditService.log({
+        actorId: dbUser.id,
+        actorEmail: dbUser.email,
+        role: userRole,
+        branchIds: userBranchIds,
+        action,
+        tableName: prismaModelName,
+        recordIds,
+        fieldIds,
+        result: "SUCCESS",
+        details,
+      }, request);
+
       return NextResponse.json(redactedRecords);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[Data Route GET Error] Table: ${table}`, error);
+    auditService.logFailure(
+      { id: dbUser.id, email: dbUser.email, role: userRole },
+      "VIEW",
+      prismaModelName,
+      `Internal database error: ${error.message || String(error)}`,
+      request
+    );
     return NextResponse.json(
       { error: "Internal server error." },
       { status: 500 }

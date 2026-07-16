@@ -11,6 +11,13 @@ export async function POST(request: Request) {
     const { email, password } = await request.json();
 
     if (!email || !password) {
+      auditService.logFailure(
+        undefined,
+        "LOGIN",
+        undefined,
+        "Missing email or password.",
+        request
+      );
       return NextResponse.json(
         { error: "Email and password are required." },
         { status: 400 },
@@ -175,6 +182,13 @@ export async function POST(request: Request) {
     });
   } catch (error: any) {
     console.error("[Login API Error]", error);
+    auditService.logFailure(
+      undefined,
+      "LOGIN",
+      undefined,
+      `Internal server error during login: ${error.message || String(error)}`,
+      request
+    );
     return NextResponse.json(
       { error: "Internal server error." },
       { status: 500 },

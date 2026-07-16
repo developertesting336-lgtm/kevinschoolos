@@ -1,24 +1,3 @@
-#!/usr/bin/env node
-
-/**
- * generate-field-map.mjs
- *
- * Generates config/field-map.json and config/schema-baseline.json
- * from the Airtable Metadata API.
- *
- * This script:
- *  - Fetches schema metadata only (tables, fields, types, descriptions)
- *  - NEVER touches record data (no student, parent, payment rows)
- *  - Keys every entry by Airtable IDs (tableId, fieldId)
- *  - Marks computed fields as readOnly: true
- *  - Assigns a sensitivity tier to every table
- *  - Produces deterministic output (sorted keys)
- *  - Generates a stable schemaHash for drift detection
- *
- * Usage:
- *   AIRTABLE_PAT=pat_xxx AIRTABLE_BASE_ID=appT1VyuwHzKGhOId \
- *     node scripts/generate-field-map.mjs
- */
 
 import dotenv from "dotenv";
 import { writeFileSync, mkdirSync } from "node:fs";
@@ -43,41 +22,41 @@ const BASELINE_PATH = resolve(CONFIG_DIR, "schema-baseline.json");
 // Names are stable identifiers for tier assignment; the output keys by ID.
 const TIER_MAP = [
   // T1 – Financial / HQ-only
-  { match: "Chart of Accounts",    tier: "T1", tierName: "Financial" },
-  { match: "Journal Entries",      tier: "T1", tierName: "Financial" },
-  { match: "Ledger Lines",         tier: "T1", tierName: "Financial" },
-  { match: "Vendors",              tier: "T1", tierName: "Financial" },
-  { match: "Expenses",             tier: "T1", tierName: "Financial" },
-  { match: "Franchise Royalties",  tier: "T1", tierName: "Financial" },
-  { match: "Teacher Pay",          tier: "T1", tierName: "Financial" },
-  { match: "Teacher Hours",        tier: "T1", tierName: "Financial" },
+  { match: "Chart of Accounts", tier: "T1", tierName: "Financial" },
+  { match: "Journal Entries", tier: "T1", tierName: "Financial" },
+  { match: "Ledger Lines", tier: "T1", tierName: "Financial" },
+  { match: "Vendors", tier: "T1", tierName: "Financial" },
+  { match: "Expenses", tier: "T1", tierName: "Financial" },
+  { match: "Franchise Royalties", tier: "T1", tierName: "Financial" },
+  { match: "Teacher Pay", tier: "T1", tierName: "Financial" },
+  { match: "Teacher Hours", tier: "T1", tierName: "Financial" },
 
   // T2 – PII / branch-admin
-  { match: "Users",                tier: "T2", tierName: "PII" },
-  { match: "Parents",              tier: "T2", tierName: "PII" },
-  { match: "Students",             tier: "T2", tierName: "PII" },
-  { match: "Enrollments",          tier: "T2", tierName: "PII" },
-  { match: "Invoices",             tier: "T2", tierName: "PII" },
-  { match: "Payments",             tier: "T2", tierName: "PII" },
-  { match: "Notifications Log",    tier: "T2", tierName: "PII" },
+  { match: "Users", tier: "T2", tierName: "PII" },
+  { match: "Parents", tier: "T2", tierName: "PII" },
+  { match: "Students", tier: "T2", tierName: "PII" },
+  { match: "Enrollments", tier: "T2", tierName: "PII" },
+  { match: "Invoices", tier: "T2", tierName: "PII" },
+  { match: "Payments", tier: "T2", tierName: "PII" },
+  { match: "Notifications Log", tier: "T2", tierName: "PII" },
 
   // T3 – Operational
-  { match: "Terms",                tier: "T3", tierName: "Operational" },
-  { match: "Rooms",                tier: "T3", tierName: "Operational" },
-  { match: "Leads",                tier: "T3", tierName: "Operational" },
-  { match: "Trials",               tier: "T3", tierName: "Operational" },
-  { match: "Class Groups",         tier: "T3", tierName: "Operational" },
-  { match: "Sessions",             tier: "T3", tierName: "Operational" },
-  { match: "Attendance",           tier: "T3", tierName: "Operational" },
-  { match: "Activities",           tier: "T3", tierName: "Operational" },
+  { match: "Terms", tier: "T3", tierName: "Operational" },
+  { match: "Rooms", tier: "T3", tierName: "Operational" },
+  { match: "Leads", tier: "T3", tierName: "Operational" },
+  { match: "Trials", tier: "T3", tierName: "Operational" },
+  { match: "Class Groups", tier: "T3", tierName: "Operational" },
+  { match: "Sessions", tier: "T3", tierName: "Operational" },
+  { match: "Attendance", tier: "T3", tierName: "Operational" },
+  { match: "Activities", tier: "T3", tierName: "Operational" },
 
   // T4-RO – Analytics (Automation-Owned)
-  { match: "Channel Performance",  tier: "T4-RO", tierName: "Analytics" },
+  { match: "Channel Performance", tier: "T4-RO", tierName: "Analytics" },
 
   // T4 – Reference / low-risk
-  { match: "Branches",             tier: "T4", tierName: "Reference" },
-  { match: "Courses",              tier: "T4", tierName: "Reference" },
-  { match: "Tuition Plans",        tier: "T4", tierName: "Reference" },
+  { match: "Branches", tier: "T4", tierName: "Reference" },
+  { match: "Courses", tier: "T4", tierName: "Reference" },
+  { match: "Tuition Plans", tier: "T4", tierName: "Reference" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -144,6 +123,10 @@ function buildSortedFieldMap(tables) {
         type: fieldType,
         readOnly,
       };
+
+      if (fieldType === "multipleRecordLinks" && field.options?.linkedTableId) {
+        fields[fieldId].linkedTableId = field.options.linkedTableId;
+      }
 
       if (fieldDescription !== null) {
         fields[fieldId].description = fieldDescription;
