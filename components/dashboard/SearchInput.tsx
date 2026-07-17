@@ -43,6 +43,9 @@ export function SearchInput({ placeholder = "Search...", paramName = "search" }:
     return () => clearTimeout(delayDebounce);
   }, [query, paramName, pathname, router, searchParams]);
 
+  const isSearching = query !== (searchParams.get(paramName) || "");
+  const isLoading = isPending || isSearching;
+
   return (
     <div className="relative w-full max-w-xs sm:max-w-sm">
       <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -52,7 +55,7 @@ export function SearchInput({ placeholder = "Search...", paramName = "search" }:
         placeholder={placeholder}
         className="pl-8 pr-8 h-8 text-xs placeholder:text-muted-foreground/70"
       />
-      {isPending && (
+      {isLoading && (
         <Loader2 className="absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-muted-foreground" />
       )}
     </div>

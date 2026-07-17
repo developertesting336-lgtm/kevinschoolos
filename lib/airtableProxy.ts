@@ -269,6 +269,8 @@ class RequestQueue {
   private isPaused = false;
   private lastRequestTime = 0;
   private minInterval = 200; // Pacing: min 200ms between requests (5/sec)
+  private last429Time: number | null = null;
+  private last429Duration: number | null = null;
 
   async enqueue<T>(task: () => Promise<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
@@ -278,6 +280,8 @@ class RequestQueue {
   }
 
   pause(durationMs: number): void {
+    this.last429Time = Date.now();
+    this.last429Duration = durationMs;
     if (this.isPaused) return;
     this.isPaused = true;
     logger.warn({ durationMs }, `Pausing request queue due to 429 rate limit.`);
@@ -285,6 +289,19 @@ class RequestQueue {
       this.isPaused = false;
       this.processNext();
     }, durationMs);
+  }
+
+  getStatus() {
+    return {
+      queueLength: this.queue.length,
+      activeCount: this.activeCount,
+      isPaused: this.isPaused,
+      maxConcurrency: this.maxConcurrency,
+      lastRequestTime: this.lastRequestTime,
+      minInterval: this.minInterval,
+      last429Time: this.last429Time,
+      last429Duration: this.last429Duration,
+    };
   }
 
   private async processNext(): Promise<void> {
@@ -800,4 +817,8 @@ export async function checkAirtableReachable(baseId: string): Promise<boolean> {
   } catch (err) {
     return false;
   }
+}
+
+export function getAirtableQueueStatus() {
+  return requestQueue.getStatus();
 }

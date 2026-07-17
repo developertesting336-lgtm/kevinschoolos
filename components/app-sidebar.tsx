@@ -31,6 +31,9 @@ import {
   Activity,
   TrendingUp,
   Award,
+  ClipboardCheck,
+  Bell,
+  Shield,
 } from "lucide-react";
 
 import {
@@ -77,6 +80,11 @@ const navItems = [
     url: "/dashboard/billing",
     icon: Receipt,
   },
+  {
+    title: "Schema Diagnostics",
+    url: "/dashboard/admin/schema-diagnostics",
+    icon: Shield,
+  },
 ];
 
 const ownerGroups = [
@@ -89,11 +97,15 @@ const ownerGroups = [
       { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
       { title: "Payments", url: "/dashboard/owner/payment", icon: Wallet },
+      { title: "Notifications Center", url: "/dashboard/notifications", icon: Bell },
     ],
   },
   {
     label: "Operations (T3)",
     items: [
+      { title: "Admissions", url: "/dashboard/admissions", icon: LayoutDashboard },
+      { title: "Onboarding", url: "/dashboard/onboarding", icon: ClipboardCheck },
+      { title: "Payments & Receipts", url: "/dashboard/payments", icon: Wallet },
       { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
       { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
       { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
@@ -107,14 +119,7 @@ const ownerGroups = [
   {
     label: "Financial Data (T1)",
     items: [
-      { title: "Chart of Accounts", url: "/dashboard/owner/account", icon: Landmark },
-      { title: "Journal Entries", url: "/dashboard/owner/journalentry", icon: BookOpen },
-      { title: "Ledger Lines", url: "/dashboard/owner/ledgerline", icon: ListTodo },
-      { title: "Vendors", url: "/dashboard/owner/vendor", icon: Truck },
-      { title: "Expenses", url: "/dashboard/owner/expense", icon: CreditCard },
-      { title: "Franchise Royalties", url: "/dashboard/owner/franchiseroyalty", icon: Percent },
-      { title: "Teacher Pay", url: "/dashboard/owner/teacherpay", icon: DollarSign },
-      { title: "Teacher Hours", url: "/dashboard/owner/teacherhours", icon: Clock },
+      { title: "Finance Console", url: "/dashboard/finance", icon: Landmark },
     ],
   },
   {
@@ -123,7 +128,8 @@ const ownerGroups = [
       { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
-      { title: "Channel Performance", url: "/dashboard/owner/channelperformance", icon: TrendingUp },
+      { title: "Channel Performance", url: "/dashboard/channel-performance", icon: TrendingUp },
+      { title: "Schema Diagnostics", url: "/dashboard/admin/schema-diagnostics", icon: Shield },
     ],
   },
 ];
@@ -168,11 +174,15 @@ const officeAdminGroups = [
       { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
       { title: "Payments", url: "/dashboard/owner/payment", icon: Wallet },
+      { title: "Notifications Center", url: "/dashboard/notifications", icon: Bell },
     ],
   },
   {
     label: "Operations (T3)",
     items: [
+      { title: "Admissions", url: "/dashboard/admissions", icon: LayoutDashboard },
+      { title: "Onboarding", url: "/dashboard/onboarding", icon: ClipboardCheck },
+      { title: "Payments & Receipts", url: "/dashboard/payments", icon: Wallet },
       { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
       { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
       { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
@@ -189,7 +199,7 @@ const officeAdminGroups = [
       { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
-      { title: "Channel Performance", url: "/dashboard/owner/channelperformance", icon: TrendingUp },
+      { title: "Channel Performance", url: "/dashboard/channel-performance", icon: TrendingUp },
     ],
   },
 ];
@@ -198,6 +208,7 @@ const smmGroups = [
   {
     label: "CRM & Operations",
     items: [
+      { title: "Admissions", url: "/dashboard/admissions", icon: LayoutDashboard },
       { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
       { title: "Trials", url: "/dashboard/owner/trial", icon: Play },
       { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
@@ -209,7 +220,7 @@ const smmGroups = [
       { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
-      { title: "Channel Performance", url: "/dashboard/owner/channelperformance", icon: TrendingUp },
+      { title: "Channel Performance", url: "/dashboard/channel-performance", icon: TrendingUp },
     ],
   },
 ];
@@ -218,14 +229,7 @@ const financeGroups = [
   {
     label: "Financial Registry (T1)",
     items: [
-      { title: "Chart of Accounts", url: "/dashboard/owner/account", icon: Landmark },
-      { title: "Journal Entries", url: "/dashboard/owner/journalentry", icon: BookOpen },
-      { title: "Ledger Lines", url: "/dashboard/owner/ledgerline", icon: ListTodo },
-      { title: "Vendors", url: "/dashboard/owner/vendor", icon: Truck },
-      { title: "Expenses", url: "/dashboard/owner/expense", icon: CreditCard },
-      { title: "Franchise Royalties", url: "/dashboard/owner/franchiseroyalty", icon: Percent },
-      { title: "Teacher Pay", url: "/dashboard/owner/teacherpay", icon: DollarSign },
-      { title: "Teacher Hours", url: "/dashboard/owner/teacherhours", icon: Clock },
+      { title: "Finance Console", url: "/dashboard/finance", icon: Landmark },
     ],
   },
   {
@@ -235,6 +239,7 @@ const financeGroups = [
       { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
       { title: "Payments", url: "/dashboard/owner/payment", icon: Wallet },
+      { title: "Payments Module", url: "/dashboard/payments", icon: Wallet },
     ],
   },
   {
@@ -262,12 +267,12 @@ export function AppSidebar({ user }: AppSidebarProps) {
 
   // Define allowed nav items per role
   const rolePermissions: Record<string, string[]> = {
-    owner: ["Overview", "Branches", "Staff & Users", "Students", "Schedule", "Billing"],
+    owner: ["Overview", "Branches", "Staff & Users", "Students", "Schedule", "Billing", "Schema Diagnostics"],
     finance: ["Overview", "Billing"],
     office_admin: ["Overview", "Branches", "Staff & Users", "Students", "Schedule", "Billing"],
     teacher: ["Overview", "Branches", "Students", "Schedule"],
     smm: ["Overview", "Branches", "Students", "Schedule"],
-    tech_admin: ["Overview"],
+    tech_admin: ["Overview", "Schema Diagnostics"],
   };
 
   const allowedTitles = rolePermissions[userRole] || ["Overview"];
@@ -308,11 +313,10 @@ export function AppSidebar({ user }: AppSidebarProps) {
                           </span>
                         </Link>
                       }
-                      className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${
-                        pathname === "/dashboard"
+                      className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${pathname === "/dashboard"
                           ? "bg-primary/10 text-primary font-semibold"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      }`}
+                        }`}
                     />
                   </SidebarMenuItem>
                 </SidebarMenu>
@@ -342,11 +346,10 @@ export function AppSidebar({ user }: AppSidebarProps) {
                                 </span>
                               </Link>
                             }
-                            className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${
-                              isActive
+                            className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${isActive
                                 ? "bg-primary/10 text-primary font-semibold"
                                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                            }`}
+                              }`}
                           />
                         </SidebarMenuItem>
                       );
@@ -378,11 +381,10 @@ export function AppSidebar({ user }: AppSidebarProps) {
                             </span>
                           </Link>
                         }
-                        className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${
-                          isActive
+                        className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${isActive
                             ? "bg-primary/10 text-primary font-semibold"
                             : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                        }`}
+                          }`}
                       />
                     </SidebarMenuItem>
                   );

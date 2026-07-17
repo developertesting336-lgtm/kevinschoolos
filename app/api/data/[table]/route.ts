@@ -170,7 +170,6 @@ export async function GET(
   }
 
   try {
-
     // Parse query params
     const search = searchParams.get("search") || undefined;
     const pageStr = searchParams.get("page");
@@ -178,21 +177,398 @@ export async function GET(
     const sortBy = searchParams.get("sortBy") || undefined;
     const sortOrder = searchParams.get("sortOrder") || "asc";
 
-    // Build Search Filter
-    const searchFilter = search && searchableFields[prismaModelName]
-      ? {
-          OR: searchableFields[prismaModelName].map((field) => ({
-            [field]: {
-              contains: search,
-              mode: "insensitive",
-            },
-          })),
-        }
-      : undefined;
+    // Build Search Filter & Custom Filters
+    let combinedWhere: Record<string, any> = { ...whereFilter };
 
-    const combinedWhere = searchFilter
-      ? { AND: [whereFilter, searchFilter] }
-      : whereFilter;
+    if (prismaModelName === "lead" && search) {
+      // Find parent records matching the search term
+      const matchingParents = await prisma.parent.findMany({
+        where: {
+          parentName: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        select: { id: true },
+      });
+      const parentIds = matchingParents.map((p) => p.id);
+
+      const searchConditions: any[] = [
+        ...searchableFields.lead.map((field) => ({
+          [field]: {
+            contains: search,
+            mode: "insensitive",
+          },
+        })),
+      ];
+
+      if (parentIds.length > 0) {
+        searchConditions.push({
+          parentIds: {
+            hasSome: parentIds,
+          },
+        });
+      }
+
+      combinedWhere = {
+        ...combinedWhere,
+        AND: [
+          ...(combinedWhere.AND as any[] || []),
+          { OR: searchConditions }
+        ],
+      };
+    } else if (prismaModelName === "payment" && search) {
+      const matchingParents = await prisma.parent.findMany({
+        where: {
+          parentName: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        select: { id: true },
+      });
+      const parentIds = matchingParents.map((p) => p.id);
+
+      const matchingInvoices = await prisma.invoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        select: { id: true },
+      });
+      const invoiceIds = matchingInvoices.map((inv) => inv.id);
+
+      const matchingStudents = await prisma.student.findMany({
+        where: {
+          studentName: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        select: { id: true, parentIds: true },
+      });
+      const studentIds = matchingStudents.map((s) => s.id);
+      const studentParentIds = Array.from(new Set(matchingStudents.flatMap((s) => s.parentIds)));
+
+      let invoiceIdsFromStudents: string[] = [];
+      if (studentIds.length > 0) {
+        const invoicesForStudents = await prisma.invoice.findMany({
+          where: {
+            studentIds: {
+              hasSome: studentIds,
+            },
+          },
+          select: { id: true },
+        });
+        invoiceIdsFromStudents = invoicesForStudents.map((inv) => inv.id);
+      }
+
+      const combinedInvoiceIds = Array.from(new Set([...invoiceIds, ...invoiceIdsFromStudents]));
+      const combinedParentIds = Array.from(new Set([...parentIds, ...studentParentIds]));
+
+      const searchConditions: any[] = [
+        {
+          paymentRef: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+
+      if (combinedParentIds.length > 0) {
+        searchConditions.push({
+          parentIds: {
+            hasSome: combinedParentIds,
+          },
+        });
+      }
+
+      if (combinedInvoiceIds.length > 0) {
+        searchConditions.push({
+          invoiceIds: {
+            hasSome: combinedInvoiceIds,
+          },
+        });
+      }
+
+      combinedWhere = {
+        ...combinedWhere,
+        AND: [
+          ...(combinedWhere.AND as any[] || []),
+          { OR: searchConditions }
+        ],
+      };
+    } else if (prismaModelName === "enrollment" && search) {
+      const matchingStudents = await prisma.student.findMany({
+        where: {
+          studentName: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        select: { id: true },
+      });
+      const studentIds = matchingStudents.map((s) => s.id);
+
+      const matchingParents = await prisma.parent.findMany({
+        where: {
+          parentName: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        select: { studentIds: true },
+      });
+      const parentStudentIds = Array.from(new Set(matchingParents.flatMap((p) => p.studentIds)));
+
+      const targetStudentIds = Array.from(new Set([...studentIds, ...parentStudentIds]));
+
+      const matchingCGs = await prisma.classGroup.findMany({
+        where: {
+          groupName: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        select: { id: true },
+      });
+      const cgIds = matchingCGs.map((cg) => cg.id);
+
+      const matchingCourses = await prisma.course.findMany({
+        where: {
+          courseName: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        select: { id: true },
+      });
+      const courseIds = matchingCourses.map((c) => c.id);
+
+      let targetCgIds = [...cgIds];
+      if (courseIds.length > 0) {
+        const cgByCourses = await prisma.classGroup.findMany({
+          where: {
+            courseIds: {
+              hasSome: courseIds,
+            },
+          },
+          select: { id: true },
+        });
+        targetCgIds = Array.from(new Set([...targetCgIds, ...cgByCourses.map((cg) => cg.id)]));
+      }
+
+      const searchConditions: any[] = [
+        {
+          enrollmentId: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+
+      if (targetStudentIds.length > 0) {
+        searchConditions.push({
+          studentIds: {
+            hasSome: targetStudentIds,
+          },
+        });
+      }
+
+      if (targetCgIds.length > 0) {
+        searchConditions.push({
+          classGroupIds: {
+            hasSome: targetCgIds,
+          },
+        });
+      }
+
+      combinedWhere = {
+        ...combinedWhere,
+        AND: [
+          ...(combinedWhere.AND as any[] || []),
+          { OR: searchConditions }
+        ],
+      };
+    } else if (search && searchableFields[prismaModelName]) {
+      combinedWhere = {
+        ...combinedWhere,
+        AND: [
+          ...(combinedWhere.AND as any[] || []),
+          {
+            OR: searchableFields[prismaModelName].map((field) => ({
+              [field]: {
+                contains: search,
+                mode: "insensitive",
+              },
+            })),
+          }
+        ]
+      };
+    }
+
+    // Apply specific filters for "lead" table
+    if (prismaModelName === "lead") {
+      const branchFilter = searchParams.get("branch");
+      const statusFilter = searchParams.get("status");
+      const ownerFilter = searchParams.get("owner");
+      const sourceFilter = searchParams.get("source");
+      const trialDateFilter = searchParams.get("trialDate");
+
+      const filterConditions: any[] = [];
+
+      if (branchFilter) {
+        filterConditions.push({ branchIds: { has: branchFilter } });
+      }
+      if (statusFilter) {
+        filterConditions.push({ status: { equals: statusFilter, mode: "insensitive" } });
+      }
+      if (ownerFilter) {
+        filterConditions.push({ ownerIds: { has: ownerFilter } });
+      }
+      if (sourceFilter) {
+        filterConditions.push({ channel: { equals: sourceFilter, mode: "insensitive" } });
+      }
+      if (trialDateFilter) {
+        const targetDate = new Date(trialDateFilter);
+        if (!isNaN(targetDate.getTime())) {
+          const startOfDay = new Date(targetDate);
+          startOfDay.setUTCHours(0, 0, 0, 0);
+          const endOfDay = new Date(targetDate);
+          endOfDay.setUTCHours(23, 59, 59, 999);
+
+          const matchingTrials = await prisma.trial.findMany({
+            where: {
+              dateTime: {
+                gte: startOfDay,
+                lte: endOfDay,
+              },
+            },
+            select: { leadIds: true },
+          });
+          const leadIds = Array.from(new Set(matchingTrials.flatMap((t) => t.leadIds)));
+          filterConditions.push({ id: { in: leadIds } });
+        }
+      }
+
+      if (filterConditions.length > 0) {
+        combinedWhere = {
+          ...combinedWhere,
+          AND: [
+            ...(combinedWhere.AND as any[] || []),
+            ...filterConditions,
+          ],
+        };
+      }
+    } else if (prismaModelName === "enrollment") {
+      const branchFilter = searchParams.get("branch");
+      const statusFilter = searchParams.get("onboardingStatus");
+      const ownerFilter = searchParams.get("owner");
+      const enrollDateFilter = searchParams.get("enrollDate");
+
+      const filterConditions: any[] = [];
+
+      if (branchFilter) {
+        filterConditions.push({ branchIds: { has: branchFilter } });
+      }
+      if (statusFilter) {
+        if (statusFilter.toLowerCase() === "pending") {
+          filterConditions.push({
+            OR: [
+              { onboardingStatus: { equals: "Pending", mode: "insensitive" } },
+              { onboardingStatus: null },
+              { onboardingStatus: "" },
+            ],
+          });
+        } else {
+          filterConditions.push({ onboardingStatus: { equals: statusFilter, mode: "insensitive" } });
+        }
+      }
+      if (ownerFilter) {
+        const matchingClassGroups = await prisma.classGroup.findMany({
+          where: { teacherIds: { has: ownerFilter } },
+          select: { id: true },
+        });
+        const cgIds = matchingClassGroups.map((cg) => cg.id);
+        filterConditions.push({ classGroupIds: { hasSome: cgIds } });
+      }
+      if (enrollDateFilter) {
+        const targetDate = new Date(enrollDateFilter);
+        if (!isNaN(targetDate.getTime())) {
+          const startOfDay = new Date(targetDate);
+          startOfDay.setUTCHours(0, 0, 0, 0);
+          const endOfDay = new Date(targetDate);
+          endOfDay.setUTCHours(23, 59, 59, 999);
+
+          filterConditions.push({
+            enrollDate: {
+              gte: startOfDay,
+              lte: endOfDay,
+            },
+          });
+        }
+      }
+
+      if (filterConditions.length > 0) {
+        combinedWhere = {
+          ...combinedWhere,
+          AND: [
+            ...(combinedWhere.AND as any[] || []),
+            ...filterConditions,
+          ],
+        };
+      }
+    } else if (prismaModelName === "payment") {
+      const branchFilter = searchParams.get("branch");
+      const paymentTypeFilter = searchParams.get("paymentType");
+      const paymentMethodFilter = searchParams.get("paymentMethod");
+      const dateFilter = searchParams.get("date");
+
+      const filterConditions: any[] = [];
+
+      if (branchFilter) {
+        filterConditions.push({ branchIds: { has: branchFilter } });
+      }
+      if (paymentTypeFilter) {
+        filterConditions.push({
+          paymentType: {
+            contains: paymentTypeFilter,
+            mode: "insensitive",
+          },
+        });
+      }
+      if (paymentMethodFilter) {
+        filterConditions.push({ method: { equals: paymentMethodFilter, mode: "insensitive" } });
+      }
+      if (dateFilter) {
+        const targetDate = new Date(dateFilter);
+        if (!isNaN(targetDate.getTime())) {
+          const startOfDay = new Date(targetDate);
+          startOfDay.setUTCHours(0, 0, 0, 0);
+          const endOfDay = new Date(targetDate);
+          endOfDay.setUTCHours(23, 59, 59, 999);
+
+          filterConditions.push({
+            date: {
+              gte: startOfDay,
+              lte: endOfDay,
+            },
+          });
+        }
+      }
+
+      if (filterConditions.length > 0) {
+        combinedWhere = {
+          ...combinedWhere,
+          AND: [
+            ...(combinedWhere.AND as any[] || []),
+            ...filterConditions,
+          ],
+        };
+      }
+    }
 
     // Build Sorting
     const orderBy = sortBy

@@ -24,7 +24,7 @@ const SENSITIVE_TABLES = [
   "Payment",
 ];
 
-import { checkRBAC, getScopingFilter } from "@/lib/rbac";
+import { checkRBAC, getScopingFilter, normalizeRole } from "@/lib/rbac";
 
 export async function GET(
   request: NextRequest,
@@ -67,6 +67,44 @@ export async function GET(
 
     const userRole = dbUser.role || "staff";
     const userBranchIds = dbUser.branchIds || [];
+    const normUserRole = normalizeRole(userRole);
+
+    // ---- Task 1: Hard owner-only gate (before any table/RBAC logic) ----
+    // Check for break-glass signal: breakglass=1 query param
+    const searchParams = request.nextUrl.searchParams;
+    const isBreakGlass = searchParams.get("breakglass") === "1";
+
+    if (normUserRole !== "owner" && !(normUserRole === "tech_admin" && isBreakGlass)) {
+      auditService.logFailure(
+        { id: dbUser.id, email: dbUser.email, role: userRole },
+        "PERMISSION_DENIED",
+        table,
+        "Generic table renderer is owner-only.",
+        request
+      );
+      return NextResponse.json(
+        { error: "Generic table renderer is owner-only." },
+        { status: 403 }
+      );
+    }
+
+    // If this is a tech_admin break-glass access, log a distinct audit event
+    if (normUserRole === "tech_admin" && isBreakGlass) {
+      // Log break-glass audit entry — clearly labeled for easy review
+      auditService.log({
+        actorId: dbUser.id,
+        actorEmail: dbUser.email,
+        role: "tech_admin",
+        branchIds: userBranchIds,
+        action: "SENSITIVE_ACCESS",
+        tableName: "break_glass_owner_table_renderer",
+        recordIds: [],
+        fieldIds: [],
+        result: "SUCCESS",
+        details: `BREAK-GLASS: tech_admin accessed owner-only generic table renderer for table "${table}".`,
+      }, request);
+    }
+    // ---- End owner-only gate ----
 
     const normalizedTable = table.toLowerCase();
     const config = ownerTablesConfig[normalizedTable];
@@ -85,7 +123,7 @@ export async function GET(
     // Prisma dynamic model mapping
     prismaModelName = config.modelName;
 
-    // Check RBAC permission for the role and table
+    // Check RBAC permission for the role and table (secondary safety net)
     const rbacCheck = checkRBAC(userRole, prismaModelName, "read", false);
     if (!rbacCheck.allowed) {
       auditService.logFailure(
@@ -98,8 +136,7 @@ export async function GET(
       return NextResponse.json({ error: rbacCheck.reason }, { status: 403 });
     }
 
-    // 3. Parse query params
-    const searchParams = request.nextUrl.searchParams;
+    // 3. Parse query params (skip breakglass as it's already consumed)
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const limit = Math.max(1, parseInt(searchParams.get("limit") || "10", 10));
     const search = searchParams.get("search") || "";

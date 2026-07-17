@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,18 +10,21 @@ import {
   Building2,
   Landmark,
   BookOpen,
-  ListTodo,
-  Truck,
   CreditCard,
   Percent,
   DollarSign,
-  Clock,
   UserPlus,
   Award,
   Receipt,
   FolderOpen,
-  ChevronRight
+  ChevronRight,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
+import { LedgerViewer } from "@/components/dashboard/finance/LedgerViewer";
+import { RoyaltyViewer } from "@/components/dashboard/finance/RoyaltyViewer";
+import { TeacherPayViewer } from "@/components/dashboard/finance/TeacherPayViewer";
+import { ExpenseList } from "@/components/dashboard/finance/ExpenseList";
 
 interface FinanceDashboardClientProps {
   stats: {
@@ -41,6 +43,8 @@ interface FinanceDashboardClientProps {
   accounts: any[];
 }
 
+type ExpandedSection = "ledger" | "royalties" | "teacher-pay" | "expenses" | null;
+
 export function FinanceDashboardClient({
   stats,
   invoices,
@@ -48,21 +52,24 @@ export function FinanceDashboardClient({
   expenses,
   accounts
 }: FinanceDashboardClientProps) {
-  // Finance folders list
+  const [expandedSection, setExpandedSection] = useState<ExpandedSection>("expenses");
+
+  const toggleSection = (section: ExpandedSection) => {
+    setExpandedSection(expandedSection === section ? null : section);
+  };
+
+  // Finance folders list — only tiles with dedicated finance views remain
   const registryTiers = [
     {
       title: "Financial Registry (T1)",
       description: "Direct accounting books, ledger entries, expenses, and payroll tables",
       color: "border-rose-500/25 bg-rose-500/5",
       items: [
-        { name: "Chart of Accounts", url: "/dashboard/owner/account", count: accounts.length, icon: Landmark },
-        { name: "Journal Entries", url: "/dashboard/owner/journalentry", count: null, icon: BookOpen },
-        { name: "Ledger Lines", url: "/dashboard/owner/ledgerline", count: null, icon: ListTodo },
-        { name: "Vendors List", url: "/dashboard/owner/vendor", count: null, icon: Truck },
-        { name: "Branch Expenses", url: "/dashboard/owner/expense", count: expenses.length, icon: CreditCard },
-        { name: "HQ Franchise Royalties", url: "/dashboard/owner/franchiseroyalty", count: null, icon: Percent },
-        { name: "Teacher Pay Runs", url: "/dashboard/owner/teacherpay", count: null, icon: DollarSign },
-        { name: "Teacher Worked Hours", url: "/dashboard/owner/teacherhours", count: null, icon: Clock },
+        { name: "Chart of Accounts", count: accounts.length, icon: Landmark, section: null as ExpandedSection, summary: true },
+        { name: "Journal Entries & Ledger Lines", count: null, icon: BookOpen, section: "ledger" as ExpandedSection, summary: false },
+        { name: "Branch Expenses", count: expenses.length, icon: CreditCard, section: "expenses" as ExpandedSection, summary: false },
+        { name: "HQ Franchise Royalties", count: null, icon: Percent, section: "royalties" as ExpandedSection, summary: false },
+        { name: "Teacher Pay Runs & Hours", count: null, icon: DollarSign, section: "teacher-pay" as ExpandedSection, summary: false },
       ],
     },
     {
@@ -70,10 +77,10 @@ export function FinanceDashboardClient({
       description: "Customer directories, active tuition enrollments, and ledger ledgers",
       color: "border-blue-500/25 bg-blue-500/5",
       items: [
-        { name: "Students Registry", url: "/dashboard/owner/student", count: stats.totalStudents, icon: GraduationCap },
-        { name: "Tuition Enrollments", url: "/dashboard/owner/enrollment", count: stats.totalEnrollments, icon: UserPlus },
-        { name: "Invoices Ledger", url: "/dashboard/owner/invoice", count: stats.invoicesCount, icon: FileText },
-        { name: "Payments Received", url: "/dashboard/owner/payment", count: stats.recentPayments, icon: Wallet },
+        { name: "Students Registry", count: stats.totalStudents, icon: GraduationCap, section: null as ExpandedSection, summary: true },
+        { name: "Tuition Enrollments", count: stats.totalEnrollments, icon: UserPlus, section: null as ExpandedSection, summary: true },
+        { name: "Invoices Ledger", count: stats.invoicesCount, icon: FileText, section: null as ExpandedSection, summary: true },
+        { name: "Payments Received", count: stats.recentPayments, icon: Wallet, section: null as ExpandedSection, summary: true },
       ],
     },
     {
@@ -81,83 +88,83 @@ export function FinanceDashboardClient({
       description: "Branches directories, academic curriculum catalogs, and tuition matrices",
       color: "border-purple-500/25 bg-purple-500/5",
       items: [
-        { name: "Branches Config", url: "/dashboard/owner/branch", count: stats.branchesCount, icon: Building2 },
-        { name: "Courses Catalog", url: "/dashboard/owner/course", count: stats.coursesCount, icon: Award },
-        { name: "Tuition Fee Plans", url: "/dashboard/owner/tuitionplan", count: null, icon: Receipt },
+        { name: "Branches Config", count: stats.branchesCount, icon: Building2, section: null as ExpandedSection, summary: true },
+        { name: "Courses Catalog", count: stats.coursesCount, icon: Award, section: null as ExpandedSection, summary: true },
+        { name: "Tuition Fee Plans", count: null, icon: Receipt, section: null as ExpandedSection, summary: true },
       ],
     },
   ];
 
   return (
     <div className="space-y-8 select-none animate-in fade-in duration-300">
-      {/* 4 Stats Cards Grid */}
+      {/* 4 Stats Cards Grid — read-only summary cards, no link-outs to owner routes */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Scoped Active Students */}
-        <Link href="/dashboard/owner/student" className="block group">
-          <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer">
+        <div className="block group">
+          <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-default">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
                 Active Students
               </span>
-              <GraduationCap className="h-3.5 w-3.5 text-primary/75 group-hover:scale-110 transition-transform" />
+              <GraduationCap className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
               <div className="text-xl font-extrabold text-foreground">{stats.activeStudents}</div>
               <p className="text-[8px] text-muted-foreground font-medium mt-0.5">Reference directories</p>
             </CardContent>
           </Card>
-        </Link>
+        </div>
 
         {/* Scoped Billing Invoices */}
-        <Link href="/dashboard/owner/invoice" className="block group">
-          <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer">
+        <div className="block group">
+          <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-default">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
                 Total Invoices
               </span>
-              <FileText className="h-3.5 w-3.5 text-primary/75 group-hover:scale-110 transition-transform" />
+              <FileText className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
               <div className="text-xl font-extrabold text-foreground">{stats.invoicesCount || 0}</div>
               <p className="text-[8px] text-muted-foreground font-medium mt-0.5">Pending & posted billing</p>
             </CardContent>
           </Card>
-        </Link>
+        </div>
 
         {/* Payments Collected */}
-        <Link href="/dashboard/owner/payment" className="block group">
-          <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer">
+        <div className="block group">
+          <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-default">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
                 Payments Count
               </span>
-              <Wallet className="h-3.5 w-3.5 text-primary/75 group-hover:scale-110 transition-transform" />
+              <Wallet className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
               <div className="text-xl font-extrabold text-foreground">{stats.recentPayments}</div>
               <p className="text-[8px] text-muted-foreground font-medium mt-0.5">Transactions ledger</p>
             </CardContent>
           </Card>
-        </Link>
+        </div>
 
         {/* Scoped Branches */}
-        <Link href="/dashboard/owner/branch" className="block group">
-          <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer">
+        <div className="block group">
+          <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-default">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
                 My Branches
               </span>
-              <Building2 className="h-3.5 w-3.5 text-primary/75 group-hover:scale-110 transition-transform" />
+              <Building2 className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
               <div className="text-xl font-extrabold text-foreground">{stats.branchesCount}</div>
               <p className="text-[8px] text-muted-foreground font-medium mt-0.5">Financial units</p>
             </CardContent>
           </Card>
-        </Link>
+        </div>
       </div>
 
-      {/* Database folders sections */}
+      {/* Database folders sections — no links to /dashboard/owner/ */}
       <div className="space-y-4">
         <h3 className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground/80 flex items-center gap-1.5 pl-1">
           <FolderOpen className="h-4 w-4 text-primary" />
@@ -172,26 +179,67 @@ export function FinanceDashboardClient({
               </CardHeader>
               <CardContent className="p-4 flex-1">
                 <div className="space-y-2">
-                  {tier.items.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.url}
-                      className="flex items-center justify-between p-2.5 rounded-lg border border-border/40 hover:bg-muted/15 transition-colors cursor-pointer group/item"
-                    >
-                      <div className="flex items-center gap-2">
-                        <item.icon className="h-4 w-4 text-muted-foreground group-hover/item:text-primary transition-colors shrink-0" />
-                        <span className="text-[11px] font-bold text-foreground">{item.name}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {item.count !== null && (
-                          <Badge variant="outline" className="text-[8px] py-0 px-1.5 font-mono text-muted-foreground font-semibold">
-                            {item.count}
-                          </Badge>
+                  {tier.items.map((item) => {
+                    const isExpandable = item.section && !item.summary;
+                    const isExpanded = expandedSection === item.section;
+
+                    if (item.summary) {
+                      // Summary-only card — no click target, just shows count
+                      return (
+                        <div
+                          key={item.name}
+                          className="flex items-center justify-between p-2.5 rounded-lg border border-border/40 bg-muted/5"
+                        >
+                          <div className="flex items-center gap-2">
+                            <item.icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <span className="text-[11px] font-bold text-foreground">{item.name}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {item.count !== null && (
+                              <Badge variant="outline" className="text-[8px] py-0 px-1.5 font-mono text-muted-foreground font-semibold">
+                                {item.count}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Expandable tile with dedicated finance view
+                    return (
+                      <div key={item.name}>
+                        <button
+                          onClick={() => toggleSection(item.section)}
+                          className="w-full flex items-center justify-between p-2.5 rounded-lg border border-border/40 hover:bg-muted/15 transition-colors cursor-pointer group/item"
+                        >
+                          <div className="flex items-center gap-2">
+                            <item.icon className="h-4 w-4 text-muted-foreground group-hover/item:text-primary transition-colors shrink-0" />
+                            <span className="text-[11px] font-bold text-foreground">{item.name}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {item.count !== null && (
+                              <Badge variant="outline" className="text-[8px] py-0 px-1.5 font-mono text-muted-foreground font-semibold">
+                                {item.count}
+                              </Badge>
+                            )}
+                            {isExpanded ? (
+                              <ChevronUp className="h-3 w-3 text-muted-foreground shrink-0" />
+                            ) : (
+                              <ChevronDown className="h-3 w-3 text-muted-foreground/50 shrink-0" />
+                            )}
+                          </div>
+                        </button>
+                        {isExpanded && (
+                          <div className="mt-2 pl-2">
+                            {item.section === "ledger" && <LedgerViewer />}
+                            {item.section === "royalties" && <RoyaltyViewer />}
+                            {item.section === "teacher-pay" && <TeacherPayViewer />}
+                            {item.section === "expenses" && <ExpenseList />}
+                          </div>
                         )}
-                        <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/item:text-primary transition-colors shrink-0" />
                       </div>
-                    </Link>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -199,19 +247,15 @@ export function FinanceDashboardClient({
         </div>
       </div>
 
-      {/* Financial logs feeds */}
+      {/* Financial logs feeds — read-only previews, no link-outs */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Recent Payments ledger */}
+        {/* Left Column: Recent Payments ledger — no link-out */}
         <Card className="bg-card border-border shadow-md overflow-hidden">
           <CardHeader className="border-b border-border py-4 px-5 bg-muted/10 flex flex-row items-center justify-between space-y-0">
             <div>
               <CardTitle className="text-sm font-bold text-foreground">Recent Payments</CardTitle>
               <CardDescription className="text-[10px]">Posted cash flows, credit receipts, and transfers</CardDescription>
             </div>
-            <Link href="/dashboard/owner/payment" className="inline-flex items-center gap-1 text-xs text-primary font-bold hover:underline">
-              Ledger
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
           </CardHeader>
           <CardContent className="p-5">
             {payments.length === 0 ? (
@@ -243,17 +287,13 @@ export function FinanceDashboardClient({
           </CardContent>
         </Card>
 
-        {/* Center Column: Recent Invoices issued */}
+        {/* Center Column: Recent Invoices issued — no link-out */}
         <Card className="bg-card border-border shadow-md overflow-hidden">
           <CardHeader className="border-b border-border py-4 px-5 bg-muted/10 flex flex-row items-center justify-between space-y-0">
             <div>
               <CardTitle className="text-sm font-bold text-foreground">Recent Invoices</CardTitle>
               <CardDescription className="text-[10px]">Tuition fees, materials billing, and assessments</CardDescription>
             </div>
-            <Link href="/dashboard/owner/invoice" className="inline-flex items-center gap-1 text-xs text-primary font-bold hover:underline">
-              Ledger
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
           </CardHeader>
           <CardContent className="p-5">
             {invoices.length === 0 ? (
@@ -292,17 +332,20 @@ export function FinanceDashboardClient({
           </CardContent>
         </Card>
 
-        {/* Right Column: Recent Expenses */}
+        {/* Right Column: Recent Expenses — no link-out */}
         <Card className="bg-card border-border shadow-md overflow-hidden">
           <CardHeader className="border-b border-border py-4 px-5 bg-muted/10 flex flex-row items-center justify-between space-y-0">
             <div>
               <CardTitle className="text-sm font-bold text-foreground">Recent Expenses</CardTitle>
               <CardDescription className="text-[10px]">Operational bills, hardware utilities, and payrolls</CardDescription>
             </div>
-            <Link href="/dashboard/owner/expense" className="inline-flex items-center gap-1 text-xs text-primary font-bold hover:underline">
-              Ledger
+            <button
+              onClick={() => toggleSection("expenses")}
+              className="inline-flex items-center gap-1 text-xs text-primary font-bold hover:underline"
+            >
+              {expandedSection === "expenses" ? "Hide" : "View All"}
               <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+            </button>
           </CardHeader>
           <CardContent className="p-5">
             {expenses.length === 0 ? (
@@ -341,6 +384,28 @@ export function FinanceDashboardClient({
           </CardContent>
         </Card>
       </div>
+
+      {/* Expanded section content area */}
+      {expandedSection === "ledger" && (
+        <div className="mt-4">
+          <LedgerViewer />
+        </div>
+      )}
+      {expandedSection === "royalties" && (
+        <div className="mt-4">
+          <RoyaltyViewer />
+        </div>
+      )}
+      {expandedSection === "teacher-pay" && (
+        <div className="mt-4">
+          <TeacherPayViewer />
+        </div>
+      )}
+      {expandedSection === "expenses" && (
+        <div className="mt-4">
+          <ExpenseList />
+        </div>
+      )}
     </div>
   );
 }

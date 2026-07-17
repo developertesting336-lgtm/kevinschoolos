@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShieldAlert } from "lucide-react";
 import { ownerTablesConfig } from "@/lib/owner-schema";
+import { normalizeRole } from "@/lib/roles";
 import { OwnerTableClient } from "@/components/dashboard/OwnerTableClient";
 
 // Force dynamic fetch
@@ -37,7 +38,6 @@ export default async function OwnerTablePage({
     redirect("/login");
   }
 
-  // 2. Fetch full user details and check Owner role
   // 2. Fetch full user details and check role access
   const dbUser = await prisma.user.findUnique({
     where: { id: session.userId },
@@ -45,6 +45,7 @@ export default async function OwnerTablePage({
   });
 
   const userRole = dbUser?.role || "staff";
+  const normUserRole = normalizeRole(userRole);
   const userBranchIds = dbUser?.branchIds || [];
 
   // 3. Resolve target table configuration
@@ -67,6 +68,45 @@ export default async function OwnerTablePage({
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground leading-relaxed">
               The table name <span className="font-semibold text-foreground">"{table}"</span> does not match any known security tier modules.
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 text-xs font-semibold text-primary hover:underline"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Back to Dashboard Overview
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // ---- Task 1: Hard owner-only gate (before any RBAC logic) ----
+  // Consume searchParams once, check for break-glass signal: breakglass=1 query param
+  const sParams = await searchParams;
+  const isBreakGlass = sParams?.breakglass === "1";
+
+  if (normUserRole !== "owner" && !(normUserRole === "tech_admin" && isBreakGlass)) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center select-none animate-in fade-in duration-300 px-4">
+        <Card className="max-w-md w-full border-destructive/30 bg-destructive/5 shadow-lg shadow-destructive/5">
+          <CardHeader className="flex flex-col items-center pb-2">
+            <div className="h-12 w-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mb-2">
+              <ShieldAlert className="h-6 w-6" />
+            </div>
+            <CardTitle className="text-xl font-bold text-destructive">
+              Access Restricted
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground mt-1">
+              Generic table renderer is owner-only.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Your role <span className="font-semibold text-foreground capitalize">({userRole})</span> does not have access to view this administration panel.
             </p>
             <div className="pt-2">
               <Link
@@ -122,8 +162,7 @@ export default async function OwnerTablePage({
     );
   }
 
-  // 4. Construct Backend API Query URL
-  const sParams = await searchParams;
+  // 4. Construct Backend API Query URL (sParams already consumed above)
   const page = sParams.page || "1";
   const limit = sParams.limit || "10";
   const search = sParams.search || "";
