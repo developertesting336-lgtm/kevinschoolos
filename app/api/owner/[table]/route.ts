@@ -74,7 +74,7 @@ export async function GET(
     const searchParams = request.nextUrl.searchParams;
     const isBreakGlass = searchParams.get("breakglass") === "1";
 
-    if (normUserRole !== "owner" && !(normUserRole === "tech_admin" && isBreakGlass)) {
+    if (normUserRole === "tech_admin" && !isBreakGlass) {
       auditService.logFailure(
         { id: dbUser.id, email: dbUser.email, role: userRole },
         "PERMISSION_DENIED",

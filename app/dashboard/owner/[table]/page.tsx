@@ -89,7 +89,7 @@ export default async function OwnerTablePage({
   const sParams = await searchParams;
   const isBreakGlass = sParams?.breakglass === "1";
 
-  if (normUserRole !== "owner" && !(normUserRole === "tech_admin" && isBreakGlass)) {
+  if (normUserRole === "tech_admin" && !isBreakGlass) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center select-none animate-in fade-in duration-300 px-4">
         <Card className="max-w-md w-full border-destructive/30 bg-destructive/5 shadow-lg shadow-destructive/5">
