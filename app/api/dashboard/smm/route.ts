@@ -36,8 +36,8 @@ export async function GET() {
       select: { id: true, name: true },
     });
 
-    // Fetch active courses, and recent CRM activities in branch scoped in-memory lookup
-    const [courses, recentActivities] = await Promise.all([
+    // Fetch active courses, recent CRM activities, and stats in branch scoped lookup
+    const [courses, recentActivities, coursesCount, leadsCount, allTrials] = await Promise.all([
       prisma.course.findMany({
         where: { active: true },
         take: 4,
@@ -61,12 +61,41 @@ export async function GET() {
           .filter((a: any) => a.leadIds.some((id: string) => allowedLeadIds.has(id)))
           .slice(0, 4);
       }),
+      prisma.course.count(),
+      prisma.lead.count({
+        where: { branchIds: { hasSome: userBranchIds } },
+      }),
+      prisma.trial.findMany({
+        select: { leadIds: true },
+      }),
     ]);
+
+    // Calculate trials scoped to user's branches
+    const trialLeadIds = Array.from(new Set(allTrials.flatMap((t: any) => t.leadIds || [])));
+    const matchingTrialLeads = await prisma.lead.findMany({
+      where: {
+        id: { in: trialLeadIds },
+        branchIds: { hasSome: userBranchIds },
+      },
+      select: { id: true },
+    });
+    const allowedTrialLeadIds = new Set(matchingTrialLeads.map((l: any) => l.id));
+    const trialsCount = allTrials.filter((t: any) =>
+      t.leadIds.some((id: string) => allowedTrialLeadIds.has(id))
+    ).length;
+
+    const stats = {
+      branchesCount: branches.length,
+      coursesCount,
+      leadsCount,
+      trialsCount,
+    };
 
     return NextResponse.json({
       branches,
       courses,
       recentActivities,
+      stats,
     });
   } catch (error) {
     console.error("[SMM Dashboard API Error]", error);

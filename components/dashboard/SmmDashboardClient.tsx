@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   PhoneCall,
   Play,
@@ -13,26 +14,115 @@ import {
   Receipt,
   TrendingUp,
   FolderOpen,
-  ChevronRight
+  ChevronRight,
+  AlertCircle,
 } from "lucide-react";
 
-interface SmmDashboardClientProps {
-  stats: {
-    branchesCount: number;
-    coursesCount: number;
-    leadsCount: number;
-    trialsCount: number;
-  };
-  courses: any[];
-  recentActivities: any[];
+interface Stats {
+  branchesCount: number;
+  coursesCount: number;
+  leadsCount: number;
+  trialsCount: number;
 }
 
-export function SmmDashboardClient({
-  stats,
-  courses,
-  recentActivities
-}: SmmDashboardClientProps) {
-  // SMM directories folders
+interface Activity {
+  id: string;
+  activityId: string;
+  type: string | null;
+  outcome: string | null;
+  notes: string | null;
+  dateTime: string | null;
+}
+
+interface Course {
+  id: string;
+  courseName: string;
+  description: string | null;
+  stage: string | null;
+  ageBand: string | null;
+}
+
+interface DashboardData {
+  stats: Stats;
+  courses: Course[];
+  recentActivities: Activity[];
+}
+
+export function SmmDashboardClient() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/dashboard/smm");
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.error || `HTTP ${res.status}`);
+        }
+        const d: DashboardData = await res.json();
+        setData(d);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-8 select-none">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="bg-card border-border">
+              <CardContent className="p-6">
+                <Skeleton className="h-3 w-20 bg-muted rounded mb-3" />
+                <Skeleton className="h-8 w-16 bg-muted rounded mb-2" />
+                <Skeleton className="h-3 w-24 bg-muted rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[1, 2].map((i) => (
+            <Card key={i} className="bg-card border-border">
+              <CardHeader className="border-b border-border py-3 px-5">
+                <Skeleton className="h-4 w-32 bg-muted rounded" />
+              </CardHeader>
+              <CardContent className="p-5">
+                {[1, 2, 3].map((j) => (
+                  <div key={j} className="flex items-center justify-between py-3 border-b border-border/40 last:border-0">
+                    <Skeleton className="h-4 w-36 bg-muted rounded" />
+                    <Skeleton className="h-4 w-16 bg-muted rounded" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="p-8 max-w-lg mx-auto text-center">
+        <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-3" />
+        <h2 className="text-lg font-bold text-foreground mb-1">Unable to Load</h2>
+        <p className="text-sm text-muted-foreground">{error || "No data available."}</p>
+      </div>
+    );
+  }
+
+  const stats = data.stats || { branchesCount: 0, coursesCount: 0, leadsCount: 0, trialsCount: 0 };
+  const courses = data.courses || [];
+  const recentActivities = data.recentActivities || [];
+
   const registryTiers = [
     {
       title: "CRM & Operations Registry (T3)",
@@ -61,13 +151,10 @@ export function SmmDashboardClient({
     <div className="space-y-8 select-none animate-in fade-in duration-300">
       {/* 4 Stats Cards Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* Scoped Branches */}
         <Link href="/dashboard/owner/branch" className="block group">
           <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">
-                My Branches
-              </span>
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">My Branches</span>
               <Building2 className="h-3.5 w-3.5 text-primary/75 group-hover:scale-110 transition-transform" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -77,13 +164,10 @@ export function SmmDashboardClient({
           </Card>
         </Link>
 
-        {/* Course Catalog */}
         <Link href="/dashboard/owner/course" className="block group">
           <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">
-                Course Catalog
-              </span>
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">Course Catalog</span>
               <Award className="h-3.5 w-3.5 text-primary/75 group-hover:scale-110 transition-transform" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -93,13 +177,10 @@ export function SmmDashboardClient({
           </Card>
         </Link>
 
-        {/* Scoped Leads */}
         <Link href="/dashboard/owner/lead" className="block group">
           <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">
-                CRM Leads
-              </span>
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">CRM Leads</span>
               <PhoneCall className="h-3.5 w-3.5 text-primary/75 group-hover:scale-110 transition-transform" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -109,13 +190,10 @@ export function SmmDashboardClient({
           </Card>
         </Link>
 
-        {/* Scoped Trials */}
         <Link href="/dashboard/owner/trial" className="block group">
           <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">
-                Trials Scheduled
-              </span>
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground group-hover:text-primary transition-colors">Trials Scheduled</span>
               <Play className="h-3.5 w-3.5 text-primary/75 group-hover:scale-110 transition-transform" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -170,7 +248,6 @@ export function SmmDashboardClient({
 
       {/* CRM activity feed and syllabus catalog */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Recent activities */}
         <Card className="lg:col-span-2 bg-card border-border shadow-md overflow-hidden">
           <CardHeader className="border-b border-border py-4 px-5 bg-muted/10 flex flex-row items-center justify-between space-y-0">
             <div>
@@ -201,7 +278,7 @@ export function SmmDashboardClient({
                           <span className="text-[10px] text-muted-foreground font-medium">• {act.outcome}</span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2" title={act.notes}>
+                      <p className="text-xs text-muted-foreground line-clamp-2" title={act.notes || ""}>
                         {act.notes || "No description notes logged."}
                       </p>
                     </div>
@@ -215,7 +292,6 @@ export function SmmDashboardClient({
           </CardContent>
         </Card>
 
-        {/* Right Column: Syllabus Courses */}
         <Card className="bg-card border-border shadow-md overflow-hidden">
           <CardHeader className="border-b border-border py-4 px-5 bg-muted/10 flex flex-row items-center justify-between space-y-0">
             <div>
@@ -237,10 +313,10 @@ export function SmmDashboardClient({
                 {courses.map((course) => (
                   <div key={course.id} className="p-3 rounded-lg border border-border/80 bg-muted/5 flex flex-col justify-between space-y-1 hover:border-primary/20 transition-colors">
                     <div className="space-y-0.5">
-                      <h4 className="text-xs font-bold text-foreground truncate" title={course.courseName}>
+                      <h4 className="text-xs font-bold text-foreground truncate" title={course.courseName || ""}>
                         {course.courseName}
                       </h4>
-                      <p className="text-[10px] text-muted-foreground line-clamp-2" title={course.description}>
+                      <p className="text-[10px] text-muted-foreground line-clamp-2" title={course.description || ""}>
                         {course.description || "No curriculum description."}
                       </p>
                     </div>

@@ -12,13 +12,6 @@ import {
   Receipt,
   LogOut,
   Landmark,
-  BookOpen,
-  ListTodo,
-  Truck,
-  CreditCard,
-  Percent,
-  DollarSign,
-  Clock,
   UserCheck,
   UserPlus,
   FileText,
@@ -106,6 +99,7 @@ const ownerGroups = [
       { title: "Admissions", url: "/dashboard/admissions", icon: LayoutDashboard },
       { title: "Onboarding", url: "/dashboard/onboarding", icon: ClipboardCheck },
       { title: "Payments & Receipts", url: "/dashboard/payments", icon: Wallet },
+      { title: "Schedule Console", url: "/dashboard/schedule", icon: Calendar },
       { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
       { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
       { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
@@ -135,6 +129,12 @@ const ownerGroups = [
 ];
 
 const teacherGroups = [
+  {
+    label: "My Today",
+    items: [
+      { title: "My Today", url: "/dashboard", icon: Calendar },
+    ],
+  },
   {
     label: "My Students & CRM",
     items: [
@@ -183,6 +183,7 @@ const officeAdminGroups = [
       { title: "Admissions", url: "/dashboard/admissions", icon: LayoutDashboard },
       { title: "Onboarding", url: "/dashboard/onboarding", icon: ClipboardCheck },
       { title: "Payments & Receipts", url: "/dashboard/payments", icon: Wallet },
+      { title: "Schedule Console", url: "/dashboard/schedule", icon: Calendar },
       { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
       { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
       { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },

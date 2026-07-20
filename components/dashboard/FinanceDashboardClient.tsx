@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   GraduationCap,
   FileText,
@@ -19,46 +20,146 @@ import {
   FolderOpen,
   ChevronRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  AlertCircle,
 } from "lucide-react";
 import { LedgerViewer } from "@/components/dashboard/finance/LedgerViewer";
 import { RoyaltyViewer } from "@/components/dashboard/finance/RoyaltyViewer";
 import { TeacherPayViewer } from "@/components/dashboard/finance/TeacherPayViewer";
 import { ExpenseList } from "@/components/dashboard/finance/ExpenseList";
 
-interface FinanceDashboardClientProps {
-  stats: {
-    activeStudents: number;
-    totalStudents: number;
-    activeEnrollments: number;
-    totalEnrollments: number;
-    branchesCount: number;
-    coursesCount: number;
-    recentPayments: number;
-    invoicesCount?: number;
-  };
-  invoices: any[];
-  payments: any[];
-  expenses: any[];
-  accounts: any[];
+interface Stats {
+  activeStudents: number;
+  totalStudents: number;
+  activeEnrollments: number;
+  totalEnrollments: number;
+  branchesCount: number;
+  coursesCount: number;
+  recentPayments: number;
+  invoicesCount?: number;
+}
+
+interface Invoice {
+  id: string;
+  invoiceNo: string;
+  amount: number | null;
+  status: string | null;
+  dueDate: string | null;
+}
+
+interface Payment {
+  id: string;
+  paymentRef: string;
+  amount: number | null;
+  method: string | null;
+  date: string | null;
+}
+
+interface Expense {
+  id: string;
+  expenseNo: string;
+  amount: number | null;
+  paid: boolean;
+  description: string | null;
+}
+
+interface Account {
+  id: string;
+  accountName: string;
+}
+
+interface DashboardData {
+  stats: Stats;
+  invoices: Invoice[];
+  payments: Payment[];
+  expenses: Expense[];
+  accounts: Account[];
 }
 
 type ExpandedSection = "ledger" | "royalties" | "teacher-pay" | "expenses" | null;
 
-export function FinanceDashboardClient({
-  stats,
-  invoices,
-  payments,
-  expenses,
-  accounts
-}: FinanceDashboardClientProps) {
+export function FinanceDashboardClient() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<ExpandedSection>("expenses");
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/dashboard/finance");
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.error || `HTTP ${res.status}`);
+        }
+        const d: DashboardData = await res.json();
+        setData(d);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
   const toggleSection = (section: ExpandedSection) => {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
-  // Finance folders list — only tiles with dedicated finance views remain
+  if (loading) {
+    return (
+      <div className="space-y-8 select-none">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="bg-card border-border">
+              <CardContent className="p-6">
+                <Skeleton className="h-3 w-20 bg-muted rounded mb-3" />
+                <Skeleton className="h-8 w-16 bg-muted rounded mb-2" />
+                <Skeleton className="h-3 w-24 bg-muted rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="bg-card border-border">
+              <CardHeader className="border-b border-border py-3 px-5">
+                <Skeleton className="h-4 w-32 bg-muted rounded" />
+              </CardHeader>
+              <CardContent className="p-5">
+                {[1, 2, 3].map((j) => (
+                  <div key={j} className="flex items-center justify-between py-3 border-b border-border/40 last:border-0">
+                    <Skeleton className="h-4 w-36 bg-muted rounded" />
+                    <Skeleton className="h-4 w-16 bg-muted rounded" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="p-8 max-w-lg mx-auto text-center">
+        <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-3" />
+        <h2 className="text-lg font-bold text-foreground mb-1">Unable to Load</h2>
+        <p className="text-sm text-muted-foreground">{error || "No data available."}</p>
+      </div>
+    );
+  }
+
+  const stats = data.stats;
+  const invoices = data.invoices;
+  const payments = data.payments;
+  const expenses = data.expenses;
+  const accounts = data.accounts;
+
   const registryTiers = [
     {
       title: "Financial Registry (T1)",
@@ -99,13 +200,10 @@ export function FinanceDashboardClient({
     <div className="space-y-8 select-none animate-in fade-in duration-300">
       {/* 4 Stats Cards Grid — read-only summary cards, no link-outs to owner routes */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* Scoped Active Students */}
         <div className="block group">
           <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-default">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
-                Active Students
-              </span>
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">Active Students</span>
               <GraduationCap className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -115,13 +213,10 @@ export function FinanceDashboardClient({
           </Card>
         </div>
 
-        {/* Scoped Billing Invoices */}
         <div className="block group">
           <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-default">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
-                Total Invoices
-              </span>
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">Total Invoices</span>
               <FileText className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -131,13 +226,10 @@ export function FinanceDashboardClient({
           </Card>
         </div>
 
-        {/* Payments Collected */}
         <div className="block group">
           <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-default">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
-                Payments Count
-              </span>
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">Payments Count</span>
               <Wallet className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -147,13 +239,10 @@ export function FinanceDashboardClient({
           </Card>
         </div>
 
-        {/* Scoped Branches */}
         <div className="block group">
           <Card className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 hover:-translate-y-1 h-full cursor-default">
             <CardHeader className="p-4 pb-1 flex flex-row items-center justify-between space-y-0">
-              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
-                My Branches
-              </span>
+              <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">My Branches</span>
               <Building2 className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -184,7 +273,6 @@ export function FinanceDashboardClient({
                     const isExpanded = expandedSection === item.section;
 
                     if (item.summary) {
-                      // Summary-only card — no click target, just shows count
                       return (
                         <div
                           key={item.name}
@@ -205,7 +293,6 @@ export function FinanceDashboardClient({
                       );
                     }
 
-                    // Expandable tile with dedicated finance view
                     return (
                       <div key={item.name}>
                         <button
@@ -249,7 +336,6 @@ export function FinanceDashboardClient({
 
       {/* Financial logs feeds — read-only previews, no link-outs */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Recent Payments ledger — no link-out */}
         <Card className="bg-card border-border shadow-md overflow-hidden">
           <CardHeader className="border-b border-border py-4 px-5 bg-muted/10 flex flex-row items-center justify-between space-y-0">
             <div>
@@ -259,9 +345,7 @@ export function FinanceDashboardClient({
           </CardHeader>
           <CardContent className="p-5">
             {payments.length === 0 ? (
-              <div className="py-8 text-center text-xs text-muted-foreground">
-                No recent payment transactions recorded.
-              </div>
+              <div className="py-8 text-center text-xs text-muted-foreground">No recent payment transactions recorded.</div>
             ) : (
               <div className="space-y-4">
                 {payments.map((p) => (
@@ -273,13 +357,9 @@ export function FinanceDashboardClient({
                           {p.method || "Cash"}
                         </Badge>
                       </div>
-                      <p className="text-[10px] text-muted-foreground">
-                        {p.date ? new Date(p.date).toLocaleDateString() : "—"}
-                      </p>
+                      <p className="text-[10px] text-muted-foreground">{p.date ? new Date(p.date).toLocaleDateString() : "—"}</p>
                     </div>
-                    <span className="text-xs font-extrabold text-foreground font-mono">
-                      ${p.amount?.toFixed(2)}
-                    </span>
+                    <span className="text-xs font-extrabold text-foreground font-mono">${p.amount?.toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -287,7 +367,6 @@ export function FinanceDashboardClient({
           </CardContent>
         </Card>
 
-        {/* Center Column: Recent Invoices issued — no link-out */}
         <Card className="bg-card border-border shadow-md overflow-hidden">
           <CardHeader className="border-b border-border py-4 px-5 bg-muted/10 flex flex-row items-center justify-between space-y-0">
             <div>
@@ -297,9 +376,7 @@ export function FinanceDashboardClient({
           </CardHeader>
           <CardContent className="p-5">
             {invoices.length === 0 ? (
-              <div className="py-8 text-center text-xs text-muted-foreground">
-                No recent invoices issued.
-              </div>
+              <div className="py-8 text-center text-xs text-muted-foreground">No recent invoices issued.</div>
             ) : (
               <div className="space-y-4">
                 {invoices.map((inv) => (
@@ -318,13 +395,9 @@ export function FinanceDashboardClient({
                           {inv.status || "Draft"}
                         </Badge>
                       </div>
-                      <p className="text-[10px] text-muted-foreground">
-                        Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : "—"}
-                      </p>
+                      <p className="text-[10px] text-muted-foreground">Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : "—"}</p>
                     </div>
-                    <span className="text-xs font-extrabold text-foreground font-mono">
-                      ${inv.amount?.toFixed(2)}
-                    </span>
+                    <span className="text-xs font-extrabold text-foreground font-mono">${inv.amount?.toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -332,7 +405,6 @@ export function FinanceDashboardClient({
           </CardContent>
         </Card>
 
-        {/* Right Column: Recent Expenses — no link-out */}
         <Card className="bg-card border-border shadow-md overflow-hidden">
           <CardHeader className="border-b border-border py-4 px-5 bg-muted/10 flex flex-row items-center justify-between space-y-0">
             <div>
@@ -349,9 +421,7 @@ export function FinanceDashboardClient({
           </CardHeader>
           <CardContent className="p-5">
             {expenses.length === 0 ? (
-              <div className="py-8 text-center text-xs text-muted-foreground">
-                No recent expense vouchers found.
-              </div>
+              <div className="py-8 text-center text-xs text-muted-foreground">No recent expense vouchers found.</div>
             ) : (
               <div className="space-y-4">
                 {expenses.map((exp) => (
@@ -370,13 +440,11 @@ export function FinanceDashboardClient({
                           {exp.paid ? "Paid" : "Unpaid"}
                         </Badge>
                       </div>
-                      <p className="text-[10px] text-muted-foreground line-clamp-1" title={exp.description}>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1" title={exp.description || ""}>
                         {exp.description || "Utility purchase"}
                       </p>
                     </div>
-                    <span className="text-xs font-extrabold text-foreground font-mono">
-                      ${exp.amount?.toFixed(2)}
-                    </span>
+                    <span className="text-xs font-extrabold text-foreground font-mono">${exp.amount?.toFixed(2)}</span>
                   </div>
                 ))}
               </div>

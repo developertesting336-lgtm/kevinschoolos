@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -22,7 +22,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -36,20 +36,17 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.error || "Login failed. Please check credentials.",
-        );
+        throw new Error(data.error || "Login failed. Please check credentials.");
       }
 
-      toast.success("Welcome back! Loading dashboard...");
+      // OPTIMIZATION: Navigate immediately — don't wait for refresh
+      // The dashboard layout will validate the session on the server side
       router.push("/dashboard");
-      router.refresh();
     } catch (err: any) {
       toast.error(err.message);
-    } finally {
       setIsLoading(false);
     }
-  };
+  }, [email, password, router]);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-center items-center px-4 font-sans relative">
@@ -66,10 +63,7 @@ export default function LoginPage() {
         <CardContent className="pt-2">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label
-                htmlFor="email"
-                className="text-xs font-semibold text-muted-foreground"
-              >
+              <Label htmlFor="email" className="text-xs font-semibold text-muted-foreground">
                 Email Address
               </Label>
               <Input
@@ -80,14 +74,12 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="email@school.com"
                 className="bg-background border-border text-foreground focus-visible:border-primary focus-visible:ring-primary/20 h-9"
+                autoComplete="email"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label
-                htmlFor="password"
-                className="text-xs font-semibold text-muted-foreground"
-              >
+              <Label htmlFor="password" className="text-xs font-semibold text-muted-foreground">
                 Password
               </Label>
               <div className="relative">
@@ -99,6 +91,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="bg-background border-border text-foreground focus-visible:border-primary focus-visible:ring-primary/20 h-9 pr-9"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
@@ -107,11 +100,7 @@ export default function LoginPage() {
                   className="absolute inset-y-0 right-0 flex items-center px-2.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
                   tabIndex={-1}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>

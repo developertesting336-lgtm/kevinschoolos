@@ -731,6 +731,57 @@ export async function createRecord(
   return mapRecord(tableId, result, "toFieldIds");
 }
 
+export async function createRecords(
+  tableIdOrName: string,
+  recordsData: any[],
+  options: { baseId?: string } = {}
+): Promise<any[]> {
+  const table = resolveTable(tableIdOrName);
+  if (!table) {
+    throw new Error(`Table not found in schema field map: "${tableIdOrName}"`);
+  }
+
+  const baseId = options.baseId || process.env.AIRTABLE_BASE_ID || "";
+  validateBaseId(baseId);
+
+  const pat = getPAT();
+  const tableId = table.tableId;
+
+  const chunked: any[][] = [];
+  for (let i = 0; i < recordsData.length; i += 10) {
+    chunked.push(recordsData.slice(i, i + 10));
+  }
+
+  const allResults: any[] = [];
+
+  for (const chunk of chunked) {
+    const formattedRecords = chunk.map(data => {
+      const displayFields = mapRecord(tableId, data, "toDisplayNames");
+      return { fields: displayFields };
+    });
+
+    const url = `https://api.airtable.com/v0/${baseId}/${tableId}`;
+    const response = await fetchWithQueue(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${pat}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ records: formattedRecords }),
+    });
+
+    if (!response.ok) {
+      await handleHttpError(response, `Failed to create batch records in table ${tableId}`);
+    }
+
+    const result = await response.json();
+    const mapped = result.records.map((r: any) => mapRecord(tableId, r, "toFieldIds"));
+    allResults.push(...mapped);
+  }
+
+  return allResults;
+}
+
 export async function updateRecord(
   tableIdOrName: string,
   recordId: string,

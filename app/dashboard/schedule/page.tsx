@@ -7,6 +7,9 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Calendar, ArrowLeft, ShieldAlert, Clock, Layers } from "lucide-react";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import { PaginationControls } from "@/components/dashboard/PaginationControls";
+import { normalizeRole } from "@/lib/roles";
+import ScheduleActions from "@/components/dashboard/schedule/ScheduleActions";
+import ClassGroupRowActions from "@/components/dashboard/schedule/ClassGroupRowActions";
 
 interface SessionData {
   id: string;
@@ -53,6 +56,10 @@ export default async function SchedulePage({
   searchParams: Promise<{ tab?: string; page?: string; search?: string }>;
 }) {
   const session = await validateSession();
+  const userRole = session?.role || "staff";
+  const normRole = normalizeRole(userRole);
+  const showCreateBtn = normRole === "owner" || normRole === "office_admin";
+
   const params = await searchParams;
   const activeTab = params.tab || "sessions";
   const currentPage = params.page || "1";
@@ -199,13 +206,16 @@ export default async function SchedulePage({
             Academic classes, sessions, and daily schedule
           </p>
         </div>
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back Overview
-        </Link>
+        <div className="flex items-center gap-3">
+          {showCreateBtn && <ScheduleActions />}
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back Overview
+          </Link>
+        </div>
       </div>
 
       {/* Tab Selection Row */}
@@ -332,7 +342,7 @@ export default async function SchedulePage({
           </CardHeader>
           <CardContent className="p-0">
             <Table>
-              <TableHeader>
+               <TableHeader>
                 <TableRow className="hover:bg-transparent bg-muted/20 border-b border-border">
                   <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase">Group Name</TableHead>
                   <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase">Weekdays</TableHead>
@@ -340,12 +350,15 @@ export default async function SchedulePage({
                   <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase">Capacity</TableHead>
                   <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase">Status</TableHead>
                   <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase">Branches</TableHead>
+                  {showCreateBtn && (
+                    <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase text-right">Actions</TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-border">
                 {classGroupsList.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-32 text-center text-xs text-muted-foreground">
+                    <TableCell colSpan={showCreateBtn ? 7 : 6} className="h-32 text-center text-xs text-muted-foreground">
                       No class groups found.
                     </TableCell>
                   </TableRow>
@@ -385,6 +398,11 @@ export default async function SchedulePage({
                         <TableCell className="px-6 py-4 text-sm text-muted-foreground max-w-xs truncate" title={branchNames}>
                           {branchNames}
                         </TableCell>
+                        {showCreateBtn && (
+                          <TableCell className="px-6 py-4 text-sm text-right">
+                            <ClassGroupRowActions classGroupId={group.id} groupName={group.groupName} />
+                          </TableCell>
+                        )}
                       </TableRow>
                     );
                   })

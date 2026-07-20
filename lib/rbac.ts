@@ -25,9 +25,33 @@ export function checkRBAC(
 ): { allowed: boolean; reason: string } {
   const normRole = normalizeRole(role);
 
-  // Phase 1 is strictly read-only for all production data routes.
+  // Phase 3: Allow write operations for specific tables (Attendance, ClassGroup, Session, Enrollment)
+  const allowedWriteTables = ["attendance", "classgroup", "session", "enrollment"];
   if (action !== "read") {
-    return { allowed: false, reason: "Phase 1 is strictly read-only for all production data routes." };
+    if (!allowedWriteTables.includes(tableName.toLowerCase())) {
+      return { allowed: false, reason: `Phase 1/2 is strictly read-only for table '${tableName}'.` };
+    }
+    if (normRole === "owner") {
+      return { allowed: true, reason: "Owner has unrestricted write access." };
+    }
+    if (tableName.toLowerCase() === "classgroup") {
+      if (normRole === "office_admin") {
+        return { allowed: true, reason: "Office Admin has write access to ClassGroup." };
+      }
+      return { allowed: false, reason: `Role '${role}' is not permitted to write to ClassGroup.` };
+    }
+    if (tableName.toLowerCase() === "enrollment") {
+      if (normRole === "office_admin") {
+        return { allowed: true, reason: "Office Admin has write access to Enrollment." };
+      }
+      return { allowed: false, reason: `Role '${role}' is not permitted to write to Enrollment.` };
+    }
+    if (tableName.toLowerCase() === "attendance" || tableName.toLowerCase() === "session") {
+      if (normRole === "office_admin" || normRole === "teacher") {
+        return { allowed: true, reason: `${role} has write access to ${tableName}.` };
+      }
+      return { allowed: false, reason: `Role '${role}' is not permitted to write to ${tableName}.` };
+    }
   }
 
   // Deny cleaner (excluded) immediately

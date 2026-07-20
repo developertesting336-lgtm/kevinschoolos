@@ -11,187 +11,88 @@ export async function POST(request: Request) {
     const { email, password } = await request.json();
 
     if (!email || !password) {
-      auditService.logFailure(
-        undefined,
-        "LOGIN",
-        undefined,
-        "Missing email or password.",
-        request
-      );
-      return NextResponse.json(
-        { error: "Email and password are required." },
-        { status: 400 },
-      );
+      auditService.logFailure(undefined, "LOGIN", undefined, "Missing email or password.", request);
+      return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
     }
 
+    // OPTIMIZATION: Single query with select to fetch only needed columns
     const user = await prisma.user.findFirst({
-      where: {
-        email: {
-          equals: email.trim(),
-          mode: "insensitive",
-        },
-      },
+      where: { email: { equals: email.trim(), mode: "insensitive" } },
+      select: { id: true, email: true, role: true, branchIds: true },
     });
 
     if (!user) {
-      auditService.log({
-        actorEmail: email,
-        action: "LOGIN",
-        result: "FAIL",
-        details: "Invalid email or account does not exist.",
-      }, request);
-
-      return NextResponse.json(
-        { error: "Invalid email or password." },
-        { status: 401 },
-      );
+      // Fire-and-forget audit — don't block the response
+      auditService.log({ actorEmail: email, action: "LOGIN", result: "FAIL", details: "Invalid email." }, request);
+      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
 
     if (user.role?.toLowerCase() === "cleaner") {
-      auditService.log({
-        actorId: user.id,
-        actorEmail: user.email,
-        role: user.role,
-        branchIds: user.branchIds,
-        action: "LOGIN",
-        result: "FAIL",
-        details: "Cleaner role blocked from accessing dashboard.",
-      }, request);
-
+      auditService.log({ actorId: user.id, actorEmail: user.email, role: user.role, branchIds: user.branchIds, action: "LOGIN", result: "FAIL", details: "Cleaner blocked." }, request);
       return NextResponse.json({ error: "Access denied." }, { status: 403 });
     }
-    let secret = await prisma.userSecret.findUnique({
+
+    // OPTIMIZATION: Single query with select for secret
+    const secret = await prisma.userSecret.findUnique({
       where: { userId: user.id },
+      select: { passwordHash: true, loginAttempts: true, lockoutUntil: true },
     });
 
-    if (!secret) {
-      auditService.log({
-        actorId: user.id,
-        actorEmail: user.email,
-        role: user.role,
-        branchIds: user.branchIds,
-        action: "LOGIN",
-        result: "FAIL",
-        details: "Password not set up.",
-      }, request);
-
-      return NextResponse.json(
-        {
-          error:
-            "Account exists but password is not set up. Please use setup endpoint.",
-        },
-        { status: 400 },
-      );
+    if (!secret || !secret.passwordHash) {
+      auditService.log({ actorId: user.id, actorEmail: user.email, role: user.role, action: "LOGIN", result: "FAIL", details: "Password not set up." }, request);
+      return NextResponse.json({ error: "Account exists but password is not set up." }, { status: 400 });
     }
 
     const now = new Date();
 
+    // Check lockout
     if (secret.lockoutUntil && secret.lockoutUntil > now) {
-      const minutesLeft = Math.ceil(
-        (secret.lockoutUntil.getTime() - now.getTime()) / (60 * 1000),
-      );
-
-      auditService.log({
-        actorId: user.id,
-        actorEmail: user.email,
-        role: user.role,
-        branchIds: user.branchIds,
-        action: "LOGIN",
-        result: "FAIL",
-        details: "Account locked out due to multiple failed attempts.",
-      }, request);
-
-      return NextResponse.json(
-        {
-          error: `Account locked due to multiple failed attempts. Try again in ${minutesLeft} minutes.`,
-        },
-        { status: 403 },
-      );
+      const minutesLeft = Math.ceil((secret.lockoutUntil.getTime() - now.getTime()) / (60 * 1000));
+      auditService.log({ actorId: user.id, actorEmail: user.email, role: user.role, action: "LOGIN", result: "FAIL", details: "Account locked." }, request);
+      return NextResponse.json({ error: `Account locked. Try again in ${minutesLeft} minutes.` }, { status: 403 });
     }
 
-    const isPasswordValid = secret.passwordHash
-      ? await verifyPassword(secret.passwordHash, password)
-      : false;
+    // Verify password (CPU-intensive but unavoidable)
+    const isPasswordValid = await verifyPassword(secret.passwordHash, password);
 
     if (!isPasswordValid) {
       const attempts = secret.loginAttempts + 1;
-      const lockoutUntil =
-        attempts >= MAX_LOGIN_ATTEMPTS
-          ? new Date(now.getTime() + LOCKOUT_DURATION_MS)
-          : null;
+      const lockoutUntil = attempts >= MAX_LOGIN_ATTEMPTS ? new Date(now.getTime() + LOCKOUT_DURATION_MS) : null;
 
+      // OPTIMIZATION: Single update query
       await prisma.userSecret.update({
         where: { userId: user.id },
-        data: {
-          loginAttempts: attempts,
-          lockoutUntil,
-        },
+        data: { loginAttempts: attempts, lockoutUntil },
       });
 
-      auditService.log({
-        actorId: user.id,
-        actorEmail: user.email,
-        role: user.role,
-        branchIds: user.branchIds,
-        action: "LOGIN",
-        result: "FAIL",
-        details: lockoutUntil ? "Too many failed attempts. Account locked." : "Invalid password entered.",
-      }, request);
+      auditService.log({ actorId: user.id, actorEmail: user.email, role: user.role, action: "LOGIN", result: "FAIL", details: lockoutUntil ? "Account locked." : "Invalid password." }, request);
 
       if (lockoutUntil) {
-        return NextResponse.json(
-          { error: "Too many failed attempts. Account locked for 15 minutes." },
-          { status: 403 },
-        );
+        return NextResponse.json({ error: "Too many failed attempts. Account locked for 15 minutes." }, { status: 403 });
       }
-
-      return NextResponse.json(
-        { error: "Invalid email or password." },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
 
-    await prisma.userSecret.update({
-      where: { userId: user.id },
-      data: {
-        loginAttempts: 0,
-        lockoutUntil: null,
-      },
-    });
+    // Success: reset attempts and create session in parallel
+    await Promise.all([
+      prisma.userSecret.update({
+        where: { userId: user.id },
+        data: { loginAttempts: 0, lockoutUntil: null },
+      }),
+      createSession(user.id),
+    ]);
 
-    await createSession(user.id);
+    // Fire-and-forget audit
+    auditService.log({ actorId: user.id, actorEmail: user.email, role: user.role, branchIds: user.branchIds, action: "LOGIN", result: "SUCCESS", details: "Login successful." }, request);
 
-    auditService.log({
-      actorId: user.id,
-      actorEmail: user.email,
-      role: user.role,
-      branchIds: user.branchIds,
-      action: "LOGIN",
-      result: "SUCCESS",
-      details: "User logged in successfully.",
-    }, request);
-
+    // OPTIMIZATION: Return minimal payload — no full user object
     return NextResponse.json({
       success: true,
       message: "Successfully logged in.",
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        role: user.role,
-      },
     });
   } catch (error: any) {
     console.error("[Login API Error]", error);
-    auditService.logFailure(
-      undefined,
-      "LOGIN",
-      undefined,
-      `Internal server error during login: ${error.message || String(error)}`,
-      request
-    );
-    return NextResponse.json(
-      { error: "Internal server error." },
-      { status: 500 },
-    );
+    auditService.logFailure(undefined, "LOGIN", undefined, `Login error: ${error.message}`, request);
+    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }

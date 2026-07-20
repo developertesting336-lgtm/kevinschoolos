@@ -4,6 +4,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -15,7 +17,8 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  // Fetch user details directly via Prisma (no HTTP round-trip)
+  // OPTIMIZATION: Fetch only the fields needed for the sidebar (name, email, role)
+  // Single lightweight query with select
   let dbUser = null;
   try {
     dbUser = await prisma.user.findUnique({
@@ -35,12 +38,9 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground font-sans">
-        {/* Render AppSidebar */}
         <AppSidebar user={userProp} />
 
-        {/* Dashboard Content Container */}
         <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-          {/* Header Bar */}
           <header className="h-14 border-b border-border bg-card flex items-center px-4 justify-between shrink-0">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="h-8 w-8 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors cursor-pointer" />
@@ -51,7 +51,6 @@ export default async function DashboardLayout({
             </div>
           </header>
 
-          {/* Main Scrollable Area */}
           <main className="flex-1 overflow-y-auto bg-background px-6 py-6 min-w-0">
             <div className="max-w-7xl mx-auto w-full">{children}</div>
           </main>

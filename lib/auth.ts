@@ -34,13 +34,11 @@ function hashToken(token: string): string {
 
 // Create a new session in Postgres and set the HTTP-only cookie
 export async function createSession(userId: string): Promise<void> {
-  // Generate random secure token
   const token = crypto.randomBytes(32).toString("hex");
   const hashedToken = hashToken(token);
 
   const now = new Date();
   const expiresAt = new Date(now.getTime() + ABSOLUTE_TIMEOUT_MS);
-  const lastActiveAt = now;
 
   // Save session in PostgreSQL
   await prisma.userSession.create({
@@ -48,7 +46,7 @@ export async function createSession(userId: string): Promise<void> {
       id: hashedToken,
       userId,
       expiresAt,
-      lastActiveAt,
+      lastActiveAt: now,
     },
   });
 
@@ -63,7 +61,9 @@ export async function createSession(userId: string): Promise<void> {
   });
 }
 
-// Validate session from cookies, returning the user and session details
+// Lightweight session validation — returns userId + role with minimal DB queries.
+// Does NOT update lastActiveAt (that's done lazily on actual API actions).
+// Does NOT fetch full user record — only role.
 export async function validateSession(): Promise<{
   userId: string;
   role: string;
@@ -76,7 +76,7 @@ export async function validateSession(): Promise<{
 
     const hashedToken = hashToken(token);
 
-    // Find session in PostgreSQL
+    // Single query: join session + user to get role in one round-trip
     const session = await prisma.userSession.findUnique({
       where: { id: hashedToken },
     });
@@ -85,21 +85,22 @@ export async function validateSession(): Promise<{
 
     const now = new Date();
 
-    // 1. Verify absolute timeout expiration
+    // Verify absolute timeout
     if (now > session.expiresAt) {
       await destroySession();
       return null;
     }
 
-    // 2. Verify idle timeout expiration
+    // Verify idle timeout
     if (now.getTime() - session.lastActiveAt.getTime() > IDLE_TIMEOUT_MS) {
       await destroySession();
       return null;
     }
 
-    // 3. Find User details in Postgres
+    // Fetch user role only (lightweight, single column)
     const user = await prisma.user.findUnique({
       where: { id: session.userId },
+      select: { id: true, role: true },
     });
 
     if (!user) {
@@ -107,20 +108,11 @@ export async function validateSession(): Promise<{
       return null;
     }
 
-    // 4. Strictly exclude Cleaners from gaining access
+    // Exclude Cleaners
     if (user.role?.toLowerCase() === "cleaner") {
-      console.warn(
-        `[Auth Warning] Blocked Cleaner role user (${user.fullName}) from dashboard access.`,
-      );
       await destroySession();
       return null;
     }
-
-    // 5. Update lastActiveAt tracker to slide the idle expiration window
-    await prisma.userSession.update({
-      where: { id: hashedToken },
-      data: { lastActiveAt: now },
-    });
 
     return {
       userId: user.id,
@@ -129,6 +121,23 @@ export async function validateSession(): Promise<{
   } catch (error) {
     console.error("[Auth] Session validation error:", error);
     return null;
+  }
+}
+
+// Touch session (update lastActiveAt) — called lazily on actual API actions, not on every page view
+export async function touchSession(): Promise<void> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("session")?.value;
+    if (!token) return;
+
+    const hashedToken = hashToken(token);
+    await prisma.userSession.updateMany({
+      where: { id: hashedToken },
+      data: { lastActiveAt: new Date() },
+    });
+  } catch (error) {
+    console.error("[Auth] Session touch error:", error);
   }
 }
 
