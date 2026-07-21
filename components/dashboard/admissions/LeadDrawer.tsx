@@ -1,11 +1,17 @@
 "use client";
 
+import { useState } from "react";
+
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { ConvertLeadWizard } from "./ConvertLeadWizard";
 import { TrialScheduleCard } from "./TrialScheduleCard";
 import { ActivityTimeline } from "./ActivityTimeline";
+import { AddActivityModal } from "./AddActivityModal";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Mail, MessageSquare, MapPin, Calendar, Clock, User, UserCheck, Compass, Info, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAppSelector } from "@/store/hooks";
+import { selectAuthRole } from "@/store/slices/authSlice";
+import { Phone, Mail, MessageSquare, MapPin, Calendar, Clock, User, UserCheck, Compass, Info, FileText, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LeadData {
@@ -76,7 +82,19 @@ export function LeadDrawer({
   ownerName,
   staffIdToNameMap,
 }: LeadDrawerProps) {
+  const userRole = useAppSelector(selectAuthRole);
+  const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+
   if (!lead) return null;
+
+  const roleLower = (userRole || "").toLowerCase().trim();
+  const isTeacher = roleLower === "teacher";
+  const canAddActivity = ["owner", "office_admin", "smm"].includes(roleLower);
+
+  // Sort activities in reverse chronological order (newest first)
+  const sortedActivities = [...activities].sort((a, b) => {
+    return new Date(b.dateTime || 0).getTime() - new Date(a.dateTime || 0).getTime();
+  });
 
   const formattedInquiry = lead.inquiryDate
     ? new Date(lead.inquiryDate).toLocaleDateString("en-US", {
@@ -193,36 +211,52 @@ export function LeadDrawer({
                 </div>
 
                 {/* Lead Notes */}
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider flex items-center gap-1">
-                      <FileText className="h-3 w-3" /> Lead Phone
-                    </span>
-                    <p className="text-xs font-semibold text-foreground">
-                      {lead.phone || "—"}
-                    </p>
-                  </div>
-                  {lead.whatsapp && (
+                {/* Lead Notes */}
+                {!isTeacher ? (
+                  <div className="space-y-3">
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider flex items-center gap-1">
-                        <MessageSquare className="h-3 w-3" /> Lead WhatsApp
+                        <FileText className="h-3 w-3" /> Lead Phone
                       </span>
                       <p className="text-xs font-semibold text-foreground">
-                        {lead.whatsapp}
+                        {lead.phone || "—"}
                       </p>
                     </div>
-                  )}
-                  {lead.lostReason && (
-                    <div className="space-y-1 p-2 bg-rose-500/5 border border-rose-500/10 rounded-lg">
-                      <span className="text-[10px] uppercase font-bold text-rose-600 tracking-wider block">
-                        Reason for Loss
-                      </span>
-                      <p className="text-xs font-medium text-rose-700 leading-tight">
-                        {lead.lostReason}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                    {lead.whatsapp && (
+                      <div className="space-y-1">
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider flex items-center gap-1">
+                          <MessageSquare className="h-3 w-3" /> Lead WhatsApp
+                        </span>
+                        <p className="text-xs font-semibold text-foreground">
+                          {lead.whatsapp}
+                        </p>
+                      </div>
+                    )}
+                    {lead.lostReason && (
+                      <div className="space-y-1 p-2 bg-rose-500/5 border border-rose-500/10 rounded-lg">
+                        <span className="text-[10px] uppercase font-bold text-rose-600 tracking-wider block">
+                          Reason for Loss
+                        </span>
+                        <p className="text-xs font-medium text-rose-700 leading-tight">
+                          {lead.lostReason}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {lead.lostReason && (
+                      <div className="space-y-1 p-2 bg-rose-500/5 border border-rose-500/10 rounded-lg">
+                        <span className="text-[10px] uppercase font-bold text-rose-600 tracking-wider block">
+                          Reason for Loss
+                        </span>
+                        <p className="text-xs font-medium text-rose-700 leading-tight">
+                          {lead.lostReason}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {lead.notes && (
@@ -238,7 +272,7 @@ export function LeadDrawer({
             </div>
 
             {/* Parent Profiles Section */}
-            {parents.length > 0 && (
+            {parents.length > 0 && !isTeacher && (
               <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
                 <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">
                   Parent Profiles ({parents.length})
@@ -294,12 +328,20 @@ export function LeadDrawer({
 
             {/* Activity History Timeline */}
             <ActivityTimeline
-              activities={activities}
+              activities={sortedActivities}
               staffIdToNameMap={staffIdToNameMap}
+              onAddActivity={canAddActivity ? () => setIsActivityModalOpen(true) : undefined}
             />
 
           </div>
         </div>
+
+        <AddActivityModal
+          isOpen={isActivityModalOpen}
+          onClose={() => setIsActivityModalOpen(false)}
+          leadId={lead.id}
+          leadName={lead.leadName}
+        />
       </SheetContent>
     </Sheet>
   );

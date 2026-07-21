@@ -1,90 +1,66 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
-import { validateSession } from "@/lib/auth";
-import { apiFetch } from "@/lib/apiFetch";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { useSearchParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchBranches, selectBranches, selectBranchesLoading, selectBranchesError, selectBranchesPagination } from "@/store/slices/branchesSlice";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Building2, ArrowLeft, ShieldAlert } from "lucide-react";
+import { Building2, ArrowLeft } from "lucide-react";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import { PaginationControls } from "@/components/dashboard/PaginationControls";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface BranchData {
-  id: string;
-  name: string;
-  city: string | null;
-  address: string | null;
-  phone: string | null;
-  status: string | null;
-  notes: string | null;
-  openedDate: string | null;
-}
+export default function BranchesPage() {
+  const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
 
-interface PaginatedResponse {
-  data: BranchData[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+  // Redux state
+  const branches = useAppSelector(selectBranches);
+  const pagination = useAppSelector(selectBranchesPagination);
+  const loading = useAppSelector(selectBranchesLoading);
+  const error = useAppSelector(selectBranchesError);
 
-export default async function BranchesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string; search?: string }>;
-}) {
-  const session = await validateSession();
-  const params = await searchParams;
-  const currentPage = params.page || "1";
-  const search = params.search || "";
+  // Get params from URL
+  const pageParam = searchParams.get("page") || "1";
+  const searchParam = searchParams.get("search") || "";
 
-  let branchesList: BranchData[] = [];
-  let pagination = { total: 0, page: 1, limit: 10, totalPages: 1 };
-  let errorMsg = null;
-  let isForbidden = false;
+  // Fetch data when params change
+  useEffect(() => {
+    dispatch(fetchBranches({
+      page: pageParam,
+      search: searchParam,
+    }));
+  }, [dispatch, pageParam, searchParam]);
 
-  try {
-    const branchesResponse = await apiFetch(`/api/data/branch?page=${currentPage}&search=${encodeURIComponent(search)}`);
-    branchesList = (branchesResponse as PaginatedResponse).data;
-    pagination = (branchesResponse as PaginatedResponse).pagination;
-  } catch (error: any) {
-    console.error("[Dashboard Branches Fetch Error]", error);
-    errorMsg = error.message || "Failed to load branches data.";
-    if (error.message?.includes("403") || error.message?.includes("Forbidden")) {
-      isForbidden = true;
-    }
-  }
-
-  // Handle unauthorized or RBAC restricted views
-  if (isForbidden) {
+  // Skeleton Loader
+  if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center select-none animate-in fade-in duration-300 px-4">
-        <Card className="max-w-md w-full border-destructive/30 bg-destructive/5 shadow-lg shadow-destructive/5">
-          <CardHeader className="flex flex-col items-center pb-2">
-            <div className="h-12 w-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mb-2">
-              <ShieldAlert className="h-6 w-6" />
-            </div>
-            <CardTitle className="text-xl font-bold text-destructive">
-              Access Restricted
-            </CardTitle>
-            <CardDescription className="text-xs text-muted-foreground mt-1">
-              Insufficient Permissions
-            </CardDescription>
+      <div className="space-y-8 select-none animate-pulse">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="h-4 w-48 bg-muted rounded mb-2" />
+            <div className="h-8 w-72 bg-muted rounded mb-1" />
+            <div className="h-4 w-96 bg-muted rounded" />
+          </div>
+        </div>
+        <Card className="bg-card border-border">
+          <CardHeader className="border-b border-border py-3 px-6">
+            <Skeleton className="h-5 w-48 bg-muted rounded" />
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Your role <span className="font-semibold text-foreground capitalize">({session?.role || "Staff"})</span> does not have access to view branch information.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-primary hover:underline"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Back to Dashboard Overview
-              </Link>
-            </div>
+          <CardContent className="p-0">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center px-6 py-4 border-b border-border/40">
+                <Skeleton className="h-4 w-32 bg-muted rounded mr-4" />
+                <Skeleton className="h-4 w-20 bg-muted rounded mr-4" />
+                <Skeleton className="h-4 w-40 bg-muted rounded mr-4" />
+                <Skeleton className="h-4 w-28 bg-muted rounded mr-4" />
+                <Skeleton className="h-5 w-16 bg-muted rounded mr-4" />
+                <Skeleton className="h-4 w-24 bg-muted rounded" />
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
@@ -120,9 +96,9 @@ export default async function BranchesPage({
         </Link>
       </div>
 
-      {errorMsg ? (
+      {error ? (
         <Card className="border-destructive/20 bg-destructive/5 text-destructive p-4 text-sm font-medium">
-          {errorMsg}
+          {error}
         </Card>
       ) : (
         <Card className="bg-card border-border shadow-md overflow-hidden">
@@ -130,7 +106,7 @@ export default async function BranchesPage({
             <CardTitle className="text-sm font-bold text-foreground">
               ALL BRANCHES ({pagination.total})
             </CardTitle>
-            <SearchInput placeholder="Search branches..." />
+            <SearchInput placeholder="Search branches..." paramName="search" />
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -146,14 +122,14 @@ export default async function BranchesPage({
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-border">
-                {branchesList.length === 0 ? (
+                {(branches as any[]).length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="h-32 text-center text-xs text-muted-foreground">
                       No branches found.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  branchesList.map((branch) => (
+                  (branches as any[]).map((branch: any) => (
                     <TableRow key={branch.id} className="hover:bg-muted/30 transition-colors">
                       <TableCell className="px-6 py-4 font-semibold text-sm text-foreground">
                         {branch.name}
@@ -193,7 +169,7 @@ export default async function BranchesPage({
             <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
               <PaginationControls
                 totalPages={pagination.totalPages}
-                currentPage={parseInt(currentPage, 10)}
+                currentPage={pagination.page}
               />
             </div>
           </CardContent>

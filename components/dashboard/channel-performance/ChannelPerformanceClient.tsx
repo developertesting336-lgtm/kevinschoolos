@@ -84,6 +84,7 @@ export function ChannelPerformanceClient({
 
   // Filters State
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [channelFilter, setChannelFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
@@ -91,19 +92,27 @@ export function ChannelPerformanceClient({
 
   const [, startTransition] = useTransition();
 
+  // Search input debouncer (400ms delay)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
+
   useEffect(() => {
     setPage(1);
-  }, [search, channelFilter, monthFilter, selectedBranch]);
+  }, [debouncedSearch, channelFilter, monthFilter, selectedBranch]);
 
   useEffect(() => {
     fetchPerformance();
-  }, [page, search, channelFilter, monthFilter, selectedBranch]);
+  }, [page, debouncedSearch, channelFilter, monthFilter, selectedBranch]);
 
   const fetchPerformance = async () => {
     setRefreshing(true);
     try {
       let url = `/api/dashboard/channel-performance?page=${page}&limit=10`;
-      if (search) url += `&search=${encodeURIComponent(search)}`;
+      if (debouncedSearch) url += `&search=${encodeURIComponent(debouncedSearch)}`;
       if (channelFilter) url += `&channel=${encodeURIComponent(channelFilter)}`;
       if (monthFilter) url += `&month=${encodeURIComponent(monthFilter)}`;
       if (selectedBranch) url += `&branchId=${encodeURIComponent(selectedBranch)}`;

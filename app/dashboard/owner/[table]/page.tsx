@@ -3,14 +3,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { validateSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { apiFetch } from "@/lib/apiFetch";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShieldAlert } from "lucide-react";
 import { ownerTablesConfig } from "@/lib/owner-schema";
 import { normalizeRole } from "@/lib/roles";
-import { OwnerTableClient } from "@/components/dashboard/OwnerTableClient";
+import { OwnerTableReduxView } from "@/components/dashboard/OwnerTableReduxView";
 
 // Force dynamic fetch
 export const dynamic = "force-dynamic";
@@ -46,7 +43,6 @@ export default async function OwnerTablePage({
 
   const userRole = dbUser?.role || "staff";
   const normUserRole = normalizeRole(userRole);
-  const userBranchIds = dbUser?.branchIds || [];
 
   // 3. Resolve target table configuration
   const { table } = await params;
@@ -85,7 +81,6 @@ export default async function OwnerTablePage({
   }
 
   // ---- Task 1: Hard owner-only gate (before any RBAC logic) ----
-  // Consume searchParams once, check for break-glass signal: breakglass=1 query param
   const sParams = await searchParams;
   const isBreakGlass = sParams?.breakglass === "1";
 
@@ -162,52 +157,25 @@ export default async function OwnerTablePage({
     );
   }
 
-  // 4. Construct Backend API Query URL (sParams already consumed above)
-  const page = sParams.page || "1";
-  const limit = sParams.limit || "10";
-  const search = sParams.search || "";
-  const sortBy = sParams.sortBy || config.defaultSortBy;
-  const sortOrder = sParams.sortOrder || config.defaultSortOrder;
-  const branchId = sParams.branchId || "";
-
-  const queryParams = new URLSearchParams();
-  queryParams.set("page", page);
-  queryParams.set("limit", limit);
-  if (search) queryParams.set("search", search);
-  queryParams.set("sortBy", sortBy);
-  queryParams.set("sortOrder", sortOrder);
-  if (branchId) queryParams.set("branchId", branchId);
-
-  // Dynamic filter query arguments
+  // Extract filterable params for extraFilters
+  const extraFilters: Record<string, string> = {};
   config.filterableFields.forEach((f) => {
     const val = sParams[f.key];
     if (val !== undefined && val !== "") {
-      queryParams.set(f.key, val);
+      extraFilters[f.key] = val;
     }
   });
 
-  // 5. Fetch Table Data and Branches parallelly
-  let tableData = [];
-  let pagination = { total: 0, page: 1, limit: 10, totalPages: 1 };
-  let errorMsg: string | null = null;
-  let branches: any[] = [];
-
-  try {
-    const dataUrl = `/api/owner/${normalizedTable}?${queryParams.toString()}`;
-    const branchUrl = `/api/owner/branch?limit=100`;
-
-    const [dataRes, branchRes] = await Promise.all([
-      apiFetch(dataUrl),
-      apiFetch(branchUrl).catch(() => ({ data: [] })),
-    ]);
-
-    tableData = dataRes.data || [];
-    pagination = dataRes.pagination || { total: tableData.length, page: 1, limit: 10, totalPages: 1 };
-    branches = branchRes.data || [];
-  } catch (error: any) {
-    console.error("[Owner Dashboard Fetch Error]", error);
-    errorMsg = error.message || "Failed to load database records.";
-  }
+  // Pass serializable props to client component
+  const initialQueryParams = {
+    page: sParams.page || "1",
+    limit: sParams.limit || "10",
+    search: sParams.search || "",
+    sortBy: sParams.sortBy || config.defaultSortBy,
+    sortOrder: sParams.sortOrder || config.defaultSortOrder,
+    branchId: sParams.branchId || "",
+    extraFilters,
+  };
 
   return (
     <div className="space-y-6 select-none animate-in fade-in duration-300">
@@ -239,13 +207,11 @@ export default async function OwnerTablePage({
         </Link>
       </div>
 
-      {/* Render Dynamic Owner Table */}
-      <OwnerTableClient
-        data={tableData}
-        pagination={pagination}
+      {/* Redux-powered Owner Table with Skeleton */}
+      <OwnerTableReduxView
+        table={normalizedTable}
         config={config}
-        branches={branches}
-        errorMsg={errorMsg}
+        initialQueryParams={initialQueryParams}
       />
     </div>
   );

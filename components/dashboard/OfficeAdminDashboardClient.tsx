@@ -76,7 +76,7 @@ export function OfficeAdminDashboardClient({
         { name: "Active Students", url: "/dashboard/owner/student", count: stats.activeStudents, icon: GraduationCap },
         { name: "Enrollment Logs", url: "/dashboard/owner/enrollment", count: stats.totalEnrollments, icon: UserPlus },
         { name: "Invoices Billing", url: "/dashboard/owner/invoice", count: stats.invoicesCount || 0, icon: FileText },
-        { name: "Payments Received", url: "/dashboard/owner/payment", count: stats.recentPayments, icon: Wallet },
+        { name: "Payments Received", url: "/dashboard/payments", count: stats.recentPayments, icon: Wallet },
       ],
     },
     {
@@ -287,7 +287,7 @@ export function OfficeAdminDashboardClient({
                 <div className="relative border-l-2 border-primary/20 pl-4 space-y-4 py-1">
                   {terms.map((term) => (
                     <div key={term.id} className="relative space-y-0.5">
-                      <div className="absolute left-[-21px] top-1 h-2 w-2 rounded-full bg-primary" />
+                      <div className="absolute -left-5.25 top-1 h-2 w-2 rounded-full bg-primary" />
                       <div className="flex items-center justify-between gap-2">
                         <h4 className="text-xs font-bold text-foreground">{term.termName}</h4>
                         <Badge variant="outline" className="text-[8px] py-0 px-1 bg-emerald-500/10 border-emerald-500/20 text-emerald-600 font-semibold uppercase">
@@ -334,7 +334,7 @@ export function OfficeAdminDashboardClient({
                             <DoorOpen className="h-3.5 w-3.5 text-primary/80 shrink-0" />
                             <h4 className="text-xs font-bold text-foreground">{room.roomName}</h4>
                           </div>
-                          <p className="text-[9px] text-muted-foreground truncate max-w-[150px]" title={branchNames}>
+                          <p className="text-[9px] text-muted-foreground truncate max-w-37.5" title={branchNames}>
                             {branchNames}
                           </p>
                         </div>

@@ -89,7 +89,6 @@ const ownerGroups = [
       { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
       { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
-      { title: "Payments", url: "/dashboard/owner/payment", icon: Wallet },
       { title: "Notifications Center", url: "/dashboard/notifications", icon: Bell },
     ],
   },
@@ -119,7 +118,7 @@ const ownerGroups = [
   {
     label: "Reference & Analytics (T4)",
     items: [
-      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
       { title: "Channel Performance", url: "/dashboard/channel-performance", icon: TrendingUp },
@@ -156,7 +155,7 @@ const teacherGroups = [
   {
     label: "School & Directory",
     items: [
-      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
       { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
@@ -173,7 +172,6 @@ const officeAdminGroups = [
       { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
       { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
-      { title: "Payments", url: "/dashboard/owner/payment", icon: Wallet },
       { title: "Notifications Center", url: "/dashboard/notifications", icon: Bell },
     ],
   },
@@ -197,7 +195,7 @@ const officeAdminGroups = [
   {
     label: "Reference & Analytics (T4)",
     items: [
-      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
       { title: "Channel Performance", url: "/dashboard/channel-performance", icon: TrendingUp },
@@ -218,7 +216,7 @@ const smmGroups = [
   {
     label: "Reference & Analytics",
     items: [
-      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
       { title: "Channel Performance", url: "/dashboard/channel-performance", icon: TrendingUp },
@@ -239,14 +237,14 @@ const financeGroups = [
       { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
       { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
-      { title: "Payments", url: "/dashboard/owner/payment", icon: Wallet },
+      { title: "Payments", url: "/dashboard/payments", icon: Wallet },
       { title: "Payments Module", url: "/dashboard/payments", icon: Wallet },
     ],
   },
   {
     label: "Academic & Reference (T4)",
     items: [
-      { title: "Branches", url: "/dashboard/owner/branch", icon: Building2 },
+      { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
     ],

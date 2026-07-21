@@ -1,170 +1,81 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
-import { validateSession } from "@/lib/auth";
-import { apiFetch } from "@/lib/apiFetch";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { useSearchParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchBillingData, selectBillingActiveTab, selectBillingInvoices, selectBillingPayments, selectBillingBranches, selectBillingPagination, selectBillingLoading, selectBillingError } from "@/store/slices/billingSlice";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Receipt, ArrowLeft, ShieldAlert, FileText, CreditCard, AlertCircle } from "lucide-react";
+import { Receipt, ArrowLeft, FileText, CreditCard, AlertCircle } from "lucide-react";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import { PaginationControls } from "@/components/dashboard/PaginationControls";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface InvoiceData {
-  id: string;
-  invoiceNo: string;
-  issueDate: string | null;
-  dueDate: string | null;
-  amount: number | null;
-  status: string | null;
-  branchIds: string[];
-}
+export default function BillingPage() {
+  const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
 
-interface PaymentData {
-  id: string;
-  paymentRef: string;
-  date: string | null;
-  amount: number | null;
-  method: string | null;
-  branchIds: string[];
-  possibleDuplicate: boolean;
-  paymentType: string | null;
-}
+  // Redux state
+  const activeTab = useAppSelector(selectBillingActiveTab);
+  const invoices = useAppSelector(selectBillingInvoices);
+  const payments = useAppSelector(selectBillingPayments);
+  const branches = useAppSelector(selectBillingBranches);
+  const pagination = useAppSelector(selectBillingPagination);
+  const loading = useAppSelector(selectBillingLoading);
+  const error = useAppSelector(selectBillingError);
 
-interface BranchData {
-  id: string;
-  name: string;
-}
+  // Get params from URL
+  const tabParam = searchParams.get("tab") || "invoices";
+  const pageParam = searchParams.get("page") || "1";
+  const searchParam = searchParams.get("search") || "";
 
-interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+  // Fetch data when params change
+  useEffect(() => {
+    dispatch(fetchBillingData({
+      tab: tabParam,
+      page: pageParam,
+      search: searchParam,
+    }));
+  }, [dispatch, tabParam, pageParam, searchParam]);
 
-export default async function BillingPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ tab?: string; page?: string; search?: string }>;
-}) {
-  const session = await validateSession();
-  const params = await searchParams;
-  const activeTab = params.tab || "invoices";
-  const currentPage = params.page || "1";
-  const search = params.search || "";
+  const branchIdToNameMap = new Map<string, string>((branches as any[]).map((b: any) => [b.id, b.name]));
 
-  let invoicesList: InvoiceData[] = [];
-  let paymentsList: PaymentData[] = [];
-  let branchesList: BranchData[] = [];
-  let pagination = { total: 0, page: 1, limit: 10, totalPages: 1 };
-  let errorMsg = null;
-  let isForbidden = false;
-
-  try {
-    // We always fetch branches for mapping (unpaginated)
-    branchesList = await apiFetch("/api/data/branch").catch((e) => {
-      console.error("Could not fetch branches", e);
-      return [];
-    });
-
-    if (activeTab === "invoices") {
-      const invoicesResponse = await apiFetch(`/api/data/invoice?page=${currentPage}&search=${encodeURIComponent(search)}`);
-      invoicesList = (invoicesResponse as PaginatedResponse<InvoiceData>).data;
-      pagination = (invoicesResponse as PaginatedResponse<InvoiceData>).pagination;
-    } else {
-      const paymentsResponse = await apiFetch(`/api/data/payment?page=${currentPage}&search=${encodeURIComponent(search)}`);
-      paymentsList = (paymentsResponse as PaginatedResponse<PaymentData>).data;
-      pagination = (paymentsResponse as PaginatedResponse<PaymentData>).pagination;
-    }
-  } catch (error: any) {
-    console.error(`[Dashboard Billing Fetch Error] Tab: ${activeTab}`, error);
-    errorMsg = error.message || `Failed to load ${activeTab} data.`;
-    if (error.message?.includes("403") || error.message?.includes("Forbidden")) {
-      isForbidden = true;
-    }
-  }
-
-  const branchIdToNameMap = new Map(branchesList.map((b) => [b.id, b.name]));
-
-  // Handle unauthorized or RBAC restricted views
-  if (isForbidden) {
+  // Skeleton Loader
+  if (loading) {
     return (
-      <div className="space-y-8 select-none animate-in fade-in duration-300">
-        {/* Header */}
+      <div className="space-y-8 select-none animate-pulse">
+        {/* Header skeleton */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1.5">
-              <Link href="/dashboard" className="hover:text-foreground transition-colors">
-                Dashboard
-              </Link>
-              <span>/</span>
-              <span className="text-foreground font-medium">Billing</span>
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
-              <Receipt className="h-8 w-8 text-primary" />
-              Billing
-            </h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              Financial bookkeeping, client invoices, and payment receipts
-            </p>
+            <div className="h-4 w-48 bg-muted rounded mb-2" />
+            <div className="h-8 w-72 bg-muted rounded mb-1" />
+            <div className="h-4 w-96 bg-muted rounded" />
           </div>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back Overview
-          </Link>
         </div>
-
-        {/* Tab Selection Row */}
-        <div className="flex border-b border-border">
-          <Link
-            href="/dashboard/billing?tab=invoices"
-            className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
-              activeTab === "invoices"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <FileText className="h-4 w-4" />
-            Invoices
-          </Link>
-          <Link
-            href="/dashboard/billing?tab=payments"
-            className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
-              activeTab === "payments"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <CreditCard className="h-4 w-4" />
-            Payments Log
-          </Link>
+        {/* Tab skeleton */}
+        <div className="flex gap-4 border-b border-border pb-2">
+          <Skeleton className="h-8 w-24 bg-muted rounded" />
+          <Skeleton className="h-8 w-24 bg-muted rounded" />
         </div>
-
-        <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
-          <Card className="max-w-md w-full border-destructive/30 bg-destructive/5 shadow-lg shadow-destructive/5">
-            <CardHeader className="flex flex-col items-center pb-2">
-              <div className="h-12 w-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mb-2">
-                <ShieldAlert className="h-6 w-6" />
+        {/* Table skeleton */}
+        <Card className="bg-card border-border">
+          <CardHeader className="border-b border-border py-3 px-6">
+            <Skeleton className="h-5 w-48 bg-muted rounded" />
+          </CardHeader>
+          <CardContent className="p-0">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center px-6 py-4 border-b border-border/40">
+                <Skeleton className="h-4 w-32 bg-muted rounded mr-4" />
+                <Skeleton className="h-4 w-24 bg-muted rounded mr-4" />
+                <Skeleton className="h-4 w-24 bg-muted rounded mr-4" />
+                <Skeleton className="h-4 w-20 bg-muted rounded ml-auto" />
+                <Skeleton className="h-5 w-16 bg-muted rounded ml-4" />
               </div>
-              <CardTitle className="text-xl font-bold text-destructive">
-                Access Restricted
-              </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground mt-1">
-                Insufficient Permissions
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Your role <span className="font-semibold text-foreground capitalize">({session?.role || "Staff"})</span> does not have access to view {activeTab === "invoices" ? "billing invoices" : "payment transactions"}.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -224,9 +135,9 @@ export default async function BillingPage({
         </Link>
       </div>
 
-      {errorMsg ? (
+      {error ? (
         <Card className="border-destructive/20 bg-destructive/5 text-destructive p-4 text-sm font-medium">
-          {errorMsg}
+          {error}
         </Card>
       ) : activeTab === "invoices" ? (
         /* Invoices Table */
@@ -235,7 +146,7 @@ export default async function BillingPage({
             <CardTitle className="text-sm font-bold text-foreground">
               ALL INVOICES ({pagination.total})
             </CardTitle>
-            <SearchInput placeholder="Search invoices..." />
+            <SearchInput placeholder="Search invoices..." paramName="search" />
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -250,16 +161,16 @@ export default async function BillingPage({
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-border">
-                {invoicesList.length === 0 ? (
+                {(invoices as any[]).length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="h-32 text-center text-xs text-muted-foreground">
                       No invoices found.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  invoicesList.map((invoice) => {
+                  (invoices as any[]).map((invoice: any) => {
                     const branchNames = invoice.branchIds
-                      ?.map((id) => branchIdToNameMap.get(id) || id)
+                      ?.map((id: string) => branchIdToNameMap.get(id) || id)
                       .join(", ") || "—";
 
                     return (
@@ -274,7 +185,7 @@ export default async function BillingPage({
                           {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : "—"}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-sm text-foreground font-semibold text-right font-mono">
-                          {invoice.amount !== null ? `$${invoice.amount.toFixed(2)}` : "—"}
+                          {invoice.amount !== null ? `$${Number(invoice.amount).toFixed(2)}` : "—"}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-sm">
                           <Badge
@@ -302,7 +213,7 @@ export default async function BillingPage({
             <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
               <PaginationControls
                 totalPages={pagination.totalPages}
-                currentPage={parseInt(currentPage, 10)}
+                currentPage={pagination.page}
               />
             </div>
           </CardContent>
@@ -314,7 +225,7 @@ export default async function BillingPage({
             <CardTitle className="text-sm font-bold text-foreground">
               ALL TRANSACTIONS ({pagination.total})
             </CardTitle>
-            <SearchInput placeholder="Search payments..." />
+            <SearchInput placeholder="Search payments..." paramName="search" />
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -329,16 +240,16 @@ export default async function BillingPage({
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-border">
-                {paymentsList.length === 0 ? (
+                {(payments as any[]).length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="h-32 text-center text-xs text-muted-foreground">
                       No payment transactions found.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paymentsList.map((payment) => {
+                  (payments as any[]).map((payment: any) => {
                     const branchNames = payment.branchIds
-                      ?.map((id) => branchIdToNameMap.get(id) || id)
+                      ?.map((id: string) => branchIdToNameMap.get(id) || id)
                       .join(", ") || "—";
 
                     return (
@@ -362,7 +273,7 @@ export default async function BillingPage({
                           {payment.date ? new Date(payment.date).toLocaleDateString() : "—"}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-sm text-emerald-600 font-semibold text-right font-mono">
-                          {payment.amount !== null ? `$${payment.amount.toFixed(2)}` : "—"}
+                          {payment.amount !== null ? `$${Number(payment.amount).toFixed(2)}` : "—"}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-sm text-muted-foreground capitalize">
                           {payment.method || "—"}
@@ -382,7 +293,7 @@ export default async function BillingPage({
             <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
               <PaginationControls
                 totalPages={pagination.totalPages}
-                currentPage={parseInt(currentPage, 10)}
+                currentPage={pagination.page}
               />
             </div>
           </CardContent>

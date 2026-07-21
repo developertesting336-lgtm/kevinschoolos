@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, DM_Sans, Noto_Serif } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
+import { ReduxProvider } from "@/store/provider";
 
 const notoSerifHeading = Noto_Serif({
   subsets: ["latin"],
@@ -45,7 +46,9 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <ReduxProvider>
+          {children}
+        </ReduxProvider>
         <Toaster position="top-right" richColors />
       </body>
     </html>

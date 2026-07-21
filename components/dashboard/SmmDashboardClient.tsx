@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,62 +17,29 @@ import {
   ChevronRight,
   AlertCircle,
 } from "lucide-react";
-
-interface Stats {
-  branchesCount: number;
-  coursesCount: number;
-  leadsCount: number;
-  trialsCount: number;
-}
-
-interface Activity {
-  id: string;
-  activityId: string;
-  type: string | null;
-  outcome: string | null;
-  notes: string | null;
-  dateTime: string | null;
-}
-
-interface Course {
-  id: string;
-  courseName: string;
-  description: string | null;
-  stage: string | null;
-  ageBand: string | null;
-}
-
-interface DashboardData {
-  stats: Stats;
-  courses: Course[];
-  recentActivities: Activity[];
-}
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  fetchSmmDashboardData,
+  selectSmmStats,
+  selectSmmCourses,
+  selectSmmActivities,
+  selectSmmLoading,
+  selectSmmError,
+} from "@/store/slices/dashboardSlice";
 
 export function SmmDashboardClient() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+
+  // Redux hooks
+  const stats = useAppSelector(selectSmmStats);
+  const courses = useAppSelector(selectSmmCourses);
+  const recentActivities = useAppSelector(selectSmmActivities);
+  const loading = useAppSelector(selectSmmLoading);
+  const error = useAppSelector(selectSmmError);
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch("/api/dashboard/smm");
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || `HTTP ${res.status}`);
-        }
-        const d: DashboardData = await res.json();
-        setData(d);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+    dispatch(fetchSmmDashboardData());
+  }, [dispatch]);
 
   if (loading) {
     return (
@@ -109,19 +76,15 @@ export function SmmDashboardClient() {
     );
   }
 
-  if (error || !data) {
+  if (error) {
     return (
       <div className="p-8 max-w-lg mx-auto text-center">
         <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-3" />
         <h2 className="text-lg font-bold text-foreground mb-1">Unable to Load</h2>
-        <p className="text-sm text-muted-foreground">{error || "No data available."}</p>
+        <p className="text-sm text-muted-foreground">{error}</p>
       </div>
     );
   }
-
-  const stats = data.stats || { branchesCount: 0, coursesCount: 0, leadsCount: 0, trialsCount: 0 };
-  const courses = data.courses || [];
-  const recentActivities = data.recentActivities || [];
 
   const registryTiers = [
     {
@@ -266,7 +229,7 @@ export function SmmDashboardClient() {
               </div>
             ) : (
               <div className="space-y-4">
-                {recentActivities.map((act) => (
+                {recentActivities.map((act: any) => (
                   <div key={act.id} className="flex items-start justify-between gap-3 border-b border-border/40 pb-3 last:border-0 last:pb-0">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -310,7 +273,7 @@ export function SmmDashboardClient() {
               </div>
             ) : (
               <div className="space-y-3.5">
-                {courses.map((course) => (
+                {courses.map((course: any) => (
                   <div key={course.id} className="p-3 rounded-lg border border-border/80 bg-muted/5 flex flex-col justify-between space-y-1 hover:border-primary/20 transition-colors">
                     <div className="space-y-0.5">
                       <h4 className="text-xs font-bold text-foreground truncate" title={course.courseName || ""}>

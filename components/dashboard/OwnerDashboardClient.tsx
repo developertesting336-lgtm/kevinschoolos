@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchOwnerDashboard, selectDashboardData, selectDashboardLoading, selectDashboardError, selectDashboardFilters, setFilters, clearFilters as clearDashboardFilters } from "@/store/slices/dashboardSlice";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   GraduationCap,
@@ -14,7 +15,6 @@ import {
   PhoneCall,
   Play,
   Users,
-  DollarSign as DollarIcon,
   AlertCircle,
   RefreshCw,
   Filter,
@@ -108,72 +108,49 @@ type ExpandedSection = "financial" | "payroll" | "channel" | null;
 
 // ─── Component ────────────────────────────────────────────────────────────
 export function OwnerDashboardClient() {
-  const [data, setData] = useState<DashboardResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  
+  // Redux state
+  const data = useAppSelector(selectDashboardData);
+  const loading = useAppSelector(selectDashboardLoading);
+  const error = useAppSelector(selectDashboardError);
+  const filters = useAppSelector(selectDashboardFilters);
+  
   const [expandedSection, setExpandedSection] = useState<ExpandedSection>(null);
 
-  // Filters (Main State)
-  const [branchFilter, setBranchFilter] = useState("");
-  const [monthFilter, setMonthFilter] = useState("");
-  const [courseFilter, setCourseFilter] = useState("");
-  const [channelFilter, setChannelFilter] = useState("");
-
   // Local Input State (Prevents reloading/skeletons on every keystroke)
-  const [localBranchFilter, setLocalBranchFilter] = useState("");
-  const [localMonthFilter, setLocalMonthFilter] = useState("");
-  const [localCourseFilter, setLocalCourseFilter] = useState("");
-  const [localChannelFilter, setLocalChannelFilter] = useState("");
+  const [localBranchFilter, setLocalBranchFilter] = useState(filters.branch);
+  const [localMonthFilter, setLocalMonthFilter] = useState(filters.month);
+  const [localCourseFilter, setLocalCourseFilter] = useState(filters.course);
+  const [localChannelFilter, setLocalChannelFilter] = useState(filters.channel);
 
+  // Fetch data when filters change
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const params = new URLSearchParams();
-        if (branchFilter) params.set("branch", branchFilter);
-        if (monthFilter) params.set("month", monthFilter);
-        if (courseFilter) params.set("course", courseFilter);
-        if (channelFilter) params.set("channel", channelFilter);
-
-        const res = await fetch(`/api/owner/dashboard?${params.toString()}`);
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || `HTTP ${res.status}`);
-        }
-        const d: DashboardResponse = await res.json();
-        setData(d);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [branchFilter, monthFilter, courseFilter, channelFilter]);
-
-  const toggleSection = (section: ExpandedSection) => {
-    setExpandedSection(expandedSection === section ? null : section);
-  };
+    dispatch(fetchOwnerDashboard(filters));
+  }, [dispatch, filters]);
 
   const handleApplyFilters = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    setBranchFilter(localBranchFilter);
-    setMonthFilter(localMonthFilter);
-    setCourseFilter(localCourseFilter);
-    setChannelFilter(localChannelFilter);
+    dispatch(setFilters({
+      branch: localBranchFilter,
+      month: localMonthFilter,
+      course: localCourseFilter,
+      channel: localChannelFilter,
+    }));
   };
 
   const clearFilters = () => {
-    setBranchFilter("");
-    setMonthFilter("");
-    setCourseFilter("");
-    setChannelFilter("");
+    dispatch(clearDashboardFilters());
     setLocalBranchFilter("");
     setLocalMonthFilter("");
     setLocalCourseFilter("");
     setLocalChannelFilter("");
   };
+
+  const toggleSection = (section: ExpandedSection) => {
+    setExpandedSection(expandedSection === section ? null : section);
+  };
+
 
   if (loading) {
     return (
@@ -224,7 +201,7 @@ export function OwnerDashboardClient() {
   const payrollAlerts = data.payrollAlerts;
   const role = data.role;
 
-  const hasActiveFilters = branchFilter || monthFilter || courseFilter || channelFilter;
+  const hasActiveFilters = filters.branch || filters.month || filters.course || filters.channel;
 
   return (
     <div className="space-y-6 select-none animate-in fade-in duration-300">

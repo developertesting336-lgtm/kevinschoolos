@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,15 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  fetchNotificationsHistory,
+  selectNotificationsHistory,
+  selectNotificationsHistoryStats,
+  selectNotificationsHistoryPagination,
+  selectNotificationsHistoryLoading,
+  selectNotificationsHistoryError,
+} from "@/store/slices/notificationsSlice";
 import { NotificationTable } from "@/components/dashboard/notifications/NotificationTable";
 import { NotificationDrawer } from "@/components/dashboard/notifications/NotificationDrawer";
 
@@ -36,26 +45,20 @@ export function NotificationsCenterClient({
   userRole,
   userName,
 }: NotificationsCenterClientProps) {
-  const [data, setData] = useState<any[]>([]);
-  const [stats, setStats] = useState({
-    scheduled: 0,
-    sent: 0,
-    failed: 0,
-    today: 0,
-  });
-  const [pagination, setPagination] = useState({
-    total: 0,
-    page: 1,
-    limit: 10,
-    totalPages: 1,
-  });
+  const dispatch = useAppDispatch();
 
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  // Redux selectors
+  const data = useAppSelector(selectNotificationsHistory);
+  const stats = useAppSelector(selectNotificationsHistoryStats);
+  const pagination = useAppSelector(selectNotificationsHistoryPagination);
+  const loading = useAppSelector(selectNotificationsHistoryLoading);
+  const error = useAppSelector(selectNotificationsHistoryError);
+
   const [selectedNotification, setSelectedNotification] = useState<any | null>(null);
 
   // Filter States
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState("");
   const [channel, setChannel] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
@@ -64,48 +67,30 @@ export function NotificationsCenterClient({
   const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(1);
 
-  const [, startTransition] = useTransition();
+  // Search input debouncer (400ms delay)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, status, channel, selectedBranch, recipientType, startDate, endDate]);
+  }, [debouncedSearch, status, channel, selectedBranch, recipientType, startDate, endDate]);
 
   useEffect(() => {
-    fetchNotifications();
-  }, [page, search, status, channel, selectedBranch, recipientType, startDate, endDate]);
-
-  const fetchNotifications = async () => {
-    setRefreshing(true);
-    try {
-      let url = `/api/dashboard/notifications?page=${page}&limit=10`;
-      if (search) url += `&search=${encodeURIComponent(search)}`;
-      if (status) url += `&status=${encodeURIComponent(status)}`;
-      if (channel) url += `&channel=${encodeURIComponent(channel)}`;
-      if (selectedBranch) url += `&branchId=${encodeURIComponent(selectedBranch)}`;
-      if (recipientType) url += `&recipientType=${encodeURIComponent(recipientType)}`;
-      if (startDate) url += `&startDate=${encodeURIComponent(startDate)}`;
-      if (endDate) url += `&endDate=${encodeURIComponent(endDate)}`;
-
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to load notifications history");
-      const json = await res.json();
-
-      startTransition(() => {
-        setData(json.data || []);
-        if (json.stats) {
-          setStats(json.stats);
-        }
-        if (json.pagination) {
-          setPagination(json.pagination);
-        }
-      });
-    } catch (error) {
-      console.error("[Notifications Center Fetch Error]", error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+    dispatch(fetchNotificationsHistory({
+      page,
+      search: debouncedSearch,
+      status,
+      channel,
+      branchId: selectedBranch,
+      recipientType,
+      startDate,
+      endDate,
+    }));
+  }, [dispatch, page, debouncedSearch, status, channel, selectedBranch, recipientType, startDate, endDate]);
 
   const handleClearFilters = () => {
     setSearch("");
@@ -116,6 +101,19 @@ export function NotificationsCenterClient({
     setStartDate("");
     setEndDate("");
     setPage(1);
+  };
+
+  const triggerManualRefresh = () => {
+    dispatch(fetchNotificationsHistory({
+      page,
+      search: debouncedSearch,
+      status,
+      channel,
+      branchId: selectedBranch,
+      recipientType,
+      startDate,
+      endDate,
+    }));
   };
 
   return (
@@ -138,12 +136,12 @@ export function NotificationsCenterClient({
 
         <div className="flex flex-wrap items-center gap-3">
           <button
-            onClick={fetchNotifications}
-            disabled={refreshing}
+            onClick={triggerManualRefresh}
+            disabled={loading}
             className="p-2 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground hover:shadow-sm active:scale-95 transition-all cursor-pointer shrink-0 disabled:opacity-50"
             title="Refresh logs"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin text-primary" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-primary" : ""}`} />
           </button>
           <Badge variant="outline" className="bg-primary/5 text-primary border-primary/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
             Role: {userRole === "owner" ? "Owner" : "Office Administrator"}
@@ -169,7 +167,7 @@ export function NotificationsCenterClient({
               <div className="h-7 w-12 bg-muted animate-pulse rounded" />
             ) : (
               <div className="text-2xl font-extrabold text-foreground tracking-tight font-mono">
-                {stats.scheduled}
+                {stats.scheduledCount}
               </div>
             )}
             <p className="text-[8px] text-muted-foreground font-semibold mt-1">Pending queue items</p>
@@ -181,7 +179,7 @@ export function NotificationsCenterClient({
           <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-emerald-500/80 to-teal-500/80 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="p-4 pb-1.5 flex flex-row items-center justify-between space-y-0">
             <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
-              Sent Successfully
+              Sent Success
             </span>
             <div className="h-6 w-6 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
               <Send className="h-3.5 w-3.5" />
@@ -192,7 +190,7 @@ export function NotificationsCenterClient({
               <div className="h-7 w-12 bg-muted animate-pulse rounded" />
             ) : (
               <div className="text-2xl font-extrabold text-foreground tracking-tight font-mono">
-                {stats.sent}
+                {stats.sentCount}
               </div>
             )}
             <p className="text-[8px] text-muted-foreground font-semibold mt-1">Dispatched successfully</p>
@@ -201,10 +199,10 @@ export function NotificationsCenterClient({
 
         {/* Failed Card */}
         <Card className="bg-card border-border hover:border-rose-500/30 hover:shadow-md hover:shadow-rose-500/2 transition-all duration-300 group relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-rose-500/80 to-red-500/80 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-rose-500/80 to-orange-500/80 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="p-4 pb-1.5 flex flex-row items-center justify-between space-y-0">
             <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
-              Delivery Failures
+              Failed
             </span>
             <div className="h-6 w-6 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-600">
               <AlertTriangle className="h-3.5 w-3.5" />
@@ -214,22 +212,22 @@ export function NotificationsCenterClient({
             {loading ? (
               <div className="h-7 w-12 bg-muted animate-pulse rounded" />
             ) : (
-              <div className="text-2xl font-extrabold text-foreground tracking-tight font-mono">
-                {stats.failed}
+              <div className="text-2xl font-extrabold tracking-tight font-mono text-rose-600">
+                {stats.failedCount}
               </div>
             )}
-            <p className="text-[8px] text-muted-foreground font-semibold mt-1">Erroneous or undeliverable</p>
+            <p className="text-[8px] text-muted-foreground font-semibold mt-1">Errors & retries logs</p>
           </CardContent>
         </Card>
 
-        {/* Today Card */}
-        <Card className="bg-card border-border hover:border-blue-500/30 hover:shadow-md hover:shadow-blue-500/2 transition-all duration-300 group relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-blue-500/80 to-indigo-500/80 opacity-0 group-hover:opacity-100 transition-opacity" />
+        {/* Total Communication Volume */}
+        <Card className="bg-card border-border hover:border-sky-500/30 hover:shadow-md hover:shadow-sky-500/2 transition-all duration-300 group relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-sky-500/80 to-blue-500/80 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="p-4 pb-1.5 flex flex-row items-center justify-between space-y-0">
             <span className="text-[9px] font-bold tracking-wider uppercase text-muted-foreground">
-              Today's Notifications
+              Total logs
             </span>
-            <div className="h-6 w-6 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600">
+            <div className="h-6 w-6 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600">
               <Calendar className="h-3.5 w-3.5" />
             </div>
           </CardHeader>
@@ -238,41 +236,47 @@ export function NotificationsCenterClient({
               <div className="h-7 w-12 bg-muted animate-pulse rounded" />
             ) : (
               <div className="text-2xl font-extrabold text-foreground tracking-tight font-mono">
-                {stats.today}
+                {stats.totalCount}
               </div>
             )}
-            <p className="text-[8px] text-muted-foreground font-semibold mt-1">Total triggered today</p>
+            <p className="text-[8px] text-muted-foreground font-semibold mt-1">Aggregate registry entries</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Control panel: Search and Filters */}
-      <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-          {/* Search */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-3 h-4 w-4 text-muted-foreground/60" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search notifications by recipient name, message text, ref..."
-              className="pl-10 text-xs h-10 rounded-xl focus-visible:ring-primary/20 border-border bg-muted/20"
-            />
-          </div>
-
-          {/* Filters toggle/reset */}
+      {/* Audit Search bar & filters panel */}
+      <div className="bg-card border border-border p-5 rounded-2xl shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-border/50 pb-3">
           <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-primary" />
+            <h3 className="text-xs font-bold text-foreground">Advanced Query Filters</h3>
+          </div>
+          {(search || status || channel || selectedBranch || recipientType || startDate || endDate) && (
             <button
               onClick={handleClearFilters}
-              className="px-4 py-2 border border-border hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground rounded-xl transition-all cursor-pointer select-none"
+              className="text-[10px] font-extrabold text-rose-500 hover:text-rose-600 transition-all hover:underline cursor-pointer"
             >
               Reset Filters
             </button>
-          </div>
+          )}
         </div>
 
-        {/* Dynamic Filters Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {/* Search query input */}
+          <div className="flex flex-col gap-1.5 lg:col-span-2">
+            <label className="text-[9px] font-bold uppercase text-muted-foreground tracking-wider">Search Recipient or message</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-3.5 w-3.5 text-muted-foreground/60" />
+              <Input
+                type="text"
+                placeholder="Recipient name, message contents..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="bg-muted/30 border-border text-xs pl-9 h-10 rounded-xl focus-visible:ring-primary/20 w-full"
+              />
+            </div>
+          </div>
+
           {/* Status filter */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[9px] font-bold uppercase text-muted-foreground tracking-wider">Status</label>
@@ -288,7 +292,7 @@ export function NotificationsCenterClient({
             </select>
           </div>
 
-          {/* Branch filter (conditional selector) */}
+          {/* Branch filter */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[9px] font-bold uppercase text-muted-foreground tracking-wider">Branch</label>
             <select
@@ -365,6 +369,10 @@ export function NotificationsCenterClient({
           <div className="py-24 flex flex-col items-center justify-center space-y-4">
             <Loader2 className="h-7 w-7 animate-spin text-primary" />
             <span className="text-xs text-muted-foreground font-semibold">Loading communication logs...</span>
+          </div>
+        ) : error ? (
+          <div className="py-24 text-center select-none text-rose-500 font-semibold">
+            {error}
           </div>
         ) : data.length === 0 ? (
           <div className="py-24 text-center select-none space-y-2 border border-dashed border-border rounded-2xl bg-muted/5">

@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loginThunk, selectAuthLoading, selectAuthError } from "@/store/slices/authSlice";
 import {
   Card,
   CardHeader,
@@ -17,36 +19,25 @@ import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const isLoading = useAppSelector(selectAuthLoading);
+  const authError = useAppSelector(selectAuthError);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    const result = await dispatch(loginThunk({ email, password }));
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed. Please check credentials.");
-      }
-
-      // OPTIMIZATION: Navigate immediately — don't wait for refresh
-      // The dashboard layout will validate the session on the server side
+    if (loginThunk.fulfilled.match(result)) {
       router.push("/dashboard");
-    } catch (err: any) {
-      toast.error(err.message);
-      setIsLoading(false);
+    } else {
+      const errorMessage = result.payload as string || "Login failed. Please check credentials.";
+      toast.error(errorMessage);
     }
-  }, [email, password, router]);
+  }, [email, password, dispatch, router]);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-center items-center px-4 font-sans relative">

@@ -3,51 +3,22 @@
 import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Users, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
-
-interface TeacherHours {
-  id: string;
-  entry: string;
-  hours: number | null;
-  type: string | null;
-  notes: string | null;
-}
-
-interface TeacherPayRun {
-  id: string;
-  payRunNo: string;
-  period: string | null;
-  payType: string | null;
-  hours: number | null;
-  rate: number | null;
-  grossPay: number | null;
-  paymentMethod: string | null;
-  status: string | null;
-  datePaid: string | null;
-  notes: string | null;
-  teacherIds: string[];
-  branchIds: string[];
-  teacherName: string;
-  adjustments: number;
-  finalPay: number;
-  teacherHours: TeacherHours[];
-}
-
-interface Pagination {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchTeacherPayList, selectTeacherPayList, selectTeacherPayPagination, selectTeacherPayLoading, selectTeacherPayError } from "@/store/slices/financeSlice";
 
 interface TeacherPayViewerProps {
   branchId?: string;
 }
 
 export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
-  const [data, setData] = useState<TeacherPayRun[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({ total: 0, page: 1, limit: 10, totalPages: 1 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+
+  // Redux hooks
+  const data = useAppSelector(selectTeacherPayList);
+  const pagination = useAppSelector(selectTeacherPayPagination);
+  const loading = useAppSelector(selectTeacherPayLoading);
+  const error = useAppSelector(selectTeacherPayError);
+
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -55,28 +26,8 @@ export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
   }, [branchId]);
 
   useEffect(() => {
-    fetchData();
-  }, [page, branchId]);
-
-  async function fetchData() {
-    setLoading(true);
-    setError(null);
-    try {
-      let url = `/api/dashboard/finance/teacher-pay?page=${page}&limit=10`;
-      if (branchId) {
-        url += `&branchId=${encodeURIComponent(branchId)}`;
-      }
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Failed to load teacher pay runs (${res.status})`);
-      const json = await res.json();
-      setData(json.data || []);
-      setPagination(json.pagination || { total: 0, page: 1, limit: 10, totalPages: 1 });
-    } catch (err: any) {
-      setError(err.message || "Failed to load teacher pay runs");
-    } finally {
-      setLoading(false);
-    }
-  }
+    dispatch(fetchTeacherPayList({ page, branchId }));
+  }, [dispatch, page, branchId]);
 
   const formatCurrency = (val: number | null) => {
     if (val === null || val === undefined) return "—";
@@ -135,7 +86,7 @@ export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
-              {data.map((row) => (
+              {data.map((row: any) => (
                 <tr key={row.id} className="hover:bg-muted/10 transition-colors">
                   <td className="p-3 font-bold text-foreground/90">{row.teacherName}</td>
                   <td className="p-3 text-muted-foreground font-medium">{formatDate(row.period)}</td>

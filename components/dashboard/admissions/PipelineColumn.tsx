@@ -73,7 +73,7 @@ export function PipelineColumn({
 
   return (
     <div className={cn(
-      "flex flex-col flex-1 shrink-0 rounded-2xl border p-3.5 space-y-3 min-w-[270px] sm:min-w-[290px] h-full max-h-[75vh] overflow-hidden",
+      "flex flex-col flex-1 shrink-0 rounded-2xl border p-3.5 space-y-3 min-w-67.5 sm:min-w-72.5 h-full max-h-[75vh] overflow-hidden",
       currentTheme.bg,
       currentTheme.border
     )}>

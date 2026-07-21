@@ -1,121 +1,58 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { Search, Loader2, ChevronLeft, ChevronRight, BookOpen, Lock, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  BookOpen,
-  Loader2,
-  ChevronLeft,
-  ChevronRight,
-  Lock,
-  Search,
-  CheckCircle2,
-  AlertCircle,
-  HelpCircle,
-} from "lucide-react";
-
-interface AccountInfo {
-  id: string;
-  accountNo: string;
-  accountName: string;
-}
-
-interface LedgerLine {
-  id: string;
-  line: string;
-  debit: number | null;
-  credit: number | null;
-  memo: string | null;
-  accountIds: string[];
-  branchIds: string[];
-  account?: AccountInfo | null;
-}
-
-interface JournalEntry {
-  id: string;
-  entryNo: string;
-  date: string | null;
-  memo: string | null;
-  source: string | null;
-  posted: boolean;
-  isReversed?: boolean;
-  branchIds: string[];
-  ledgerLines: LedgerLine[];
-}
-
-interface Pagination {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchLedgerList, selectLedgerList, selectLedgerPagination, selectLedgerLoading, selectLedgerError } from "@/store/slices/financeSlice";
 
 interface LedgerViewerProps {
   branchId?: string;
 }
 
 export function LedgerViewer({ branchId }: LedgerViewerProps) {
-  const [data, setData] = useState<JournalEntry[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({
-    total: 0,
-    page: 1,
-    limit: 10,
-    totalPages: 1,
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+
+  // Redux hooks
+  const data = useAppSelector(selectLedgerList);
+  const pagination = useAppSelector(selectLedgerPagination);
+  const loading = useAppSelector(selectLedgerLoading);
+  const error = useAppSelector(selectLedgerError);
+
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [postedFilter, setPostedFilter] = useState("all");
+
+  // Search input debouncer (400ms delay)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, postedFilter, branchId]);
+  }, [debouncedSearch, postedFilter, branchId]);
 
   useEffect(() => {
-    fetchData();
-  }, [page, search, postedFilter, branchId]);
+    dispatch(fetchLedgerList({ page, search: debouncedSearch, posted: postedFilter, branchId }));
+  }, [dispatch, page, debouncedSearch, postedFilter, branchId]);
 
-  async function fetchData() {
-    setLoading(true);
-    setError(null);
-    try {
-      let url = `/api/dashboard/finance/ledger?page=${page}&limit=10`;
-      if (search) {
-        url += `&search=${encodeURIComponent(search)}`;
-      }
-      if (postedFilter !== "all") {
-        url += `&posted=${encodeURIComponent(postedFilter)}`;
-      }
-      if (branchId) {
-        url += `&branchId=${encodeURIComponent(branchId)}`;
-      }
-
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Failed to load ledger data (${res.status})`);
-      const json = await res.json();
-      setData(json.data || []);
-      setPagination(json.pagination || { total: 0, page: 1, limit: 10, totalPages: 1 });
-    } catch (err: any) {
-      setError(err.message || "Failed to load ledger data");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // Flatten the journal entries and their ledger lines for the table rows
-  const rows = data.flatMap((entry) => {
-    if (entry.ledgerLines.length === 0) {
+  // Flatten the lines inside journal entries for grid display
+  const rows = data.flatMap((entry: any) => {
+    if (!entry.ledgerLines || entry.ledgerLines.length === 0) {
       return [
         {
-          id: `${entry.id}-empty`,
+          id: entry.id + "-empty",
           entryNo: entry.entryNo,
           date: entry.date,
           posted: entry.posted,
           isReversed: entry.isReversed,
           accountNo: "—",
-          accountName: "No ledger lines",
+          accountName: "No ledger lines recorded.",
           description: entry.memo || "—",
           debit: null,
           credit: null,
@@ -123,7 +60,7 @@ export function LedgerViewer({ branchId }: LedgerViewerProps) {
         },
       ];
     }
-    return entry.ledgerLines.map((line) => ({
+    return entry.ledgerLines.map((line: any) => ({
       id: line.id,
       entryNo: entry.entryNo,
       date: entry.date,
@@ -204,7 +141,7 @@ export function LedgerViewer({ branchId }: LedgerViewerProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
-              {rows.map((row) => (
+              {rows.map((row: any) => (
                 <tr key={row.id} className="hover:bg-muted/10 transition-colors">
                   <td className="p-3 font-mono font-bold text-foreground/90">{row.entryNo}</td>
                   <td className="p-3 text-muted-foreground">

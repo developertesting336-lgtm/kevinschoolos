@@ -3,39 +3,22 @@
 import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Percent, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
-
-interface Royalty {
-  id: string;
-  royaltyNo: string;
-  period: string | null;
-  revenueBase: number | null;
-  royaltyPercent: number | null;
-  marketingFeePercent: number | null;
-  status: string | null;
-  studentsReported: number | null;
-  activeCoursesReported: number | null;
-  notes: string | null;
-  branchIds: string[];
-  royaltyAmount?: number;
-  dueDate?: string | null;
-}
-
-interface Pagination {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchRoyaltiesList, selectRoyaltiesList, selectRoyaltiesPagination, selectRoyaltiesLoading, selectRoyaltiesError } from "@/store/slices/financeSlice";
 
 interface RoyaltyViewerProps {
   branchId?: string;
 }
 
 export function RoyaltyViewer({ branchId }: RoyaltyViewerProps) {
-  const [data, setData] = useState<Royalty[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({ total: 0, page: 1, limit: 10, totalPages: 1 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+
+  // Redux hooks
+  const data = useAppSelector(selectRoyaltiesList);
+  const pagination = useAppSelector(selectRoyaltiesPagination);
+  const loading = useAppSelector(selectRoyaltiesLoading);
+  const error = useAppSelector(selectRoyaltiesError);
+
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -43,28 +26,8 @@ export function RoyaltyViewer({ branchId }: RoyaltyViewerProps) {
   }, [branchId]);
 
   useEffect(() => {
-    fetchData();
-  }, [page, branchId]);
-
-  async function fetchData() {
-    setLoading(true);
-    setError(null);
-    try {
-      let url = `/api/dashboard/finance/royalties?page=${page}&limit=10`;
-      if (branchId) {
-        url += `&branchId=${encodeURIComponent(branchId)}`;
-      }
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Failed to load royalties (${res.status})`);
-      const json = await res.json();
-      setData(json.data || []);
-      setPagination(json.pagination || { total: 0, page: 1, limit: 10, totalPages: 1 });
-    } catch (err: any) {
-      setError(err.message || "Failed to load royalties");
-    } finally {
-      setLoading(false);
-    }
-  }
+    dispatch(fetchRoyaltiesList({ page, branchId }));
+  }, [dispatch, page, branchId]);
 
   const formatCurrency = (val: number | null) => {
     if (val === null || val === undefined) return "—";
@@ -126,7 +89,7 @@ export function RoyaltyViewer({ branchId }: RoyaltyViewerProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
-              {data.map((row) => (
+              {data.map((row: any) => (
                 <tr key={row.id} className="hover:bg-muted/10 transition-colors">
                   <td className="p-3 font-semibold text-foreground">{formatDate(row.period)}</td>
                   <td className="p-3 text-right font-mono font-bold text-foreground">

@@ -1,77 +1,119 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
-import { validateSession } from "@/lib/auth";
-import { apiFetch } from "@/lib/apiFetch";
+import { useSearchParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  fetchStaffData,
+  selectStaffUsers,
+  selectStaffBranches,
+  selectStaffTotalCount,
+  selectStaffCurrentPage,
+  selectStaffTotalPages,
+  selectStaffLimit,
+  selectStaffLoading,
+  selectStaffError,
+  selectStaffIsForbidden,
+  UserData,
+} from "@/store/slices/staffSlice";
+import { validateSessionThunk, selectAuthRole } from "@/store/slices/authSlice";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Users, ArrowLeft, ShieldAlert } from "lucide-react";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import { PaginationControls } from "@/components/dashboard/PaginationControls";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface UserData {
-  id: string;
-  fullName: string;
-  role: string | null;
-  email: string | null;
-  phone: string | null;
-  workingLanguage: string | null;
-  status: string | null;
-  branchIds: string[];
-}
+export default function StaffPage() {
+  const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
 
-interface BranchData {
-  id: string;
-  name: string;
-}
+  // Redux selectors
+  const staffList = useAppSelector(selectStaffUsers);
+  const branchesList = useAppSelector(selectStaffBranches);
+  const totalCount = useAppSelector(selectStaffTotalCount);
+  const currentPage = useAppSelector(selectStaffCurrentPage);
+  const totalPages = useAppSelector(selectStaffTotalPages);
+  const limit = useAppSelector(selectStaffLimit);
+  const loading = useAppSelector(selectStaffLoading);
+  const errorMsg = useAppSelector(selectStaffError);
+  const isForbidden = useAppSelector(selectStaffIsForbidden);
+  const userRole = useAppSelector(selectAuthRole);
 
-interface PaginatedResponse {
-  data: UserData[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+  const pageParam = searchParams.get("page") || "1";
+  const searchParam = searchParams.get("search") || "";
 
-export default async function StaffPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string; search?: string }>;
-}) {
-  const session = await validateSession();
-  const params = await searchParams;
-  const currentPage = params.page || "1";
-  const search = params.search || "";
+  useEffect(() => {
+    dispatch(validateSessionThunk());
+  }, [dispatch]);
 
-  let staffList: UserData[] = [];
-  let branchesList: BranchData[] = [];
-  let pagination = { total: 0, page: 1, limit: 10, totalPages: 1 };
-  let errorMsg = null;
-  let isForbidden = false;
-
-  try {
-    // Fetch users and branches in parallel (branches for mapping - unpaginated)
-    const [usersResponse, branchesResponse] = await Promise.all([
-      apiFetch(`/api/data/user?page=${currentPage}&search=${encodeURIComponent(search)}`),
-      apiFetch("/api/data/branch").catch((e) => {
-        console.error("Could not fetch branches, returning empty list", e);
-        return [];
-      }),
-    ]);
-    staffList = (usersResponse as PaginatedResponse).data;
-    pagination = (usersResponse as PaginatedResponse).pagination;
-    branchesList = branchesResponse;
-  } catch (error: any) {
-    console.error("[Dashboard Staff Fetch Error]", error);
-    errorMsg = error.message || "Failed to load staff list.";
-    if (error.message?.includes("403") || error.message?.includes("Forbidden")) {
-      isForbidden = true;
-    }
-  }
+  useEffect(() => {
+    dispatch(fetchStaffData({ page: pageParam, search: searchParam }));
+  }, [dispatch, pageParam, searchParam]);
 
   // Map branchIds to Branch names
-  const branchIdToNameMap = new Map(branchesList.map((b) => [b.id, b.name]));
+  const branchIdToNameMap = new Map(branchesList.map((b: any) => [b.id, b.name]));
+
+  // Skeleton Loader for Premium Experience
+  if (loading) {
+    return (
+      <div className="space-y-8 select-none animate-pulse">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1.5">
+              <Skeleton className="h-3 w-16 bg-muted rounded" />
+              <span>/</span>
+              <Skeleton className="h-3 w-24 bg-muted rounded" />
+            </div>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8 bg-muted rounded-full" />
+              <Skeleton className="h-8 w-48 bg-muted rounded" />
+            </div>
+            <Skeleton className="h-4 w-72 bg-muted rounded mt-2" />
+          </div>
+          <Skeleton className="h-9 w-32 bg-muted rounded" />
+        </div>
+
+        {/* Table Card Skeleton */}
+        <Card className="bg-card border-border shadow-md overflow-hidden">
+          <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
+            <Skeleton className="h-5 w-32 bg-muted rounded" />
+            <Skeleton className="h-8 w-64 bg-muted rounded" />
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="border-b border-border">
+              <div className="flex px-6 py-3.5 bg-muted/20">
+                <Skeleton className="h-4 w-28 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-16 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-36 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-28 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-20 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-16 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-40 bg-muted rounded" />
+              </div>
+            </div>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex px-6 py-4 border-b border-border/40 items-center">
+                <Skeleton className="h-4 w-28 bg-muted rounded mr-6" />
+                <Skeleton className="h-5 w-16 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-36 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-28 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-20 bg-muted rounded mr-6" />
+                <Skeleton className="h-5 w-16 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-40 bg-muted rounded" />
+              </div>
+            ))}
+            <div className="px-6 py-3 bg-muted/5 flex justify-end border-t border-border">
+              <Skeleton className="h-8 w-48 bg-muted rounded" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Handle unauthorized or RBAC restricted views
   if (isForbidden) {
@@ -91,7 +133,7 @@ export default async function StaffPage({
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Your role <span className="font-semibold text-foreground capitalize">({session?.role || "Staff"})</span> does not have access to view staff and user directories.
+              Your role <span className="font-semibold text-foreground capitalize">({userRole || "Staff"})</span> does not have access to view staff and user directories.
             </p>
             <div className="pt-2">
               <Link
@@ -145,7 +187,7 @@ export default async function StaffPage({
         <Card className="bg-card border-border shadow-md overflow-hidden">
           <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle className="text-sm font-bold text-foreground">
-              ALL STAFF ({pagination.total})
+              ALL STAFF ({totalCount})
             </CardTitle>
             <SearchInput placeholder="Search staff..." />
           </CardHeader>
@@ -170,7 +212,7 @@ export default async function StaffPage({
                     </TableCell>
                   </TableRow>
                 ) : (
-                  staffList.map((staff) => {
+                  staffList.map((staff: UserData) => {
                     const assignedBranches = staff.branchIds
                       ?.map((id) => branchIdToNameMap.get(id) || id)
                       .join(", ") || "—";
@@ -226,8 +268,8 @@ export default async function StaffPage({
             </Table>
             <div className="px-6 py-3 border-t border-border bg-muted/5 flex justify-end">
               <PaginationControls
-                totalPages={pagination.totalPages}
-                currentPage={parseInt(currentPage, 10)}
+                totalPages={totalPages}
+                currentPage={parseInt(pageParam, 10)}
               />
             </div>
           </CardContent>

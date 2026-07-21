@@ -454,7 +454,7 @@ export function SchemaDiagnosticsClient({
           </div>
         </CardHeader>
         <CardContent className="p-0 select-text">
-          <div className="max-h-[350px] overflow-y-auto">
+          <div className="max-h-87.5 overflow-y-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border text-muted-foreground select-none sticky top-0 bg-card z-10">

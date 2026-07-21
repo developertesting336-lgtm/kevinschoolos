@@ -59,7 +59,7 @@ export function ReceiptPreview({
       <div className="space-y-3.5 text-xs">
         <div className="flex justify-between items-start">
           <span className="text-muted-foreground font-medium">Student Name:</span>
-          <span className="text-foreground font-bold text-right truncate max-w-[180px]">
+          <span className="text-foreground font-bold text-right truncate max-w-45">
             {studentName || "—"}
           </span>
         </div>
@@ -67,7 +67,7 @@ export function ReceiptPreview({
         {parentName && (
           <div className="flex justify-between items-start">
             <span className="text-muted-foreground font-medium">Parent Name:</span>
-            <span className="text-foreground font-bold text-right truncate max-w-[180px]">
+            <span className="text-foreground font-bold text-right truncate max-w-45">
               {parentName || "—"}
             </span>
           </div>

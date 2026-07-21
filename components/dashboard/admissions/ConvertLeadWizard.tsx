@@ -99,7 +99,7 @@ export function ConvertLeadWizard({ status }: ConvertLeadWizardProps) {
                 )}
               </div>
               
-              <div className="text-center mt-2.5 max-w-[80px] sm:max-w-none">
+              <div className="text-center mt-2.5 max-w-20 sm:max-w-none">
                 <p className={cn(
                   "text-[10px] sm:text-xs font-bold leading-tight",
                   isActive ? "text-primary" : "text-muted-foreground"

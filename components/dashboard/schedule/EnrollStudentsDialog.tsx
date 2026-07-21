@@ -3,6 +3,17 @@
 import React, { useState, useEffect } from "react";
 import { X, Users, Search, CheckSquare, Square } from "lucide-react";
 import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  fetchEnrollmentsForGroup,
+  saveEnrollmentsForGroup,
+  selectEnrollDialogStudents,
+  selectEnrollDialogEnrolledIds,
+  selectEnrollDialogLoading,
+  selectEnrollDialogError,
+  selectEnrollDialogSaving,
+  selectEnrollDialogSaveError,
+} from "@/store/slices/scheduleSlice";
 
 interface StudentItem {
   id: string;
@@ -22,33 +33,28 @@ export default function EnrollStudentsDialog({
   onClose,
   onSuccess,
 }: EnrollStudentsDialogProps) {
-  const [students, setStudents] = useState<StudentItem[]>([]);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
+  // Redux hooks
+  const students = useAppSelector(selectEnrollDialogStudents) as StudentItem[];
+  const enrolledStudentIds = useAppSelector(selectEnrollDialogEnrolledIds) as string[];
+  const loading = useAppSelector(selectEnrollDialogLoading);
+  const error = useAppSelector(selectEnrollDialogError);
+  const saving = useAppSelector(selectEnrollDialogSaving);
+  const saveError = useAppSelector(selectEnrollDialogSaveError);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [search, setSearch] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadEnrollments() {
-      try {
-        const res = await fetch(`/api/dashboard/groups/enroll?classGroupId=${classGroupId}`);
-        if (!res.ok) {
-          throw new Error("Failed to load student roster data.");
-        }
-        const data = await res.json();
-        setStudents(data.students || []);
-        setSelectedIds(data.enrolledStudentIds || []);
-      } catch (err: any) {
-        setError(err.message || "Failed to load database records.");
-      } finally {
-        setLoading(false);
-      }
+    dispatch(fetchEnrollmentsForGroup(classGroupId));
+  }, [dispatch, classGroupId]);
+
+  useEffect(() => {
+    if (!loading) {
+      setSelectedIds(enrolledStudentIds);
     }
-    loadEnrollments();
-  }, [classGroupId]);
+  }, [loading, enrolledStudentIds]);
 
   const handleToggle = (id: string) => {
     setSelectedIds((prev) =>
@@ -66,35 +72,19 @@ export default function EnrollStudentsDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaveError(null);
-    setSaving(true);
-    try {
-      const res = await fetch("/api/dashboard/groups/enroll", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classGroupId,
-          studentIds: selectedIds,
-        }),
+    dispatch(saveEnrollmentsForGroup({ classGroupId, studentIds: selectedIds }))
+      .unwrap()
+      .then(() => {
+        onSuccess();
+        toast.success("Student enrollment updated successfully!");
+        onClose();
+      })
+      .catch((err) => {
+        toast.error(err || "Failed to save student enrollments.");
       });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || `HTTP ${res.status}`);
-      }
-
-      onSuccess();
-      toast.success("Student enrollment updated successfully!");
-      onClose();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save student enrollments.");
-      setSaveError(err.message || "Failed to save student enrollments.");
-    } finally {
-      setSaving(false);
-    }
   };
 
-  const filteredStudents = students.filter((s) =>
+  const filteredStudents = students.filter((s: StudentItem) =>
     s.name.toLowerCase().includes(search.toLowerCase())
   );
 

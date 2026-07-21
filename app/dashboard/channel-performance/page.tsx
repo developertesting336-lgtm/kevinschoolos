@@ -1,69 +1,109 @@
-import { validateSession } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { normalizeRole } from "@/lib/roles";
-import { ShieldAlert } from "lucide-react";
-import { redirect } from "next/navigation";
-import { ChannelPerformanceClient } from "../../../components/dashboard/channel-performance/ChannelPerformanceClient";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchChannelPerformanceData, selectChannelLoading, selectChannelError, selectChannelBranches, selectChannelUserRole, selectChannelUserName } from "@/store/slices/channelPerformanceSlice";
+import { validateSessionThunk } from "@/store/slices/authSlice";
+import { ChannelPerformanceClient } from "@/components/dashboard/channel-performance/ChannelPerformanceClient";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function ChannelPerformancePage() {
-  const session = await validateSession();
-  if (!session) {
-    redirect("/login");
-  }
+export default function ChannelPerformancePage() {
+  const dispatch = useAppDispatch();
+  const loading = useAppSelector(selectChannelLoading);
+  const error = useAppSelector(selectChannelError);
+  const branches = useAppSelector(selectChannelBranches);
+  const userRole = useAppSelector(selectChannelUserRole);
+  const userName = useAppSelector(selectChannelUserName);
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { id: true, fullName: true, email: true, role: true, branchIds: true },
-  });
+  useEffect(() => {
+    dispatch(validateSessionThunk()).then((result: any) => {
+      if (result.meta.requestStatus === "fulfilled") {
+        const { role, userId } = result.payload;
+        dispatch(fetchChannelPerformanceData({
+          page: 1,
+          userRole: role || "",
+          userName: userId || "",
+        }));
+      }
+    });
+  }, [dispatch]);
 
-  if (!dbUser) {
-    redirect("/login");
-  }
-
-  const userRole = normalizeRole(dbUser.role || "staff");
-
-  // RBAC protection check: only Owner, Office Admin, and SMM allowed.
-  if (userRole !== "owner" && userRole !== "office_admin" && userRole !== "smm") {
+  if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center select-none animate-in fade-in duration-300">
-        <div className="h-14 w-14 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mb-4 shadow-lg shadow-rose-500/5">
-          <ShieldAlert className="h-7 w-7" />
+      <div className="space-y-8 select-none animate-pulse">
+        {/* Freshness banner skeleton */}
+        <div className="h-20 bg-muted rounded-2xl" />
+        
+        {/* Page header skeleton */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="h-4 w-48 bg-muted rounded mb-2" />
+            <div className="h-8 w-72 bg-muted rounded mb-1" />
+            <div className="h-4 w-96 bg-muted rounded" />
+          </div>
         </div>
-        <h3 className="text-lg font-extrabold text-rose-600 tracking-tight">Access Restricted</h3>
-        <p className="text-xs text-muted-foreground mt-2 max-w-sm leading-relaxed font-medium">
-          Your account role ({dbUser.role || "unknown"}) is unauthorized to access the Marketing & Channel Performance analytics space. If you require access, please contact the system owner.
-        </p>
+
+        {/* 6 KPI cards skeleton */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="bg-card border-border">
+              <CardContent className="p-4 space-y-3">
+                <Skeleton className="h-3 w-20 bg-muted rounded" />
+                <Skeleton className="h-8 w-16 bg-muted rounded" />
+                <Skeleton className="h-3 w-24 bg-muted rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Control panel skeleton */}
+        <div className="h-32 bg-muted rounded-2xl" />
+
+        {/* Charts skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="bg-card border-border p-5">
+            <Skeleton className="h-4 w-48 bg-muted rounded mb-4" />
+            <Skeleton className="h-64 w-full bg-muted rounded" />
+          </Card>
+          <Card className="bg-card border-border p-5">
+            <Skeleton className="h-4 w-48 bg-muted rounded mb-4" />
+            <Skeleton className="h-64 w-full bg-muted rounded" />
+          </Card>
+        </div>
+
+        {/* Table skeleton */}
+        <Card className="bg-card border-border">
+          <CardContent className="p-6">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center py-3 border-b border-border/40 last:border-0">
+                <Skeleton className="h-4 w-32 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-12 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-12 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-12 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-12 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-12 bg-muted rounded" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  // Fetch branches scoping
-  let branches: any[] = [];
-  try {
-    if (userRole === "owner") {
-      branches = await prisma.branch.findMany({
-        select: { id: true, name: true },
-        orderBy: { name: "asc" },
-      });
-    } else {
-      const allowedBranchIds = dbUser.branchIds || [];
-      branches = await prisma.branch.findMany({
-        where: { id: { in: allowedBranchIds } },
-        select: { id: true, name: true },
-        orderBy: { name: "asc" },
-      });
-    }
-  } catch (error) {
-    console.error("[Channel Performance Branches Fetch Error]", error);
+  if (error) {
+    return (
+      <Card className="border-destructive/20 bg-destructive/5 text-destructive p-4 text-sm font-medium">
+        {error}
+      </Card>
+    );
   }
 
   return (
     <ChannelPerformanceClient
       initialBranches={branches}
       userRole={userRole}
-      userName={dbUser.fullName}
+      userName={userName}
     />
   );
 }

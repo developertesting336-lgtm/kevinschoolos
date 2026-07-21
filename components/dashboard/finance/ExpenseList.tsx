@@ -3,41 +3,22 @@
 import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
-
-interface Expense {
-  id: string;
-  expenseNo: string;
-  date: string | null;
-  description: string | null;
-  amount: number | null;
-  paymentMethod: string | null;
-  paid: boolean;
-  notes: string | null;
-  vendorIds: string[];
-  branchIds: string[];
-  vendorName: string;
-  category: string;
-  branchName: string;
-  submittedBy: string;
-  approvalStatus: string;
-}
-
-interface Pagination {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchExpensesList, selectExpensesList, selectExpensesPagination, selectExpensesLoading, selectExpensesError } from "@/store/slices/financeSlice";
 
 interface ExpenseListProps {
   branchId?: string;
 }
 
 export function ExpenseList({ branchId }: ExpenseListProps) {
-  const [data, setData] = useState<Expense[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({ total: 0, page: 1, limit: 10, totalPages: 1 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  
+  // Redux hooks
+  const data = useAppSelector(selectExpensesList);
+  const pagination = useAppSelector(selectExpensesPagination);
+  const loading = useAppSelector(selectExpensesLoading);
+  const error = useAppSelector(selectExpensesError);
+  
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -45,28 +26,8 @@ export function ExpenseList({ branchId }: ExpenseListProps) {
   }, [branchId]);
 
   useEffect(() => {
-    fetchData();
-  }, [page, branchId]);
-
-  async function fetchData() {
-    setLoading(true);
-    setError(null);
-    try {
-      let url = `/api/dashboard/finance/expenses?page=${page}&limit=10`;
-      if (branchId) {
-        url += `&branchId=${encodeURIComponent(branchId)}`;
-      }
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Failed to load expenses (${res.status})`);
-      const json = await res.json();
-      setData(json.data || []);
-      setPagination(json.pagination || { total: 0, page: 1, limit: 10, totalPages: 1 });
-    } catch (err: any) {
-      setError(err.message || "Failed to load expenses");
-    } finally {
-      setLoading(false);
-    }
-  }
+    dispatch(fetchExpensesList({ page, branchId }));
+  }, [dispatch, page, branchId]);
 
   const formatCurrency = (val: number | null) => {
     if (val === null || val === undefined) return "—";
@@ -121,7 +82,7 @@ export function ExpenseList({ branchId }: ExpenseListProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
-              {data.map((row) => (
+              {data.map((row: any) => (
                 <tr key={row.id} className="hover:bg-muted/10 transition-colors">
                   <td className="p-3 text-muted-foreground font-medium">{formatDate(row.date)}</td>
                   <td className="p-3 font-bold text-foreground/90">{row.vendorName}</td>

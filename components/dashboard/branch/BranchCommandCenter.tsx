@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchBranchDashboardData, selectBranchDashboardData, selectBranchDashboardLoading, selectBranchDashboardError } from "@/store/slices/branchesSlice";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -299,32 +301,19 @@ function DetailDrawer({ title, children, onClose }: { title: string; children: R
 // ─── Main Branch Command Center ───────────────────────────────────────────────
 
 export function BranchCommandCenter() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+
+  // Redux hooks
+  const data = useAppSelector(selectBranchDashboardData) as DashboardData | null;
+  const loading = useAppSelector(selectBranchDashboardLoading);
+  const error = useAppSelector(selectBranchDashboardError);
+
   const [drawer, setDrawer] = useState<{ title: string; content: React.ReactNode } | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch("/api/branch/dashboard");
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || `HTTP ${res.status}`);
-        }
-        const d: DashboardData = await res.json();
-        setData(d);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+    dispatch(fetchBranchDashboardData());
+  }, [dispatch]);
 
   const toggleGroupExpand = useCallback((groupId: string) => {
     setExpandedGroups(prev => {

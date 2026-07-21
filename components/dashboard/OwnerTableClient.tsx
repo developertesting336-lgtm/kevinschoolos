@@ -198,7 +198,7 @@ export function OwnerTableClient({
         return <span className="text-muted-foreground/60">—</span>;
       }
       return (
-        <div className="flex flex-wrap gap-1 max-w-[200px]">
+        <div className="flex flex-wrap gap-1 max-w-50">
           {val.slice(0, 3).map((item, idx) => (
             <Badge key={idx} variant="secondary" className="text-[10px] py-0 px-1 font-medium bg-muted border border-border">
               {item}
@@ -264,7 +264,7 @@ export function OwnerTableClient({
       <Card className="bg-card border-border shadow-sm">
         <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           {/* Left: Search input */}
-          <div className="relative flex-1 max-w-sm min-w-[220px]">
+          <div className="relative flex-1 max-w-sm min-w-55">
             <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={searchTerm}

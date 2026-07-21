@@ -1,53 +1,34 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { validateSessionThunk, clearSession } from "@/store/slices/authSlice";
 import { TeacherPortal } from "@/components/dashboard/teacher/TeacherPortal";
 import { BranchCommandCenter } from "@/components/dashboard/branch/BranchCommandCenter";
 import { SmmDashboardClient } from "@/components/dashboard/SmmDashboardClient";
 import { FinanceDashboardClient } from "@/components/dashboard/FinanceDashboardClient";
 import { OwnerDashboardClient } from "@/components/dashboard/OwnerDashboardClient";
 import { normalizeRole } from "@/lib/roles";
+import { selectOwnerView, setOwnerView } from "@/store/slices/dashboardSlice";
 
 export default function DashboardClient() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  // Session state
-  const [session, setSession] = useState<{ userId: string; role: string } | null>(null);
-  const [sessionLoading, setSessionLoading] = useState(true);
-  const [ownerView, setOwnerView] = useState<"hq" | "branch">("hq");
-  const role = normalizeRole(session?.role || "staff");
+  // Session state from Redux
+  const { userId, role, loading: sessionLoading } = useAppSelector((state) => state.auth);
+  const ownerView = useAppSelector(selectOwnerView);
+  const normalizedRole = normalizeRole(role || "staff");
 
   // Fetch session on mount — this is the ONLY initial data fetch
   useEffect(() => {
-    let cancelled = false;
-
-    async function fetchSession() {
-      try {
-        const res = await fetch("/api/auth/me");
-        if (res.ok) {
-          const data = await res.json();
-          if (!cancelled) {
-            setSession(data);
-          }
-        } else {
-          if (!cancelled) {
-            router.push("/login");
-          }
-        }
-      } catch (err) {
-        console.error("[Dashboard Session Error]", err);
-        if (!cancelled) {
-          router.push("/login");
-        }
-      } finally {
-        if (!cancelled) setSessionLoading(false);
+    dispatch(validateSessionThunk()).then((result) => {
+      if (result.meta.requestStatus === "rejected") {
+        router.push("/login");
       }
-    }
-
-    fetchSession();
-    return () => { cancelled = true; };
-  }, [router]);
+    });
+  }, [dispatch, router]);
 
   // Show loading skeleton while session is being validated
   if (sessionLoading) {
@@ -72,17 +53,17 @@ export default function DashboardClient() {
   }
 
   // ─── TEACHER: Mobile-First Teacher Portal (§9.3) ───
-  if (role === "teacher") {
+  if (normalizedRole === "teacher") {
     return <TeacherPortal />;
   }
 
   // ─── OFFICE ADMIN: Branch Command Center (§9.2) ───
-  if (role === "office_admin") {
+  if (normalizedRole === "office_admin") {
     return <BranchCommandCenter />;
   }
 
   // ─── OWNER: Owner / HQ Dashboard (§9.1) ───
-  if (role === "owner") {
+  if (normalizedRole === "owner") {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between border-b border-border pb-4">
@@ -98,7 +79,7 @@ export default function DashboardClient() {
           </div>
           <div className="flex bg-muted/60 p-1 rounded-lg border border-border/40 select-none">
             <button
-              onClick={() => setOwnerView("hq")}
+              onClick={() => dispatch(setOwnerView("hq"))}
               className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all duration-200 cursor-pointer ${
                 ownerView === "hq"
                   ? "bg-background text-foreground shadow-sm font-semibold"
@@ -108,7 +89,7 @@ export default function DashboardClient() {
               HQ Overview
             </button>
             <button
-              onClick={() => setOwnerView("branch")}
+              onClick={() => dispatch(setOwnerView("branch"))}
               className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all duration-200 cursor-pointer ${
                 ownerView === "branch"
                   ? "bg-background text-foreground shadow-sm font-semibold"
@@ -127,12 +108,12 @@ export default function DashboardClient() {
   }
 
   // ─── SMM ───
-  if (role === "smm") {
+  if (normalizedRole === "smm") {
     return <SmmDashboardClient />;
   }
 
   // ─── FINANCE ───
-  if (role === "finance") {
+  if (normalizedRole === "finance") {
     return <FinanceDashboardClient />;
   }
 
@@ -141,7 +122,7 @@ export default function DashboardClient() {
     <div className="space-y-8 select-none">
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-foreground capitalize">
-          {session?.role || "Staff"} Dashboard
+          {role || "Staff"} Dashboard
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
           Full system overview and management

@@ -133,8 +133,8 @@ export function PaymentTable({
                     )}
                     {p.paymentRef}
                   </TableCell>
-                  <TableCell className="py-3 px-4 truncate max-w-[120px] font-semibold text-foreground">{studentName}</TableCell>
-                  <TableCell className="py-3 px-4 truncate max-w-[120px] text-muted-foreground">{parentName}</TableCell>
+                  <TableCell className="py-3 px-4 truncate max-w-30 font-semibold text-foreground">{studentName}</TableCell>
+                  <TableCell className="py-3 px-4 truncate max-w-30 text-muted-foreground">{parentName}</TableCell>
                   <TableCell className="py-3 px-4 text-muted-foreground">{invoiceNo}</TableCell>
                   <TableCell className="py-3 px-4 text-muted-foreground">{enrollmentNo}</TableCell>
                   <TableCell className="py-3 px-4 capitalize font-medium text-foreground">{p.paymentType || "Tuition"}</TableCell>

@@ -40,14 +40,14 @@ export interface AuditEvent {
   role?: string | null;
   branchIds?: string[];
   action:
-    | "LOGIN"
-    | "LOGOUT"
-    | "VIEW"
-    | "SENSITIVE_ACCESS"
-    | "CREATE"
-    | "UPDATE"
-    | "DELETE"
-    | "PERMISSION_DENIED";
+  | "LOGIN"
+  | "LOGOUT"
+  | "VIEW"
+  | "SENSITIVE_ACCESS"
+  | "CREATE"
+  | "UPDATE"
+  | "DELETE"
+  | "PERMISSION_DENIED";
   tableName?: string | null;
   recordId?: string | null;
   recordIds?: string[];
@@ -162,7 +162,7 @@ export const auditService = {
           details: cleanDetails,
         };
         fs.appendFileSync(LOG_FILE, JSON.stringify(logEntry) + "\n");
-        console.log(`[Audit Log] ${JSON.stringify(logEntry)}`);
+        // console.log(`[Audit Log] ${JSON.stringify(logEntry)}`);
       } catch (err) {
         // Must never crash the main application process
         console.error("[Audit Service Error] Failed to write audit log:", err);
@@ -265,21 +265,21 @@ export function getVisibleFieldIds(role: string, tableName: string, paymentConte
   try {
     const normRole = (role || "").toLowerCase();
     const cleanTableName = (tableName || "").toLowerCase();
-    
+
     // Load field-map.json directly
     const fieldMapPath = path.join(process.cwd(), "config", "field-map.json");
     if (!fs.existsSync(fieldMapPath)) return [];
-    
+
     const fieldMap = JSON.parse(fs.readFileSync(fieldMapPath, "utf8"));
     const tables = fieldMap.tables || {};
-    
+
     // Find table by name or ID
-    const table = Object.values(tables).find((t: any) => 
+    const table = Object.values(tables).find((t: any) =>
       t.tableName.toLowerCase() === cleanTableName ||
       t.tableId.toLowerCase() === cleanTableName ||
       (t.prismaModel && t.prismaModel.toLowerCase() === cleanTableName)
     ) as any;
-    
+
     if (!table || !table.fields) return [];
 
     const fieldIds: string[] = [];

@@ -1,71 +1,97 @@
-import { validateSession } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { normalizeRole } from "@/lib/roles";
-import { ShieldAlert } from "lucide-react";
-import { redirect } from "next/navigation";
-import { FinanceConsoleClient } from "../../../components/dashboard/finance/FinanceConsoleClient";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchFinanceData, selectFinanceLoading, selectFinanceError, selectFinanceBranches, selectFinanceUserRole, selectFinanceUserName, selectFinanceUserEmail } from "@/store/slices/financeSlice";
+import { validateSessionThunk } from "@/store/slices/authSlice";
+import { FinanceConsoleClient } from "@/components/dashboard/finance/FinanceConsoleClient";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function FinanceConsolePage() {
-  const session = await validateSession();
-  if (!session) {
-    redirect("/login");
-  }
+export default function FinanceConsolePage() {
+  const dispatch = useAppDispatch();
+  const loading = useAppSelector(selectFinanceLoading);
+  const error = useAppSelector(selectFinanceError);
+  const branches = useAppSelector(selectFinanceBranches);
+  const userRole = useAppSelector(selectFinanceUserRole);
+  const userName = useAppSelector(selectFinanceUserName);
+  const userEmail = useAppSelector(selectFinanceUserEmail);
 
-  // Fetch user from DB to check role and branch permissions
-  const dbUser = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { id: true, fullName: true, email: true, role: true, branchIds: true },
-  });
+  useEffect(() => {
+    dispatch(validateSessionThunk()).then((result: any) => {
+      if (result.meta.requestStatus === "fulfilled") {
+        const { role, userId } = result.payload;
+        // Fetch user info from auth/me endpoint to get fullName and email
+        fetch("/api/auth/me").then(r => r.json()).then((me: any) => {
+          dispatch(fetchFinanceData({
+            branchId: "",
+            userRole: role || "",
+            userName: me.fullName || userId || "",
+            userEmail: me.email || null,
+          }));
+        }).catch(() => {
+          dispatch(fetchFinanceData({
+            branchId: "",
+            userRole: role || "",
+            userName: userId || "",
+            userEmail: null,
+          }));
+        });
+      }
+    });
+  }, [dispatch]);
 
-  if (!dbUser) {
-    redirect("/login");
-  }
+  const isInitialLoading = loading && branches.length === 0;
 
-  const userRole = normalizeRole(dbUser.role || "staff");
-
-  // Step 3 - RBAC: Only Finance and Owner roles may access the Finance Console.
-  if (userRole !== "finance" && userRole !== "owner") {
+  if (isInitialLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center select-none animate-in fade-in duration-300">
-        <div className="h-14 w-14 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mb-4 shadow-lg shadow-rose-500/5">
-          <ShieldAlert className="h-7 w-7" />
+      <div className="space-y-8 select-none animate-pulse py-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="h-4 w-48 bg-muted rounded mb-2" />
+            <div className="h-8 w-72 bg-muted rounded mb-1" />
+            <div className="h-4 w-96 bg-muted rounded" />
+          </div>
         </div>
-        <h3 className="text-lg font-extrabold text-rose-600 tracking-tight">Access Denied</h3>
-        <p className="text-xs text-muted-foreground mt-2 max-w-sm leading-relaxed font-medium">
-          Your account role ({dbUser.role || "unknown"}) is unauthorized to access the Finance Console workspace. If you require access, please contact the system owner.
-        </p>
+        {/* 6 KPI cards */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="bg-card border-border">
+              <CardContent className="p-4 space-y-3">
+                <Skeleton className="h-3 w-20 bg-muted rounded" />
+                <Skeleton className="h-8 w-24 bg-muted rounded" />
+                <Skeleton className="h-3 w-24 bg-muted rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {/* Tabs skeleton */}
+        <div className="h-12 bg-muted rounded-lg" />
+        {/* Tab content skeleton */}
+        <Card className="bg-card border-border">
+          <CardContent className="p-6">
+            <Skeleton className="h-64 w-full bg-muted rounded" />
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  // Step 5 - Fetch branches list for selector based on role permissions
-  let branches: any[] = [];
-  try {
-    if (userRole === "owner") {
-      branches = await prisma.branch.findMany({
-        select: { id: true, name: true },
-        orderBy: { name: "asc" },
-      });
-    } else {
-      const allowedBranchIds = dbUser.branchIds || [];
-      branches = await prisma.branch.findMany({
-        where: { id: { in: allowedBranchIds } },
-        select: { id: true, name: true },
-        orderBy: { name: "asc" },
-      });
-    }
-  } catch (error) {
-    console.error("[Finance Console Page Fetch Error]", error);
+  if (error) {
+    return (
+      <Card className="border-destructive/20 bg-destructive/5 text-destructive p-4 text-sm font-medium">
+        {error}
+      </Card>
+    );
   }
 
   return (
     <FinanceConsoleClient
       initialBranches={branches}
       userRole={userRole}
-      userName={dbUser.fullName}
-      userEmail={dbUser.email}
+      userName={userName}
+      userEmail={userEmail}
     />
   );
 }

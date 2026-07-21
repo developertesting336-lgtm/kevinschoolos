@@ -55,7 +55,7 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     defaultSortOrder: "asc",
     searchableFields: ["fullName", "role", "email", "phone", "workingLanguage", "status"],
     filterableFields: [
-      { key: "status", label: "Status", type: "select", options: ["Active", "Inactive", "Suspended"] },
+      { key: "status", label: "Status", type: "select", options: ["Active", "Inactive"] },
       { key: "role", label: "Role", type: "select", options: ["Owner", "Teacher", "SMM", "Office Admin", "Finance", "Tech Admin"] }
     ],
     columns: [
@@ -103,7 +103,7 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     defaultSortOrder: "asc",
     searchableFields: ["studentName", "notes", "medicalNotes", "gender", "status"],
     filterableFields: [
-      { key: "status", label: "Status", type: "select", options: ["Active", "Inactive", "Leaver", "Trial"] },
+      { key: "status", label: "Status", type: "select", options: ["Lead", "Trial", "Active", "Paused", "Graduated", "Withdrawn"] },
       { key: "gender", label: "Gender", type: "select", options: ["Male", "Female"] }
     ],
     columns: [
@@ -126,7 +126,7 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     defaultSortOrder: "desc",
     searchableFields: ["enrollmentId", "status", "onboardingStatus"],
     filterableFields: [
-      { key: "status", label: "Status", type: "select", options: ["Active", "Inactive", "Completed", "Pending"] },
+      { key: "status", label: "Status", type: "select", options: ["Active", "Completed", "Withdrawn"] },
       { key: "onboardingStatus", label: "Onboarding Status", type: "select", options: ["Complete", "In Progress", "Pending"] },
       { key: "contractSigned", label: "Contract Signed", type: "boolean" }
     ],
@@ -155,7 +155,7 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     defaultSortOrder: "asc",
     searchableFields: ["termName", "nameRussian", "status"],
     filterableFields: [
-      { key: "status", label: "Status", type: "select", options: ["Active", "Upcoming", "Past"] }
+      { key: "status", label: "Status", type: "select", options: ["Upcoming", "Active", "Closed"] }
     ],
     columns: [
       { key: "id", label: "ID", type: "string" },
@@ -218,7 +218,7 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     searchableFields: ["trialId", "outcome", "notes", "confirmationMethod", "levelAssessed"],
     filterableFields: [
       { key: "confirmationSent", label: "Confirmation Sent", type: "boolean" },
-      { key: "outcome", label: "Outcome", type: "select", options: ["Enrolled", "Lost", "No Show", "Attended"] }
+      { key: "outcome", label: "Outcome", type: "select", options: ["Scheduled", "Attended", "No-show", "Converted", "Declined", "Rescheduled"] }
     ],
     columns: [
       { key: "id", label: "ID", type: "string" },
@@ -245,7 +245,7 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     defaultSortOrder: "asc",
     searchableFields: ["groupName", "status"],
     filterableFields: [
-      { key: "status", label: "Status", type: "select", options: ["Active", "Inactive", "Completed"] }
+      { key: "status", label: "Status", type: "select", options: ["Forming", "Active", "Finished"] }
     ],
     columns: [
       { key: "id", label: "ID", type: "string" },
@@ -269,7 +269,7 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     defaultSortOrder: "desc",
     searchableFields: ["sessionId", "status"],
     filterableFields: [
-      { key: "status", label: "Status", type: "select", options: ["Scheduled", "Completed", "Cancelled"] }
+      { key: "status", label: "Status", type: "select", options: ["Scheduled", "Held", "Cancelled"] }
     ],
     columns: [
       { key: "id", label: "ID", type: "string" },
@@ -331,7 +331,7 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     searchableFields: ["planName", "nameRussian", "nameKyrgyz", "billingPeriod"],
     filterableFields: [
       { key: "active", label: "Active", type: "boolean" },
-      { key: "billingPeriod", label: "Billing Period", type: "select", options: ["Monthly", "Term", "Quarterly", "Annual"] }
+      { key: "billingPeriod", label: "Billing Period", type: "select", options: ["Monthly", "Term", "Annual"] }
     ],
     columns: [
       { key: "id", label: "ID", type: "string" },
@@ -368,31 +368,8 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "updatedAt", label: "Last Updated", type: "date", sortable: true }
     ]
   },
-  payment: {
-    label: "Payments",
-    modelName: "payment",
-    defaultSortBy: "date",
-    defaultSortOrder: "desc",
-    searchableFields: ["paymentRef", "method", "paymentType"],
-    filterableFields: [
-      { key: "method", label: "Method", type: "select", options: ["Cash", "Card", "Bank Transfer", "Online"] },
-      { key: "paymentType", label: "Type", type: "select", options: ["Tuition", "Trial Fee", "Book Fee", "Deposit"] },
-      { key: "possibleDuplicate", label: "Is Duplicate", type: "boolean" }
-    ],
-    columns: [
-      { key: "id", label: "ID", type: "string" },
-      { key: "paymentRef", label: "Payment Ref", type: "string", sortable: true },
-      { key: "date", label: "Date", type: "date", sortable: true },
-      { key: "amount", label: "Amount", type: "number", sortable: true },
-      { key: "method", label: "Method", type: "string", sortable: true },
-      { key: "possibleDuplicate", label: "Possible Duplicate", type: "boolean", sortable: true },
-      { key: "paymentType", label: "Payment Type", type: "string", sortable: true },
-      { key: "invoiceIds", label: "Invoices", type: "array" },
-      { key: "parentIds", label: "Parents", type: "array" },
-      { key: "branchIds", label: "Branches", type: "array" },
-      { key: "updatedAt", label: "Last Updated", type: "date", sortable: true }
-    ]
-  },
+  // payment removed — dedicated /dashboard/payments page handles this with Redux + skeleton loader.
+  // Do not add back. See app/dashboard/payments/page.tsx.
   account: {
     label: "Chart of Accounts",
     modelName: "account",
@@ -585,9 +562,9 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     defaultSortOrder: "desc",
     searchableFields: ["activityId", "type", "direction", "outcome", "notes"],
     filterableFields: [
-      { key: "type", label: "Type", type: "select", options: ["Call", "Message", "Email", "Meeting", "WhatsApp"] },
+      { key: "type", label: "Type", type: "select", options: ["Call", "WhatsApp", "Email", "SMS", "Walk-in", "Trial Follow-up", "Other", "Consultation"] },
       { key: "direction", label: "Direction", type: "select", options: ["Inbound", "Outbound"] },
-      { key: "outcome", label: "Outcome", type: "select", options: ["Answered", "No Answer", "Busy", "Completed", "Pending"] }
+      { key: "outcome", label: "Outcome", type: "select", options: ["Reached", "No Answer", "Left VM", "Scheduled Trial", "Requested Callback", "Not Interested"] }
     ],
     columns: [
       { key: "id", label: "ID", type: "string" },

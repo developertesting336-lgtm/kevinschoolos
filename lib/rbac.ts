@@ -276,11 +276,26 @@ export function applyRedactions(
     }
   }
 
+  // 2.5. Leads redactions: Hide phone and whatsapp from Teacher
+  if (tableName.toLowerCase() === "lead") {
+    if (normRole === "teacher") {
+      delete result.phone;
+      delete result.whatsapp;
+    }
+  }
+
   // 3. Vendors redactions: Hide phone and email from teacher and smm
   if (tableName.toLowerCase() === "vendor") {
     if (["teacher", "smm"].includes(normRole)) {
       delete result.phone;
       delete result.email;
+    }
+  }
+
+  // 4. Activity redactions: Hide notes from Teacher
+  if (tableName.toLowerCase() === "activity") {
+    if (normRole === "teacher") {
+      delete result.notes;
     }
   }
 

@@ -1,41 +1,18 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { StatusBadge } from "./StatusBadge";
-import { ProgressTracker } from "./ProgressTracker";
-import { Calendar, User, Building, Compass, ArrowRight } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, User, MapPin, GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface EnrollmentData {
-  id: string;
-  enrollmentId: string;
-  enrollDate: string | Date | null;
-  status: string | null;
-  studentIds: string[];
-  classGroupIds: string[];
-  tuitionPlanIds: string[];
-  branchIds: string[];
-  trialFeeDeducted: boolean;
-  contractSigned: boolean;
-  contractDate: string | Date | null;
-  hdSystemRegistered: boolean;
-  appCredentialsIssued: boolean;
-  scheduleDelivered: boolean;
-  calendarDelivered: boolean;
-  appInstructionsDelivered: boolean;
-  audioRecommendationsDelivered: boolean;
-  firstLessonConfirmed: boolean;
-  firstLessonDate: string | Date | null;
-  onboardingStatus: string | null;
-}
+import type { EnrollmentData } from "@/store/slices/onboardingSlice";
 
 interface EnrollmentCardProps {
   enrollment: EnrollmentData;
-  studentName: string | null;
-  parentName: string | null;
-  branchName: string | null;
-  courseName: string | null;
-  staffName: string | null;
+  studentName: string;
+  parentName?: string | null;
+  branchName?: string | null;
+  courseName?: string | null;
+  staffName?: string | null;
   onSelect: (enrollment: EnrollmentData) => void;
 }
 
@@ -48,86 +25,75 @@ export function EnrollmentCard({
   staffName,
   onSelect,
 }: EnrollmentCardProps) {
-  const formattedEnrollDate = enrollment.enrollDate
-    ? new Date(enrollment.enrollDate).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : "—";
+  const getStatusColor = (status: string | null) => {
+    switch (status) {
+      case "active":
+        return "bg-emerald-500/10 text-emerald-700 border-emerald-500/20";
+      case "pending":
+        return "bg-amber-500/10 text-amber-700 border-amber-500/20";
+      case "completed":
+        return "bg-blue-500/10 text-blue-700 border-blue-500/20";
+      default:
+        return "bg-muted text-muted-foreground border-border";
+    }
+  };
+
+  const formatDate = (date: string | Date | null) => {
+    if (!date) return "—";
+    return new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   return (
-    <Card
+    <Card 
+      className="bg-card border-border hover:border-primary/45 hover:shadow-md transition-all duration-300 cursor-pointer"
       onClick={() => onSelect(enrollment)}
-      className="group relative cursor-pointer border bg-card hover:bg-muted/5 hover:border-primary/30 hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden select-none"
     >
-      {/* Dynamic left visual highlight depending on status */}
-      <div
-        className={cn(
-          "absolute left-0 top-0 bottom-0 w-1 transition-all duration-300",
-          enrollment.onboardingStatus?.toLowerCase() === "complete"
-            ? "bg-emerald-500"
-            : enrollment.onboardingStatus?.toLowerCase() === "in progress"
-              ? "bg-amber-500"
-              : "bg-muted-foreground/30 group-hover:bg-primary"
-        )}
-      />
-
-      <CardContent className="p-4 pl-5 space-y-4">
-        {/* Row 1: ID, status, select arrow */}
+      <CardHeader className="pb-3 pt-4 px-4">
         <div className="flex items-start justify-between gap-2">
-          <div className="space-y-0.5">
-            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">
-              Enrollment ID
-            </span>
-            <span className="text-xs font-extrabold text-foreground tracking-tight">
+          <div className="space-y-1 flex-1">
+            <CardTitle className="text-xs font-extrabold text-foreground tracking-tight">
               {enrollment.enrollmentId}
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <StatusBadge status={enrollment.onboardingStatus} />
-            <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200" />
-          </div>
-        </div>
-
-        {/* Row 2: Student & Parent */}
-        <div className="space-y-1">
-          <h4 className="text-sm font-bold text-foreground truncate">
-            {studentName || "Unknown Student"}
-          </h4>
-          {parentName && (
-            <p className="text-xs text-muted-foreground font-medium truncate flex items-center gap-1">
-              <User className="h-3 w-3 text-muted-foreground/60" /> Parent: {parentName}
+            </CardTitle>
+            <p className="text-[10px] text-muted-foreground font-semibold">
+              {studentName}
             </p>
+          </div>
+          <Badge 
+            variant="outline" 
+            className={cn("text-[9px] font-bold uppercase tracking-wider", getStatusColor(enrollment.onboardingStatus))}
+          >
+            {enrollment.onboardingStatus || "pending"}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="px-4 pb-4 space-y-2">
+        <div className="grid grid-cols-2 gap-2 text-[10px]">
+          {branchName && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="font-medium truncate">{branchName}</span>
+            </div>
           )}
-        </div>
-
-        {/* Row 3: Course & Branch */}
-        <div className="grid grid-cols-2 gap-2 text-[11px] text-muted-foreground font-medium">
-          <span className="truncate flex items-center gap-1">
-            <Compass className="h-3 w-3 text-primary shrink-0" />
-            {courseName || "No Course"}
-          </span>
-          <span className="truncate flex items-center gap-1 justify-end">
-            <Building className="h-3 w-3 text-muted-foreground/60 shrink-0" />
-            {branchName || "No Branch"}
-          </span>
-        </div>
-
-        {/* Row 4: Date & Staff */}
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground/80 border-t border-border/40 pt-2.5">
-          <span className="flex items-center gap-1 font-semibold">
-            <Calendar className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
-            {formattedEnrollDate}
-          </span>
-          <span className="font-semibold truncate max-w-[120px]" title={staffName || "Unassigned"}>
-            Staff: {staffName || "Unassigned"}
-          </span>
-        </div>
-
-        {/* Row 5: Progress Bar */}
-        <div className="border-t border-border/40 pt-2.5">
-          <ProgressTracker enrollment={enrollment} />
+          {courseName && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <GraduationCap className="h-3 w-3 shrink-0" />
+              <span className="font-medium truncate">{courseName}</span>
+            </div>
+          )}
+          {parentName && (
+            <div className="flex items-center gap-1 text-muted-foreground col-span-2">
+              <User className="h-3 w-3 shrink-0" />
+              <span className="font-medium truncate">Parent: {parentName}</span>
+            </div>
+          )}
+          <div className="flex items-center gap-1 text-muted-foreground col-span-2">
+            <Calendar className="h-3 w-3 shrink-0" />
+            <span className="font-medium">{formatDate(enrollment.enrollDate)}</span>
+          </div>
         </div>
       </CardContent>
     </Card>

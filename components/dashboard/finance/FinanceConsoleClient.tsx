@@ -17,6 +17,8 @@ import {
   RefreshCw,
   TrendingUp,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchFinanceData, selectFinanceStats, selectFinanceLoading } from "@/store/slices/financeSlice";
 import { LedgerViewer } from "@/components/dashboard/finance/LedgerViewer";
 import { RoyaltyViewer } from "@/components/dashboard/finance/RoyaltyViewer";
 import { TeacherPayViewer } from "@/components/dashboard/finance/TeacherPayViewer";
@@ -42,42 +44,26 @@ export function FinanceConsoleClient({
   userName,
   userEmail,
 }: FinanceConsoleClientProps) {
+  const dispatch = useAppDispatch();
+  
+  // Redux hooks
+  const stats = useAppSelector(selectFinanceStats);
+  const loading = useAppSelector(selectFinanceLoading);
+
   const [selectedBranch, setSelectedBranch] = useState<string>("");
   const [activeTab, setActiveTab] = useState<ActiveTab>("ledger");
-  const [stats, setStats] = useState({
-    totalRevenue: 0,
-    totalExpenses: 0,
-    totalTeacherPayroll: 0,
-    totalRoyalties: 0,
-    outstandingPayments: 0,
-    currentAccountingPeriod: "Loading...",
-  });
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchStats();
   }, [selectedBranch]);
 
-  const fetchStats = async () => {
-    setRefreshing(true);
-    try {
-      let url = `/api/dashboard/finance`;
-      if (selectedBranch) {
-        url += `?branchId=${encodeURIComponent(selectedBranch)}`;
-      }
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to load dashboard metrics");
-      const json = await res.json();
-      if (json.stats) {
-        setStats(json.stats);
-      }
-    } catch (error) {
-      console.error("[Finance Console Fetch Metrics Error]", error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+  const fetchStats = () => {
+    dispatch(fetchFinanceData({
+      branchId: selectedBranch || undefined,
+      userRole,
+      userName,
+      userEmail,
+    }));
   };
 
   const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -133,11 +119,11 @@ export function FinanceConsoleClient({
 
           <button
             onClick={fetchStats}
-            disabled={refreshing}
+            disabled={loading}
             className="p-2 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground hover:shadow-sm active:scale-95 transition-all cursor-pointer shrink-0 disabled:opacity-50"
             title="Refresh Metrics"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin text-primary" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-primary" : ""}`} />
           </button>
 
           <Badge variant="outline" className="bg-primary/5 text-primary border-primary/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider">

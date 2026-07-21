@@ -23,6 +23,17 @@ import {
   ChevronUp,
   AlertCircle,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  fetchFinanceData,
+  selectFinanceStats,
+  selectFinanceInvoices,
+  selectFinancePayments,
+  selectFinanceExpenses,
+  selectFinanceAccounts,
+  selectFinanceLoading,
+  selectFinanceError,
+} from "@/store/slices/financeSlice";
 import { LedgerViewer } from "@/components/dashboard/finance/LedgerViewer";
 import { RoyaltyViewer } from "@/components/dashboard/finance/RoyaltyViewer";
 import { TeacherPayViewer } from "@/components/dashboard/finance/TeacherPayViewer";
@@ -79,31 +90,22 @@ interface DashboardData {
 type ExpandedSection = "ledger" | "royalties" | "teacher-pay" | "expenses" | null;
 
 export function FinanceDashboardClient() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+
+  // Redux selectors
+  const stats = useAppSelector(selectFinanceStats);
+  const invoices = useAppSelector(selectFinanceInvoices) as Invoice[];
+  const payments = useAppSelector(selectFinancePayments) as Payment[];
+  const expenses = useAppSelector(selectFinanceExpenses) as Expense[];
+  const accounts = useAppSelector(selectFinanceAccounts) as Account[];
+  const loading = useAppSelector(selectFinanceLoading);
+  const error = useAppSelector(selectFinanceError);
+
   const [expandedSection, setExpandedSection] = useState<ExpandedSection>("expenses");
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch("/api/dashboard/finance");
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || `HTTP ${res.status}`);
-        }
-        const d: DashboardData = await res.json();
-        setData(d);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+    dispatch(fetchFinanceData({ branchId: "" }));
+  }, [dispatch]);
 
   const toggleSection = (section: ExpandedSection) => {
     setExpandedSection(expandedSection === section ? null : section);
@@ -144,21 +146,15 @@ export function FinanceDashboardClient() {
     );
   }
 
-  if (error || !data) {
+  if (error) {
     return (
       <div className="p-8 max-w-lg mx-auto text-center">
         <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-3" />
         <h2 className="text-lg font-bold text-foreground mb-1">Unable to Load</h2>
-        <p className="text-sm text-muted-foreground">{error || "No data available."}</p>
+        <p className="text-sm text-muted-foreground">{error}</p>
       </div>
     );
   }
-
-  const stats = data.stats;
-  const invoices = data.invoices;
-  const payments = data.payments;
-  const expenses = data.expenses;
-  const accounts = data.accounts;
 
   const registryTiers = [
     {

@@ -1,109 +1,130 @@
-import { validateSession } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { apiFetch } from "@/lib/apiFetch";
+"use client";
+
+import { useEffect, useCallback, useRef } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchPaymentsData, selectPaymentsLoading, selectPaymentsError, selectPaymentsPayments, selectPaymentsInvoices, selectPaymentsEnrollments, selectPaymentsStudents, selectPaymentsParents, selectPaymentsBranches, selectPaymentsUsers, selectPaymentsTotalCount, selectPaymentsCurrentPage, selectPaymentsLimit } from "@/store/slices/paymentsSlice";
+import { validateSessionThunk } from "@/store/slices/authSlice";
 import { PaymentsClient } from "@/components/dashboard/payments/PaymentsClient";
-import { ShieldAlert } from "lucide-react";
-import { redirect } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSearchParams } from "next/navigation";
 
-export const dynamic = "force-dynamic";
+export default function PaymentsPage() {
+  const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
+  const sessionValidated = useRef(false);
 
-interface SearchParams {
-  page?: string;
-  search?: string;
-  branch?: string;
-  paymentType?: string;
-  paymentMethod?: string;
-  date?: string;
-}
+  const loading = useAppSelector(selectPaymentsLoading);
+  const error = useAppSelector(selectPaymentsError);
+  const payments = useAppSelector(selectPaymentsPayments);
+  const invoices = useAppSelector(selectPaymentsInvoices);
+  const enrollments = useAppSelector(selectPaymentsEnrollments);
+  const students = useAppSelector(selectPaymentsStudents);
+  const parents = useAppSelector(selectPaymentsParents);
+  const branches = useAppSelector(selectPaymentsBranches);
+  const users = useAppSelector(selectPaymentsUsers);
+  const totalCount = useAppSelector(selectPaymentsTotalCount);
+  const currentPage = useAppSelector(selectPaymentsCurrentPage);
+  const limit = useAppSelector(selectPaymentsLimit);
 
-export default async function PaymentsPage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>;
-}) {
-  const session = await validateSession();
-  if (!session) {
-    redirect("/login");
-  }
+  // Read filters and page from URL search params
+  const buildFiltersFromUrl = useCallback(() => ({
+    page: parseInt(searchParams.get("page") || "1", 10),
+    search: searchParams.get("search") || undefined,
+    branch: searchParams.get("branch") || undefined,
+    paymentType: searchParams.get("paymentType") || undefined,
+    paymentMethod: searchParams.get("paymentMethod") || undefined,
+    date: searchParams.get("date") || undefined,
+  }), [searchParams]);
 
-  // Fetch dbUser to inspect actual user role
-  const dbUser = await prisma.user.findUnique({
-    where: { id: session.userId },
-  });
+  // Validate session once on mount
+  useEffect(() => {
+    if (!sessionValidated.current) {
+      sessionValidated.current = true;
+      dispatch(validateSessionThunk()).then((result: any) => {
+        if (result.meta.requestStatus === "fulfilled") {
+          const filters = buildFiltersFromUrl();
+          dispatch(fetchPaymentsData(filters));
+        }
+      });
+    }
+  }, [dispatch, buildFiltersFromUrl]);
 
-  if (!dbUser) {
-    redirect("/login");
-  }
+  // Re-fetch data when URL params change (filters, pagination, search)
+  // Only after session has been validated
+  useEffect(() => {
+    if (sessionValidated.current) {
+      const filters = buildFiltersFromUrl();
+      dispatch(fetchPaymentsData(filters));
+    }
+  }, [dispatch, searchParams, buildFiltersFromUrl]);
 
-  const userRole = (dbUser.role || "").toLowerCase().trim();
-  const allowedRoles = ["owner", "office_admin", "office/admin", "office-admin", "finance"];
-
-  if (!allowedRoles.includes(userRole)) {
+  if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center select-none">
-        <div className="h-12 w-12 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mb-3">
-          <ShieldAlert className="h-6 w-6" />
+      <div className="p-6 space-y-6 select-none animate-pulse">
+        {/* Header skeleton */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-5 bg-muted rounded" />
+              <Skeleton className="h-5 w-48 bg-muted rounded" />
+            </div>
+            <Skeleton className="h-3 w-72 bg-muted rounded" />
+          </div>
+          <Skeleton className="h-9 w-64 bg-muted rounded" />
         </div>
-        <h3 className="text-base font-extrabold text-rose-600">Access Restricted</h3>
-        <p className="text-xs text-muted-foreground mt-1.5 max-w-sm leading-normal font-medium">
-          Your account role ({dbUser.role || "unknown"}) is unauthorized to view payments or receipts ledger records. Please contact administration.
-        </p>
+
+        {/* Filters skeleton */}
+        <Card className="bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex flex-wrap gap-3">
+              <Skeleton className="h-9 w-44 bg-muted rounded" />
+              <Skeleton className="h-9 w-40 bg-muted rounded" />
+              <Skeleton className="h-9 w-40 bg-muted rounded" />
+              <Skeleton className="h-9 w-36 bg-muted rounded" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Table skeleton */}
+        <Card className="bg-card border-border">
+          <CardContent className="p-0">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center px-6 py-4 border-b border-border/40">
+                <Skeleton className="h-4 w-32 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-24 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-20 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-24 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-20 bg-muted rounded mr-6" />
+                <Skeleton className="h-4 w-24 bg-muted rounded" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  // 1. Await search params Promise
-  const params = await searchParams;
-  const currentPage = params.page || "1";
-  const search = params.search || "";
-  const branch = params.branch || "";
-  const paymentType = params.paymentType || "";
-  const paymentMethod = params.paymentMethod || "";
-  const date = params.date || "";
-
-  // 2. Build payment API URL with query filters
-  let paymentUrl = `/api/data/payment?page=${currentPage}&limit=20`;
-  if (search) paymentUrl += `&search=${encodeURIComponent(search)}`;
-  if (branch) paymentUrl += `&branch=${encodeURIComponent(branch)}`;
-  if (paymentType) paymentUrl += `&paymentType=${encodeURIComponent(paymentType)}`;
-  if (paymentMethod) paymentUrl += `&paymentMethod=${encodeURIComponent(paymentMethod)}`;
-  if (date) paymentUrl += `&date=${encodeURIComponent(date)}`;
-
-  // 3. Parallel fetching of related data
-  const [
-    paymentsRes,
-    invoices,
-    enrollments,
-    students,
-    parents,
-    branches,
-    users,
-  ] = await Promise.all([
-    apiFetch(paymentUrl),
-    apiFetch("/api/data/invoice"),
-    apiFetch("/api/data/enrollment"),
-    apiFetch("/api/data/student"),
-    apiFetch("/api/data/parent"),
-    apiFetch("/api/data/branch"),
-    apiFetch("/api/data/user"),
-  ]);
-
-  const initialPayments = paymentsRes.data || [];
-  const totalCount = paymentsRes.pagination?.total || 0;
-  const limit = paymentsRes.pagination?.limit || 20;
+  if (error) {
+    return (
+      <Card className="border-destructive/20 bg-destructive/5 text-destructive p-4 text-sm font-medium m-6">
+        {error}
+      </Card>
+    );
+  }
 
   return (
     <div className="p-6">
       <PaymentsClient
-        initialPayments={initialPayments}
-        invoices={invoices || []}
-        enrollments={enrollments || []}
-        students={students || []}
-        parents={parents || []}
-        branches={branches || []}
-        users={users || []}
+        initialPayments={payments}
+        invoices={invoices}
+        enrollments={enrollments}
+        students={students}
+        parents={parents}
+        branches={branches}
+        users={users}
         totalCount={totalCount}
-        currentPage={parseInt(currentPage, 10)}
+        currentPage={currentPage}
         limit={limit}
       />
     </div>

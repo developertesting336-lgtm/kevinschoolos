@@ -2,31 +2,9 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "./StatusBadge";
-import { Calendar, User, UserCheck, Compass, FileCheck } from "lucide-react";
+import { Calendar, User, UserCheck, FileCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface EnrollmentData {
-  id: string;
-  enrollmentId: string;
-  enrollDate: string | Date | null;
-  status: string | null;
-  studentIds: string[];
-  classGroupIds: string[];
-  tuitionPlanIds: string[];
-  branchIds: string[];
-  trialFeeDeducted: boolean;
-  contractSigned: boolean;
-  contractDate: string | Date | null;
-  hdSystemRegistered: boolean;
-  appCredentialsIssued: boolean;
-  scheduleDelivered: boolean;
-  calendarDelivered: boolean;
-  appInstructionsDelivered: boolean;
-  audioRecommendationsDelivered: boolean;
-  firstLessonConfirmed: boolean;
-  firstLessonDate: string | Date | null;
-  onboardingStatus: string | null;
-}
+import type { EnrollmentData } from "@/store/slices/onboardingSlice";
 
 interface EnrollmentTableProps {
   enrollments: EnrollmentData[];
