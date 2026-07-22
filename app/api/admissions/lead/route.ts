@@ -65,7 +65,14 @@ export async function POST(request: NextRequest) {
         }
       });
       if (existingParent) {
-        parentId = existingParent.id;
+        // Verify the parent record actually exists in Airtable before reusing
+        try {
+          await airtableProxy.readRecord("parent", existingParent.id);
+          parentId = existingParent.id;
+        } catch {
+          // Parent exists in Postgres but not in Airtable — create fresh
+          console.warn(`[Lead] Parent ${existingParent.id} not found in Airtable, creating new record.`);
+        }
       }
     }
 

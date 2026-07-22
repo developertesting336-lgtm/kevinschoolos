@@ -309,12 +309,14 @@ export function AdmissionsClient() {
       )}
 
       {/* Overall Board Pagination controls */}
-      <div className="flex justify-end p-2 border border-border bg-card rounded-xl shadow-xs">
-        <PaginationControls
-          totalPages={pagination.totalPages}
-          currentPage={pagination.page}
-        />
-      </div>
+      {pagination.totalPages > 1 && (
+        <div className="flex justify-end p-2 border border-border bg-card rounded-xl shadow-xs">
+          <PaginationControls
+            totalPages={pagination.totalPages}
+            currentPage={pagination.page}
+          />
+        </div>
+      )}
 
       {/* Details Slide-out Panel */}
       <LeadDrawer

@@ -50,15 +50,21 @@ model Course {
 
 // 04 Tuition Plans / Тарифные планы
 model TuitionPlan {
-  id            String   @id
-  planName      String
-  amount        Float?
-  billingPeriod String?
-  active        Boolean  @default(false)
-  courseIds     String[]
-  nameRussian   String?
-  nameKyrgyz    String?
-  updatedAt     DateTime @updatedAt
+  id               String   @id
+  planName         String
+  amount           Float?
+  billingPeriod    String?
+  active           Boolean  @default(false)
+  courseIds        String[]
+  nameRussian      String?
+  nameKyrgyz       String?
+  discount         Boolean  @default(false)
+  discountType     String?
+  discountValue    Float?
+  discountReason   String?
+  netAmount        Float?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 // 05 Terms / Учебные периоды
@@ -218,7 +224,7 @@ model Attendance {
 // 15 Invoices / Счета
 model Invoice {
   id            String    @id
-  invoiceNo     String
+  invoiceNo     String    @unique
   issueDate     DateTime?
   dueDate       DateTime?
   amount        Float?

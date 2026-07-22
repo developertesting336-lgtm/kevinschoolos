@@ -7,11 +7,12 @@ import { ConvertLeadWizard } from "./ConvertLeadWizard";
 import { TrialScheduleCard } from "./TrialScheduleCard";
 import { ActivityTimeline } from "./ActivityTimeline";
 import { AddActivityModal } from "./AddActivityModal";
+import { ConvertLeadModal } from "./ConvertLeadModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/store/hooks";
 import { selectAuthRole } from "@/store/slices/authSlice";
-import { Phone, Mail, MessageSquare, MapPin, Calendar, Clock, User, UserCheck, Compass, Info, FileText, Plus } from "lucide-react";
+import { Phone, Mail, MessageSquare, MapPin, Calendar, Clock, User, UserCheck, Compass, Info, FileText, Plus, ArrowRightToLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LeadData {
@@ -84,12 +85,16 @@ export function LeadDrawer({
 }: LeadDrawerProps) {
   const userRole = useAppSelector(selectAuthRole);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+  const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
 
   if (!lead) return null;
 
   const roleLower = (userRole || "").toLowerCase().trim();
   const isTeacher = roleLower === "teacher";
   const canAddActivity = ["owner", "office_admin", "smm"].includes(roleLower);
+  const canConvert = ["owner", "office_admin"].includes(roleLower);
+  const isAlreadyConverted = lead.status?.toLowerCase() === "enrolled" || lead.status?.toLowerCase() === "won";
+  const isLost = lead.status?.toLowerCase() === "lost";
 
   // Sort activities in reverse chronological order (newest first)
   const sortedActivities = [...activities].sort((a, b) => {
@@ -148,6 +153,37 @@ export function LeadDrawer({
             
             {/* Stage Wizard Tracker */}
             <ConvertLeadWizard status={lead.status} />
+
+            {/* Convert Lead Button (Owner / Office Admin only, not already converted or lost) */}
+            {canConvert && !isAlreadyConverted && !isLost && (
+              <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-foreground">Ready to enroll this lead?</p>
+                    <p className="text-[10px] text-muted-foreground/60">
+                      Create parent, student, and enrollment records
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => setIsConvertModalOpen(true)}
+                    className="shrink-0"
+                  >
+                    <ArrowRightToLine className="h-3.5 w-3.5 mr-1.5" />
+                    Convert Lead
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Already converted banner */}
+            {isAlreadyConverted && (
+              <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-4">
+                <p className="text-xs font-semibold text-emerald-600 text-center">
+                  ✓ This lead has been converted to enrollment.
+                </p>
+              </div>
+            )}
 
             {/* Next Follow-up Card */}
             <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-2">
@@ -341,6 +377,20 @@ export function LeadDrawer({
           onClose={() => setIsActivityModalOpen(false)}
           leadId={lead.id}
           leadName={lead.leadName}
+        />
+
+        {/* Convert Lead Wizard Modal */}
+        <ConvertLeadModal
+          lead={lead}
+          isOpen={isConvertModalOpen}
+          onClose={() => {
+            setIsConvertModalOpen(false);
+            onClose();
+          }}
+          onSuccess={() => {
+            setIsConvertModalOpen(false);
+            onClose();
+          }}
         />
       </SheetContent>
     </Sheet>

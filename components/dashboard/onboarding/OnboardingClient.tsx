@@ -239,13 +239,15 @@ export function OnboardingClient() {
         </>
       )}
 
-      {/* Pagination controls */}
-      <div className="flex justify-end p-2 border border-border bg-card rounded-xl shadow-xs">
-        <PaginationControls
-          totalPages={pagination.totalPages}
-          currentPage={pagination.page}
-        />
-      </div>
+      {/* Pagination controls — hidden when filtered results fit on a single page */}
+      {pagination.totalPages > 1 && (
+        <div className="flex justify-end p-2 border border-border bg-card rounded-xl shadow-xs">
+          <PaginationControls
+            totalPages={pagination.totalPages}
+            currentPage={pagination.page}
+          />
+        </div>
+      )}
 
       {/* Detailed Sheet Drawer */}
       <OnboardingDrawer

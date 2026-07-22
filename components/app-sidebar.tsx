@@ -87,7 +87,6 @@ const ownerGroups = [
       { title: "Users", url: "/dashboard/owner/user", icon: Users },
       { title: "Parents", url: "/dashboard/owner/parent", icon: UserCheck },
       { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
-      { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
       { title: "Notifications Center", url: "/dashboard/notifications", icon: Bell },
     ],
@@ -138,7 +137,6 @@ const teacherGroups = [
     label: "My Students & CRM",
     items: [
       { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
-      { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Assigned Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
     ],
   },
@@ -170,7 +168,6 @@ const officeAdminGroups = [
       { title: "Users", url: "/dashboard/owner/user", icon: Users },
       { title: "Parents", url: "/dashboard/owner/parent", icon: UserCheck },
       { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
-      { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
       { title: "Notifications Center", url: "/dashboard/notifications", icon: Bell },
     ],
@@ -235,7 +232,6 @@ const financeGroups = [
     label: "Student & Billing (T2)",
     items: [
       { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
-      { title: "Enrollments", url: "/dashboard/owner/enrollment", icon: UserPlus },
       { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
       { title: "Payments", url: "/dashboard/payments", icon: Wallet },
       { title: "Payments Module", url: "/dashboard/payments", icon: Wallet },
@@ -246,7 +242,6 @@ const financeGroups = [
     items: [
       { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
-      { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
     ],
   },
 ];

@@ -1,12 +1,22 @@
 "use client";
 
+import { useState, useCallback, useRef } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { StatusBadge } from "./StatusBadge";
 import { ProgressTracker } from "./ProgressTracker";
-import { DeliveryChecklist } from "./DeliveryChecklist";
 import { Timeline } from "./Timeline";
-import { Phone, Mail, MessageSquare, User, UserCheck, Check, ShieldAlert, Award, FileText, Landmark } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { DeliveryChecklist } from "./DeliveryChecklist";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { NativeSelect } from "@/components/ui/native-select";
+import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { updateOnboarding, selectOnboardingLoading } from "@/store/slices/onboardingSlice";
+import {
+  Phone, Mail, MessageSquare, User, UserCheck,
+  Award, FileText, Landmark, Save, Loader2, AlertCircle, X
+} from "lucide-react";
 
 interface EnrollmentData {
   id: string;
@@ -60,6 +70,30 @@ interface OnboardingDrawerProps {
   staffName: string | null;
 }
 
+/** Field IDs for Airtake */
+const FIELD_IDS = {
+  onboardingStatus: "fldV0VR7E7xehetvI",
+  scheduleDelivered: "fldF5fb9UFQNHmObG",
+  calendarDelivered: "fldhH2aL9TJzK7bVR",
+  appInstructionsDelivered: "fldaLd0966SrwZDJv",
+  audioRecommendationsDelivered: "fldWj3sCWbxwJnzNq",
+  contractSigned: "fldblwDp8eo6EwKGB",
+  contractDate: "fldi8KyGXRj5tuhoH",
+  contractFile: "fldgQdBDRMGXJ2OUH",
+  hdSystemRegistered: "fldz8xpBExqXB546O",
+  appCredentialsIssued: "fldtgJU9259Sf78x9",
+  firstLessonConfirmed: "fld0vvw0hpO2FZr3F",
+  firstLessonDate: "fldMIiRIiEkU32lGv",
+};
+
+const ONBOARDING_STATUS_OPTIONS = ["Pending", "In Progress", "Complete"];
+
+function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return "";
+  const d = new Date(date);
+  return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+}
+
 export function OnboardingDrawer({
   enrollment,
   isOpen,
@@ -70,48 +104,92 @@ export function OnboardingDrawer({
   courseName,
   staffName,
 }: OnboardingDrawerProps) {
+  const dispatch = useAppDispatch();
+  const globalLoading = useAppSelector(selectOnboardingLoading);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Local form state - populated from enrollment when it opens
+  const [formData, setFormData] = useState<Record<string, any>>({});
+
+  // Sync form state when enrollment changes (useEffect, not useState initializer)
+  const prevEnrollmentRef = useRef(enrollment);
+  if (enrollment !== prevEnrollmentRef.current) {
+    prevEnrollmentRef.current = enrollment;
+    if (enrollment) {
+      setFormData({
+        [FIELD_IDS.onboardingStatus]: enrollment.onboardingStatus || "Pending",
+        [FIELD_IDS.scheduleDelivered]: enrollment.scheduleDelivered ?? false,
+        [FIELD_IDS.calendarDelivered]: enrollment.calendarDelivered ?? false,
+        [FIELD_IDS.appInstructionsDelivered]: enrollment.appInstructionsDelivered ?? false,
+        [FIELD_IDS.audioRecommendationsDelivered]: enrollment.audioRecommendationsDelivered ?? false,
+        [FIELD_IDS.contractSigned]: enrollment.contractSigned ?? false,
+        [FIELD_IDS.contractDate]: formatDate(enrollment.contractDate),
+        [FIELD_IDS.hdSystemRegistered]: enrollment.hdSystemRegistered ?? false,
+        [FIELD_IDS.appCredentialsIssued]: enrollment.appCredentialsIssued ?? false,
+        [FIELD_IDS.firstLessonConfirmed]: enrollment.firstLessonConfirmed ?? false,
+        [FIELD_IDS.firstLessonDate]: formatDate(enrollment.firstLessonDate),
+      });
+      setSaveError(null);
+    }
+  }
+
+  const handleFieldChange = useCallback((fieldId: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [fieldId]: value }));
+    setSaveError(null);
+  }, []);
+
+  const handleSave = useCallback(async () => {
+    if (!enrollment) return;
+
+    setSaving(true);
+    setSaveError(null);
+
+    try {
+      const result = await dispatch(updateOnboarding({
+        enrollmentId: enrollment.id,
+        fields: formData,
+      }));
+
+      if (updateOnboarding.fulfilled.match(result)) {
+        toast.success("Onboarding checklist updated successfully.");
+        onClose();
+      } else {
+        const errorMsg = (result.payload as string) || "Failed to save changes";
+        toast.error(errorMsg);
+        setSaveError(errorMsg);
+      }
+    } catch (err: any) {
+      const errorMsg = err.message || "Unexpected error saving onboarding data";
+      toast.error(errorMsg);
+      setSaveError(errorMsg);
+    } finally {
+      setSaving(false);
+    }
+  }, [dispatch, enrollment, formData, onClose]);
+
+  // Reset on close
+  const handleClose = useCallback(() => {
+    if (saving) return; // prevent close while saving
+    onClose();
+  }, [saving, onClose]);
+
   if (!enrollment) return null;
 
   const formattedEnrollDate = enrollment.enrollDate
     ? new Date(enrollment.enrollDate).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        year: "numeric", month: "long", day: "numeric",
       })
     : "—";
 
-  const formattedContractDate = enrollment.contractDate
-    ? new Date(enrollment.contractDate).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "—";
-
-  const formattedFirstLessonDate = enrollment.firstLessonDate
-    ? new Date(enrollment.firstLessonDate).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "—";
-
-  // Resolve parent contact details safely to handle RBAC redactions
+  // Resolve parent contact details safely
   const displayPhone = parent?.phone !== undefined ? (parent.phone || "—") : "— (Redacted)";
   const displayEmail = parent?.email !== undefined ? (parent.email || "—") : "— (Redacted)";
   const displayWhatsapp = parent?.whatsapp !== undefined ? (parent.whatsapp || "—") : "— (Redacted)";
 
-  // Additional checklist status rows helper
-  const checklistItems = [
-    { label: "Contract Signed", value: enrollment.contractSigned },
-    { label: "HD System Registered", value: enrollment.hdSystemRegistered },
-    { label: "App Credentials Issued", value: enrollment.appCredentialsIssued, note: enrollment.appCredentialsIssued ? "Issued (Yes)" : "Pending (No)" },
-    { label: "First Lesson Confirmed", value: enrollment.firstLessonConfirmed },
-    { label: "Trial Fee Deducted", value: enrollment.trialFeeDeducted },
-  ];
-
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent
         side="right"
         className="w-full sm:max-w-lg lg:max-w-xl p-0 flex flex-col h-full bg-background border-l border-border shadow-2xl transition duration-300 select-none"
@@ -122,7 +200,7 @@ export function OnboardingDrawer({
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
               Onboarding Tracker
             </span>
-            <StatusBadge status={enrollment.onboardingStatus} />
+            <StatusBadge status={formData[FIELD_IDS.onboardingStatus]} />
           </div>
           <SheetTitle className="text-xl font-extrabold text-foreground tracking-tight leading-none">
             {student?.studentName || "Onboarding Record"}
@@ -132,60 +210,200 @@ export function OnboardingDrawer({
           </SheetDescription>
         </SheetHeader>
 
-        {/* Scrollable details view */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        {/* Scrollable form content */}
+        <form ref={formRef} className="flex-1 overflow-y-auto px-6 py-4" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
           <div className="space-y-6 pb-8">
-            
+
             {/* Completion Progress Bar */}
             <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
               <ProgressTracker enrollment={enrollment} />
             </div>
 
-            {/* Delivery Gates checklist */}
-            <DeliveryChecklist enrollment={enrollment} />
-
-            {/* Additional Checklist Items list */}
+            {/* A. Onboarding Status */}
             <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
               <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">
-                Onboarding Checklist Items
+                A. Onboarding Status
               </h3>
-
-              <div className="space-y-3">
-                {checklistItems.map((item) => (
-                  <div key={item.label} className="flex items-center justify-between text-xs py-1">
-                    <span className="font-semibold text-muted-foreground">{item.label}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] text-muted-foreground font-semibold">
-                        {item.note || (item.value ? "Yes" : "No")}
-                      </span>
-                      <span
-                        className={cn(
-                          "h-5 w-5 rounded-full flex items-center justify-center border shrink-0",
-                          item.value
-                            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
-                            : "bg-muted border-border text-muted-foreground/30"
-                        )}
-                      >
-                        {item.value ? (
-                          <Check className="h-3 w-3 stroke-3" />
-                        ) : (
-                          <ShieldAlert className="h-3 w-3" />
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+              <div className="space-y-2">
+                <Label htmlFor="onboardingStatus" className="text-xs font-semibold text-muted-foreground">
+                  Status
+                </Label>
+                <NativeSelect
+                  id="onboardingStatus"
+                  value={formData[FIELD_IDS.onboardingStatus] || "Pending"}
+                  onChange={(e) => handleFieldChange(FIELD_IDS.onboardingStatus, e.target.value)}
+                >
+                  {ONBOARDING_STATUS_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </NativeSelect>
               </div>
             </div>
 
-            {/* Student & Parent summaries */}
+            {/* B. Delivery Checklist */}
+            <DeliveryChecklist
+              enrollment={{
+                scheduleDelivered: formData[FIELD_IDS.scheduleDelivered] ?? false,
+                calendarDelivered: formData[FIELD_IDS.calendarDelivered] ?? false,
+                appInstructionsDelivered: formData[FIELD_IDS.appInstructionsDelivered] ?? false,
+                audioRecommendationsDelivered: formData[FIELD_IDS.audioRecommendationsDelivered] ?? false,
+              }}
+              onChange={(field, value) => {
+                const fieldMap: Record<string, string> = {
+                  scheduleDelivered: FIELD_IDS.scheduleDelivered,
+                  calendarDelivered: FIELD_IDS.calendarDelivered,
+                  appInstructionsDelivered: FIELD_IDS.appInstructionsDelivered,
+                  audioRecommendationsDelivered: FIELD_IDS.audioRecommendationsDelivered,
+                };
+                handleFieldChange(fieldMap[field], value);
+              }}
+            />
+
+            {/* C. Contract */}
             <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
               <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">
-                Profile Summaries
+                C. Contract
               </h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="contractSigned" className="text-xs font-semibold text-muted-foreground cursor-pointer">
+                    Contract Signed
+                  </Label>
+                  <Switch
+                    id="contractSigned"
+                    checked={formData[FIELD_IDS.contractSigned] ?? false}
+                    onCheckedChange={(checked) => handleFieldChange(FIELD_IDS.contractSigned, checked)}
+                  />
+                </div>
 
+                {(formData[FIELD_IDS.contractSigned]) && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="contractDate" className="text-xs font-semibold text-muted-foreground">
+                        Contract Date <span className="text-destructive">*</span>
+                      </Label>
+                      <input
+                        id="contractDate"
+                        type="date"
+                        value={formData[FIELD_IDS.contractDate] || ""}
+                        onChange={(e) => handleFieldChange(FIELD_IDS.contractDate, e.target.value)}
+                        className="w-full h-9 px-3 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contractFile" className="text-xs font-semibold text-muted-foreground">
+                        Contract File (optional)
+                      </Label>
+                      <input
+                        id="contractFile"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        className="w-full text-xs text-muted-foreground file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-primary/10 file:text-primary file:text-xs file:font-semibold hover:file:bg-primary/20 transition-colors"
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* D. HD System Registered */}
+            <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">
+                D. HD System Registered
+              </h3>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="hdSystem" className="text-xs font-semibold text-muted-foreground cursor-pointer">
+                  Registered
+                </Label>
+                <Switch
+                  id="hdSystem"
+                  checked={formData[FIELD_IDS.hdSystemRegistered] ?? false}
+                  onCheckedChange={(checked) => handleFieldChange(FIELD_IDS.hdSystemRegistered, checked)}
+                />
+              </div>
+            </div>
+
+            {/* E. App Credentials Issued */}
+            <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">
+                E. App Credentials Issued
+              </h3>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="appCredentials" className="text-xs font-semibold text-muted-foreground cursor-pointer">
+                    Credentials Issued
+                  </Label>
+                  <p className="text-[10px] text-muted-foreground/60">
+                    Record issuance only — never store actual credentials
+                  </p>
+                </div>
+                <Switch
+                  id="appCredentials"
+                  checked={formData[FIELD_IDS.appCredentialsIssued] ?? false}
+                  onCheckedChange={(checked) => handleFieldChange(FIELD_IDS.appCredentialsIssued, checked)}
+                />
+              </div>
+            </div>
+
+            {/* F. First Lesson */}
+            <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">
+                F. First Lesson
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="firstLessonConfirmed" className="text-xs font-semibold text-muted-foreground cursor-pointer">
+                    First Lesson Confirmed
+                  </Label>
+                  <Switch
+                    id="firstLessonConfirmed"
+                    checked={formData[FIELD_IDS.firstLessonConfirmed] ?? false}
+                    onCheckedChange={(checked) => handleFieldChange(FIELD_IDS.firstLessonConfirmed, checked)}
+                  />
+                </div>
+
+                {(formData[FIELD_IDS.firstLessonConfirmed]) && (
+                  <div className="space-y-2">
+                    <Label htmlFor="firstLessonDate" className="text-xs font-semibold text-muted-foreground">
+                      First Lesson Date <span className="text-destructive">*</span>
+                    </Label>
+                    <input
+                      id="firstLessonDate"
+                      type="date"
+                      value={formData[FIELD_IDS.firstLessonDate] || ""}
+                      onChange={(e) => handleFieldChange(FIELD_IDS.firstLessonDate, e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                      required
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Save Error Banner */}
+            {saveError && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4 flex items-start gap-3">
+                <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                <div className="text-xs font-medium text-destructive">
+                  {saveError}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSaveError(null)}
+                  className="shrink-0 ml-auto text-destructive/50 hover:text-destructive transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* Student & Parent summaries (read-only) */}
+            <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">
+                Profile Summaries 
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                {/* Student summary */}
                 <div className="space-y-2">
                   <h4 className="font-bold flex items-center gap-1.5 uppercase text-[10px] tracking-wider text-muted-foreground">
                     <User className="h-3.5 w-3.5 text-primary" />
@@ -201,8 +419,6 @@ export function OnboardingDrawer({
                     {student?.gender && <p className="text-muted-foreground capitalize">Gender: {student.gender}</p>}
                   </div>
                 </div>
-
-                {/* Parent summary */}
                 <div className="space-y-2">
                   <h4 className="font-bold flex items-center gap-1.5 uppercase text-[10px] tracking-wider text-muted-foreground">
                     <UserCheck className="h-3.5 w-3.5 text-primary" />
@@ -218,62 +434,88 @@ export function OnboardingDrawer({
               </div>
             </div>
 
-            {/* Contract & Lesson Dates metadata */}
+            {/* Milestone metadata (read-only) */}
             <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
               <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">
-                Milestone Specifications
+                Milestone Metadata 
               </h3>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                {/* Contract Spec */}
                 <div className="space-y-2">
                   <h4 className="font-bold flex items-center gap-1.5 uppercase text-[10px] tracking-wider text-muted-foreground">
                     <FileText className="h-3.5 w-3.5 text-primary" />
                     Contract Details
                   </h4>
                   <div className="space-y-1">
-                    <p className="text-muted-foreground">Signed: <span className="font-semibold text-foreground">{enrollment.contractSigned ? "Yes" : "No"}</span></p>
-                    <p className="text-muted-foreground">Signed Date: <span className="font-semibold text-foreground">{formattedContractDate}</span></p>
-                    <p className="text-muted-foreground">Contract File: <span className="font-semibold text-rose-500 italic">Not Uploaded</span></p>
+                    <p className="text-muted-foreground">
+                      Trial Fee Deducted: <span className="font-semibold text-foreground">{enrollment.trialFeeDeducted ? "Yes" : "No"}</span>
+                    </p>
                   </div>
                 </div>
-
-                {/* First Lesson Spec */}
                 <div className="space-y-2">
                   <h4 className="font-bold flex items-center gap-1.5 uppercase text-[10px] tracking-wider text-muted-foreground">
                     <Award className="h-3.5 w-3.5 text-primary" />
-                    First Lesson Info
+                    First Lesson
                   </h4>
                   <div className="space-y-1">
-                    <p className="text-muted-foreground">Confirmed: <span className="font-semibold text-foreground">{enrollment.firstLessonConfirmed ? "Yes" : "No"}</span></p>
-                    <p className="text-muted-foreground">Lesson Date: <span className="font-semibold text-foreground">{formattedFirstLessonDate}</span></p>
-                    <p className="text-muted-foreground">Assigned Staff: <span className="font-semibold text-foreground truncate max-w-[120px] inline-block">{staffName || "Unassigned"}</span></p>
+                    <p className="text-muted-foreground">
+                      Staff: <span className="font-semibold text-foreground truncate max-w-[120px] inline-block">{staffName || "Unassigned"}</span>
+                    </p>
                   </div>
                 </div>
-
-                {/* Trial Fee SPEC */}
                 <div className="space-y-2 sm:col-span-2 border-t border-border/40 pt-3">
                   <h4 className="font-bold flex items-center gap-1.5 uppercase text-[10px] tracking-wider text-muted-foreground">
                     <Landmark className="h-3.5 w-3.5 text-primary" />
-                    Tuition & Fee Specifications
+                    Tuition & Fee
                   </h4>
                   <div className="space-y-1">
-                    <p className="text-muted-foreground">Enrollment Registered: <span className="font-semibold text-foreground">{formattedEnrollDate}</span></p>
-                    <p className="text-muted-foreground">Trial Fee Deducted: <span className="font-semibold text-foreground">{enrollment.trialFeeDeducted ? "Completed (Yes)" : "Pending (No)"}</span></p>
+                    <p className="text-muted-foreground">
+                      Enrolled: <span className="font-semibold text-foreground">{formattedEnrollDate}</span>
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Onboarding Milestones Timeline */}
+            {/* Timeline (read-only) */}
             <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
               <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">
-                Onboarding Event Milestones
+                Onboarding Milestones
               </h3>
               <Timeline enrollment={enrollment} />
             </div>
 
           </div>
+        </form>
+
+        {/* Footer with Save button */}
+        <div className="shrink-0 border-t border-border/60 bg-card/50 p-4 flex items-center justify-end gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleClose}
+            disabled={saving}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleSave}
+            disabled={saving || globalLoading}
+          >
+            {saving ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-3.5 w-3.5 mr-1.5" />
+                Save Changes
+              </>
+            )}
+          </Button>
         </div>
       </SheetContent>
     </Sheet>

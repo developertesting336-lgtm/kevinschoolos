@@ -120,7 +120,14 @@ export default async function OwnerTablePage({
 
   // Check RBAC permission for this role and table
   const { checkRBAC } = await import("@/lib/rbac");
-  const rbacCheck = checkRBAC(userRole, config.modelName, "read", false);
+  let rbacCheck = checkRBAC(userRole, config.modelName, "read", false);
+
+  if (config.modelName === "tuitionPlan") {
+    const isAllowedTuitionPage = ["owner", "office_admin", "smm"].includes(normUserRole) || (normUserRole === "tech_admin" && isBreakGlass);
+    if (!isAllowedTuitionPage) {
+      rbacCheck = { allowed: false, reason: "Finance, Teacher, and Tech Admin roles are not permitted to access the Tuition Plans management screen." };
+    }
+  }
 
   // If not allowed, show the access restricted page
   if (!rbacCheck.allowed) {

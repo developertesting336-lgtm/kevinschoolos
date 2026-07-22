@@ -106,7 +106,7 @@ export const fetchPaymentsData = createAsyncThunk(
       if (filters.date) params.set("date", filters.date);
 
       const [paymentsRes, invoicesRes, enrollmentsRes, studentsRes, parentsRes, branchesRes, usersRes] = await Promise.all([
-        fetch(`/api/data/payment?${params.toString()}`).then((r) => r.json()).catch(() => ({ data: [], pagination: { total: 0, page: 1, limit: 20, totalPages: 1 } })),
+        fetch(`/api/payments?${params.toString()}`).then((r) => r.json()).catch(() => ({ data: [], pagination: { total: 0, page: 1, limit: 20, totalPages: 1 } })),
         fetch("/api/data/invoice").then((r) => r.json()).catch(() => []),
         fetch("/api/data/enrollment").then((r) => r.json()).catch(() => []),
         fetch("/api/data/student").then((r) => r.json()).catch(() => []),
@@ -132,6 +132,32 @@ export const fetchPaymentsData = createAsyncThunk(
       };
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch payments data");
+    }
+  }
+);
+
+export const createPaymentThunk = createAsyncThunk(
+  "payments/createPayment",
+  async (paymentData: any, { rejectWithValue }) => {
+    try {
+      const res = await fetch("/api/payments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 409) {
+          return rejectWithValue({ possibleDuplicate: true, message: data.message });
+        }
+        throw new Error(data.error || "Failed to record payment");
+      }
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to record payment");
     }
   }
 );
@@ -173,6 +199,21 @@ const paymentsSlice = createSlice({
       })
       .addCase(fetchPaymentsData.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(createPaymentThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createPaymentThunk.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(createPaymentThunk.rejected, (state, action) => {
+        state.loading = false;
+        if (action.payload && typeof action.payload === "object" && (action.payload as any).possibleDuplicate) {
+          return;
+        }
         state.error = action.payload as string;
       });
   },

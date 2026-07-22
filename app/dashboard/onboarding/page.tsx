@@ -6,8 +6,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchOnboardingData, selectOnboardingLoading, selectOnboardingError } from "@/store/slices/onboardingSlice";
 import { validateSessionThunk } from "@/store/slices/authSlice";
 import { OnboardingClient } from "@/components/dashboard/onboarding/OnboardingClient";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ShieldAlert, ArrowLeft, ClipboardCheck } from "lucide-react";
+import { Card  } from "@/components/ui/card";
+import { ArrowLeft, ClipboardCheck } from "lucide-react";
 
 export default function OnboardingPage() {
   const dispatch = useAppDispatch();

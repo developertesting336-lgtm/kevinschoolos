@@ -111,9 +111,35 @@ const initialState: OnboardingState = {
   filters: {},
 };
 
+export const updateOnboarding = createAsyncThunk(
+  "onboarding/updateOnboarding",
+  async (
+    { enrollmentId, fields }: { enrollmentId: string; fields: Record<string, any> },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch(`/api/branch/onboarding/${enrollmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fields }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(data.errors?.join(", ") || data.error || "Failed to update onboarding");
+      }
+
+      return { enrollmentId, fields };
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to update onboarding");
+    }
+  }
+);
+
 export const fetchOnboardingData = createAsyncThunk(
   "onboarding/fetchOnboardingData",
-  async (filters: { page?: number; search?: string; branch?: string; onboardingStatus?: string; owner?: string; enrollDate?: string }, { getState, rejectWithValue }) => {
+  async (filters: { page?: number; search?: string; branch?: string; onboardingStatus?: string; owner?: string; enrollDate?: string; forceRefetch?: boolean } = {}, { getState, rejectWithValue }) => {
     try {
       const params = new URLSearchParams();
       params.set("page", String(filters.page || 1));
@@ -126,7 +152,8 @@ export const fetchOnboardingData = createAsyncThunk(
 
       const state = getState() as any;
       const onboardingState = state.onboarding;
-      const alreadyHasMetadata = onboardingState && onboardingState.students.length > 0;
+      const force = filters.forceRefetch === true;
+      const alreadyHasMetadata = !force && onboardingState && onboardingState.students.length > 0;
 
       let enrollmentsResponse;
       let studentsRes = alreadyHasMetadata ? onboardingState.students : [];
@@ -211,6 +238,33 @@ const onboardingSlice = createSlice({
       })
       .addCase(fetchOnboardingData.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Update onboarding field locally on success
+      .addCase(updateOnboarding.fulfilled, (state, action) => {
+        const { enrollmentId, fields } = action.payload;
+        const idx = state.enrollments.findIndex((e) => e.id === enrollmentId);
+        if (idx !== -1) {
+          // Only update the specific onboarding fields returned
+          const enrollment = state.enrollments[idx];
+          for (const [fieldId, value] of Object.entries(fields)) {
+            switch (fieldId) {
+              case "fldV0VR7E7xehetvI": enrollment.onboardingStatus = value; break;
+              case "fldF5fb9UFQNHmObG": enrollment.scheduleDelivered = value; break;
+              case "fldhH2aL9TJzK7bVR": enrollment.calendarDelivered = value; break;
+              case "fldaLd0966SrwZDJv": enrollment.appInstructionsDelivered = value; break;
+              case "fldWj3sCWbxwJnzNq": enrollment.audioRecommendationsDelivered = value; break;
+              case "fldblwDp8eo6EwKGB": enrollment.contractSigned = value; break;
+              case "fldi8KyGXRj5tuhoH": enrollment.contractDate = value; break;
+              case "fldz8xpBExqXB546O": enrollment.hdSystemRegistered = value; break;
+              case "fldtgJU9259Sf78x9": enrollment.appCredentialsIssued = value; break;
+              case "fld0vvw0hpO2FZr3F": enrollment.firstLessonConfirmed = value; break;
+              case "fldMIiRIiEkU32lGv": enrollment.firstLessonDate = value; break;
+            }
+          }
+        }
+      })
+      .addCase(updateOnboarding.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },

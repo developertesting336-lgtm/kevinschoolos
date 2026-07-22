@@ -1,8 +1,10 @@
 "use client";
 
 import { ReconciliationBadge } from "./ReconciliationBadge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { AlertOctagon, Receipt, ChevronRight } from "lucide-react";
+
 
 interface Payment {
   id: string;
@@ -117,6 +119,45 @@ export function PaymentCard({
         <span className="text-sm font-extrabold text-foreground">
           ${payment.amount !== null ? payment.amount.toFixed(2) : "0.00"}
         </span>
+      </div>
+    </div>
+  );
+}
+
+/** Skeleton placeholder that mirrors the PaymentCard layout. */
+export function PaymentCardSkeleton() {
+  return (
+    <div className="border border-border/60 rounded-xl p-4 space-y-3 bg-card">
+      {/* Top row: ref + date */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-28 rounded" />
+        <Skeleton className="h-3.5 w-20 rounded" />
+      </div>
+
+      {/* Detail rows */}
+      <div className="space-y-2">
+        <div className="flex justify-between">
+          <Skeleton className="h-3 w-14 rounded" />
+          <Skeleton className="h-3 w-28 rounded" />
+        </div>
+        <div className="flex justify-between">
+          <Skeleton className="h-3 w-14 rounded" />
+          <Skeleton className="h-3 w-28 rounded" />
+        </div>
+        <div className="flex justify-between">
+          <Skeleton className="h-3 w-20 rounded" />
+          <Skeleton className="h-3 w-24 rounded" />
+        </div>
+        <div className="flex justify-between">
+          <Skeleton className="h-3 w-20 rounded" />
+          <Skeleton className="h-3 w-20 rounded" />
+        </div>
+      </div>
+
+      {/* Footer: badge + amount */}
+      <div className="border-t border-border/40 pt-2.5 flex items-center justify-between">
+        <Skeleton className="h-5 w-20 rounded-full" />
+        <Skeleton className="h-5 w-16 rounded" />
       </div>
     </div>
   );

@@ -334,15 +334,15 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "billingPeriod", label: "Billing Period", type: "select", options: ["Monthly", "Term", "Annual"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "planName", label: "Plan Name", type: "string", sortable: true },
-      { key: "amount", label: "Amount", type: "number", sortable: true },
+      { key: "courseIds", label: "Course", type: "array" },
+      { key: "amount", label: "Amount (KGS)", type: "number", sortable: true },
+      { key: "netAmount", label: "Net Amount (KGS)", type: "number", sortable: true },
       { key: "billingPeriod", label: "Billing Period", type: "string", sortable: true },
+      { key: "discount", label: "Discount", type: "boolean", sortable: true },
       { key: "active", label: "Active", type: "boolean", sortable: true },
-      { key: "nameRussian", label: "Russian Name", type: "string" },
-      { key: "nameKyrgyz", label: "Kyrgyz Name", type: "string" },
-      { key: "courseIds", label: "Courses", type: "array" },
-      { key: "updatedAt", label: "Last Updated", type: "date", sortable: true }
+      { key: "enrollmentsCount", label: "Enrollments Count", type: "number", isComputed: true },
+      { key: "createdAt", label: "Created Date", type: "date", sortable: true }
     ]
   },
   invoice: {

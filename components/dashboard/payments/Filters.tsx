@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Button } from "@/components/ui/button";
-import { X, Filter, Calendar, Loader2 } from "lucide-react";
+import { X, Filter, Calendar } from "lucide-react";
 
 interface Option {
   id: string;
@@ -26,10 +26,10 @@ export function Filters({ branches }: FiltersProps) {
   const currentMethod = searchParams.get("paymentMethod") || "";
   const currentDate = searchParams.get("date") || "";
 
-  const hasActiveFilters = 
-    !!currentBranch || 
-    !!currentType || 
-    !!currentMethod || 
+  const hasActiveFilters =
+    !!currentBranch ||
+    !!currentType ||
+    !!currentMethod ||
     !!currentDate;
 
   const handleFilterChange = (key: string, value: string) => {
@@ -64,11 +64,7 @@ export function Filters({ branches }: FiltersProps) {
   return (
     <div className="flex flex-col xl:flex-row gap-4 items-center justify-between bg-card border border-border p-4 rounded-xl shadow-xs select-none">
       <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground shrink-0">
-        {isPending ? (
-          <Loader2 className="h-4 w-4 text-primary animate-spin" />
-        ) : (
-          <Filter className="h-4 w-4 text-primary" />
-        )}
+        <Filter className="h-4 w-4 text-primary" />
         <span>Filter transactions:</span>
       </div>
 

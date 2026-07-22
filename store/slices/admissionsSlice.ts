@@ -71,6 +71,8 @@ export interface ClassGroupData {
   id: string;
   groupName: string;
   roomIds: string[];
+  courseIds: string[];
+  branchIds: string[];
 }
 
 interface AdmissionsState {
@@ -271,6 +273,38 @@ export const createActivityThunk = createAsyncThunk(
   }
 );
 
+
+export const convertLeadThunk = createAsyncThunk(
+  "admissions/convertLead",
+  async (
+    payload: {
+      leadId: string;
+      parentInfo: { name: string; phone?: string; whatsapp?: string; email?: string };
+      studentInfo: { name: string; dob?: string; gender?: string };
+      classGroupId: string;
+      tuitionPlanId: string;
+      enrollDate?: string;
+      enrollmentStatus?: string;
+      completeTrial: boolean;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch("/api/admissions/convert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(data.error || "Failed to convert lead.");
+      }
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to convert lead.");
+    }
+  }
+);
 
 const admissionsSlice = createSlice({
   name: "admissions",

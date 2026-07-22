@@ -54,7 +54,9 @@ export const fetchOwnerTableData = createAsyncThunk(
         });
       }
 
-      const dataUrl = `/api/owner/${table}?${queryParams.toString()}`;
+      const dataUrl = table === "tuitionplan"
+        ? `/api/tuition-plans?${queryParams.toString()}`
+        : `/api/owner/${table}?${queryParams.toString()}`;
       const branchUrl = "/api/owner/branch?limit=100";
 
       const [dataRes, branchRes] = await Promise.all([
@@ -69,6 +71,52 @@ export const fetchOwnerTableData = createAsyncThunk(
       };
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch table data");
+    }
+  }
+);
+
+export const createTuitionPlanThunk = createAsyncThunk(
+  "ownerTable/createTuitionPlan",
+  async (planData: any, { rejectWithValue }) => {
+    try {
+      const res = await fetch("/api/tuition-plans", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(planData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to create tuition plan");
+      }
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to create tuition plan");
+    }
+  }
+);
+
+export const updateTuitionPlanThunk = createAsyncThunk(
+  "ownerTable/updateTuitionPlan",
+  async ({ id, planData }: { id: string; planData: any }, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`/api/tuition-plans/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(planData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update tuition plan");
+      }
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to update tuition plan");
     }
   }
 );
@@ -96,6 +144,30 @@ const ownerTableSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchOwnerTableData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(createTuitionPlanThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createTuitionPlanThunk.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(createTuitionPlanThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateTuitionPlanThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateTuitionPlanThunk.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(updateTuitionPlanThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

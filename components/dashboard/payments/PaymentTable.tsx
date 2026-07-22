@@ -2,6 +2,7 @@
 
 import { ReconciliationBadge } from "./ReconciliationBadge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { HelpCircle, AlertOctagon } from "lucide-react";
 
@@ -27,6 +28,7 @@ interface PaymentTableProps {
   branchMap: Record<string, { name: string }>;
   selectedPaymentId?: string;
   onSelectPayment: (payment: Payment) => void;
+  isLoading?: boolean;
 }
 
 export function PaymentTable({
@@ -38,8 +40,9 @@ export function PaymentTable({
   branchMap,
   selectedPaymentId,
   onSelectPayment,
+  isLoading = false,
 }: PaymentTableProps) {
-  
+
   const getRelationDetails = (payment: Payment) => {
     // 1. Resolve invoice details
     const firstInvoiceId = payment.invoiceIds[0] || "";
@@ -107,7 +110,57 @@ export function PaymentTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {payments.length === 0 ? (
+          {isLoading ? (
+            // Skeleton rows — 8 shimmer rows matching the 11-column layout
+            Array.from({ length: 8 }).map((_, i) => (
+              <TableRow key={i} className="border-b border-border/40">
+                {/* Receipt Ref */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-3.5 w-28 rounded" />
+                </TableCell>
+                {/* Student */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-3.5 w-24 rounded" />
+                </TableCell>
+                {/* Parent */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-3.5 w-24 rounded" />
+                </TableCell>
+                {/* Invoice No */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-3.5 w-20 rounded" />
+                </TableCell>
+                {/* Enrollment */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-3.5 w-28 rounded" />
+                </TableCell>
+                {/* Type */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-3.5 w-16 rounded" />
+                </TableCell>
+                {/* Method */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-3.5 w-16 rounded" />
+                </TableCell>
+                {/* Amount */}
+                <TableCell className="py-3 px-4 text-right">
+                  <Skeleton className="h-3.5 w-14 rounded ml-auto" />
+                </TableCell>
+                {/* Date */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-3.5 w-20 rounded" />
+                </TableCell>
+                {/* Period */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-3.5 w-20 rounded" />
+                </TableCell>
+                {/* Status badge */}
+                <TableCell className="py-3 px-4">
+                  <Skeleton className="h-5 w-20 rounded-full" />
+                </TableCell>
+              </TableRow>
+            ))
+          ) : payments.length === 0 ? (
             <TableRow>
               <TableCell colSpan={11} className="text-center py-8 text-xs text-muted-foreground italic">
                 No payments found matching the selected search or filter criteria.

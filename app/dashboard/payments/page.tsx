@@ -1,17 +1,28 @@
 "use client";
 
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchPaymentsData, selectPaymentsLoading, selectPaymentsError, selectPaymentsPayments, selectPaymentsInvoices, selectPaymentsEnrollments, selectPaymentsStudents, selectPaymentsParents, selectPaymentsBranches, selectPaymentsUsers, selectPaymentsTotalCount, selectPaymentsCurrentPage, selectPaymentsLimit } from "@/store/slices/paymentsSlice";
-import { validateSessionThunk } from "@/store/slices/authSlice";
+import {
+  selectPaymentsLoading,
+  selectPaymentsError,
+  selectPaymentsPayments,
+  selectPaymentsInvoices,
+  selectPaymentsEnrollments,
+  selectPaymentsStudents,
+  selectPaymentsParents,
+  selectPaymentsBranches,
+  selectPaymentsUsers,
+  selectPaymentsTotalCount,
+  selectPaymentsCurrentPage,
+  selectPaymentsLimit,
+} from "@/store/slices/paymentsSlice";
+import { validateSessionThunk, selectAuthRole } from "@/store/slices/authSlice";
 import { PaymentsClient } from "@/components/dashboard/payments/PaymentsClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSearchParams } from "next/navigation";
 
 export default function PaymentsPage() {
   const dispatch = useAppDispatch();
-  const searchParams = useSearchParams();
   const sessionValidated = useRef(false);
 
   const loading = useAppSelector(selectPaymentsLoading);
@@ -27,39 +38,19 @@ export default function PaymentsPage() {
   const currentPage = useAppSelector(selectPaymentsCurrentPage);
   const limit = useAppSelector(selectPaymentsLimit);
 
-  // Read filters and page from URL search params
-  const buildFiltersFromUrl = useCallback(() => ({
-    page: parseInt(searchParams.get("page") || "1", 10),
-    search: searchParams.get("search") || undefined,
-    branch: searchParams.get("branch") || undefined,
-    paymentType: searchParams.get("paymentType") || undefined,
-    paymentMethod: searchParams.get("paymentMethod") || undefined,
-    date: searchParams.get("date") || undefined,
-  }), [searchParams]);
+  const userRole = useAppSelector(selectAuthRole);
+  const normRole = (userRole || "").toLowerCase().trim();
+  const isAllowed = ["owner", "office_admin", "office/admin", "office admin", "finance"].includes(normRole);
 
   // Validate session once on mount
   useEffect(() => {
     if (!sessionValidated.current) {
       sessionValidated.current = true;
-      dispatch(validateSessionThunk()).then((result: any) => {
-        if (result.meta.requestStatus === "fulfilled") {
-          const filters = buildFiltersFromUrl();
-          dispatch(fetchPaymentsData(filters));
-        }
-      });
+      dispatch(validateSessionThunk());
     }
-  }, [dispatch, buildFiltersFromUrl]);
+  }, [dispatch]);
 
-  // Re-fetch data when URL params change (filters, pagination, search)
-  // Only after session has been validated
-  useEffect(() => {
-    if (sessionValidated.current) {
-      const filters = buildFiltersFromUrl();
-      dispatch(fetchPaymentsData(filters));
-    }
-  }, [dispatch, searchParams, buildFiltersFromUrl]);
-
-  if (loading) {
+  if (loading && !userRole) {
     return (
       <div className="p-6 space-y-6 select-none animate-pulse">
         {/* Header skeleton */}
@@ -100,6 +91,16 @@ export default function PaymentsPage() {
               </div>
             ))}
           </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (sessionValidated.current && !isAllowed) {
+    return (
+      <div className="p-6">
+        <Card className="border-destructive/20 bg-destructive/5 text-destructive p-6 text-center text-sm font-bold rounded-xl max-w-xl mx-auto mt-12 shadow-sm">
+          Access Denied: You do not have permissions to access the Payments & Receipts module.
         </Card>
       </div>
     );
