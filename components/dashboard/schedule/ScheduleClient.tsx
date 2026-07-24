@@ -37,6 +37,7 @@ export function ScheduleClient({ userRole }: ScheduleClientProps) {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
   const sessionValidated = useRef(false);
+  const hasData = useRef(false);
   const normRole = normalizeRole(userRole);
   const showCreateBtn = normRole === "owner" || normRole === "office_admin";
 
@@ -50,6 +51,14 @@ export function ScheduleClient({ userRole }: ScheduleClientProps) {
   const loading = useAppSelector(selectScheduleLoading);
   const error = useAppSelector(selectScheduleError);
   const isForbidden = useAppSelector(selectScheduleIsForbidden);
+
+  // Track if we've successfully loaded data at least once
+  if (sessions.length > 0 || classGroups.length > 0) {
+    hasData.current = true;
+  }
+
+  // Only show full-page skeleton on initial load (no data yet)
+  const showSkeleton = loading && !hasData.current;
 
   const buildParamsFromUrl = useCallback(() => ({
     tab: searchParams.get("tab") || "sessions",
@@ -79,8 +88,8 @@ export function ScheduleClient({ userRole }: ScheduleClientProps) {
 
   const activeTab = tab;
 
-  // Loading skeleton
-  if (loading) {
+  // Full-page loading skeleton (only on initial load)
+  if (showSkeleton) {
     return (
       <div className="space-y-8 select-none animate-pulse">
         {/* Header skeleton */}
@@ -270,7 +279,7 @@ export function ScheduleClient({ userRole }: ScheduleClientProps) {
 
       {activeTab === "sessions" ? (
         /* Sessions Table */
-        <Card className="bg-card border-border shadow-md overflow-hidden">
+        <Card className="bg-card border-border shadow-md overflow-hidden relative">
           <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle className="text-sm font-bold text-foreground">
               ALL SESSIONS ({totalCount})
@@ -288,7 +297,7 @@ export function ScheduleClient({ userRole }: ScheduleClientProps) {
                   <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase">Branches</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody className="divide-y divide-border">
+              <TableBody className={`divide-y divide-border transition-opacity duration-200 ${loading ? "opacity-40 pointer-events-none" : ""}`}>
                 {sessions.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="h-32 text-center text-xs text-muted-foreground">
@@ -350,10 +359,13 @@ export function ScheduleClient({ userRole }: ScheduleClientProps) {
               />
             </div>
           </CardContent>
+          {loading && (
+            <div className="absolute inset-0 bg-background/30 pointer-events-none" />
+          )}
         </Card>
       ) : (
         /* Class Groups Table */
-        <Card className="bg-card border-border shadow-md overflow-hidden">
+        <Card className="bg-card border-border shadow-md overflow-hidden relative">
           <CardHeader className="border-b border-border py-3 px-6 bg-muted/10 flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle className="text-sm font-bold text-foreground">
               ALL CLASS GROUPS ({totalCount})
@@ -375,7 +387,7 @@ export function ScheduleClient({ userRole }: ScheduleClientProps) {
                   )}
                 </TableRow>
               </TableHeader>
-              <TableBody className="divide-y divide-border">
+              <TableBody className={`divide-y divide-border transition-opacity duration-200 ${loading ? "opacity-40 pointer-events-none" : ""}`}>
                 {classGroups.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={showCreateBtn ? 7 : 6} className="h-32 text-center text-xs text-muted-foreground">
@@ -436,6 +448,9 @@ export function ScheduleClient({ userRole }: ScheduleClientProps) {
               />
             </div>
           </CardContent>
+          {loading && (
+            <div className="absolute inset-0 bg-background/30 pointer-events-none" />
+          )}
         </Card>
       )}
     </div>

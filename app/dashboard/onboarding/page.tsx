@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchOnboardingData, selectOnboardingLoading, selectOnboardingError } from "@/store/slices/onboardingSlice";
+import { selectOnboardingError } from "@/store/slices/onboardingSlice";
 import { validateSessionThunk } from "@/store/slices/authSlice";
 import { OnboardingClient } from "@/components/dashboard/onboarding/OnboardingClient";
 import { Card  } from "@/components/ui/card";
@@ -11,15 +11,10 @@ import { ArrowLeft, ClipboardCheck } from "lucide-react";
 
 export default function OnboardingPage() {
   const dispatch = useAppDispatch();
-  const loading = useAppSelector(selectOnboardingLoading);
   const error = useAppSelector(selectOnboardingError);
 
   useEffect(() => {
-    dispatch(validateSessionThunk()).then((result) => {
-      if (result.meta.requestStatus === "fulfilled") {
-        dispatch(fetchOnboardingData({}));
-      }
-    });
+    dispatch(validateSessionThunk());
   }, [dispatch]);
 
   if (error) {

@@ -26,8 +26,11 @@ export async function POST(request: Request) {
     }
 
     await destroySession();
-    const requestUrl = new URL(request.url);
-    const loginUrl = new URL("/login", requestUrl.origin);
+    const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+    const proto = request.headers.get("x-forwarded-proto") || (host && !host.includes("localhost") && !host.includes("127.0.0.1") ? "https" : "http");
+    const baseUrl = host ? `${proto}://${host}` : new URL(request.url).origin;
+
+    const loginUrl = new URL("/login", baseUrl);
     return NextResponse.redirect(loginUrl, { status: 303 });
   } catch (error) {
     console.error("[Logout Error]", error);

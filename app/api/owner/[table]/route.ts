@@ -153,15 +153,74 @@ export async function GET(
     const whereConditions: any[] = [];
 
     // Search clause
-    if (search && config.searchableFields.length > 0) {
-      whereConditions.push({
-        OR: config.searchableFields.map((field) => ({
+    if (search) {
+      if (prismaModelName === "trial") {
+        // Find leads matching leadName, phone, or whatsapp
+        const matchingLeads = await prisma.lead.findMany({
+          where: {
+            OR: [
+              { leadName: { contains: search, mode: "insensitive" } },
+              { phone: { contains: search, mode: "insensitive" } },
+              { whatsapp: { contains: search, mode: "insensitive" } },
+            ],
+          },
+          select: { id: true },
+        });
+        const leadIdsFromLeads = matchingLeads.map((l) => l.id);
+
+        // Find parent records matching parentName
+        const matchingParents = await prisma.parent.findMany({
+          where: {
+            parentName: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+          select: { id: true },
+        });
+        const parentIds = matchingParents.map((p) => p.id);
+
+        let leadIdsFromParents: string[] = [];
+        if (parentIds.length > 0) {
+          const leadsByParents = await prisma.lead.findMany({
+            where: {
+              parentIds: {
+                hasSome: parentIds,
+              },
+            },
+            select: { id: true },
+          });
+          leadIdsFromParents = leadsByParents.map((l) => l.id);
+        }
+
+        const allTargetLeadIds = Array.from(new Set([...leadIdsFromLeads, ...leadIdsFromParents]));
+
+        const searchOR: any[] = config.searchableFields.map((field) => ({
           [field]: {
             contains: search,
             mode: "insensitive",
           },
-        })),
-      });
+        }));
+
+        if (allTargetLeadIds.length > 0) {
+          searchOR.push({
+            leadIds: {
+              hasSome: allTargetLeadIds,
+            },
+          });
+        }
+
+        whereConditions.push({ OR: searchOR });
+      } else if (config.searchableFields.length > 0) {
+        whereConditions.push({
+          OR: config.searchableFields.map((field) => ({
+            [field]: {
+              contains: search,
+              mode: "insensitive",
+            },
+          })),
+        });
+      }
     }
 
     // Dynamic column filters

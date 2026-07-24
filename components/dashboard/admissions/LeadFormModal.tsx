@@ -2,25 +2,45 @@
 
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { createLeadThunk, selectAdmissionsSavingLead, selectAdmissionsSaveLeadError } from "@/store/slices/admissionsSlice";
+import {
+  createLeadThunk,
+  selectAdmissionsSavingLead,
+  selectAdmissionsSaveLeadError,
+} from "@/store/slices/admissionsSlice";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Info, User, Phone, Globe, UserCheck, HelpCircle } from "lucide-react";
+import { Info, User, Phone, Globe, UserCheck, HelpCircle, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 
 interface LeadFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   branches: { id: string; name: string }[];
-  staffUsers: { id: string; fullName: string }[];
+  staffUsers: { id: string; fullName: string; role?: string | null }[];
 }
 
 export function LeadFormModal({ isOpen, onClose, branches, staffUsers }: LeadFormModalProps) {
   const dispatch = useAppDispatch();
   const saving = useAppSelector(selectAdmissionsSavingLead);
   const saveError = useAppSelector(selectAdmissionsSaveLeadError);
+
+  // Filter assigned staff users to only display users with Owner and Office/Admin roles
+  const eligibleStaffUsers = staffUsers.filter((u) => {
+    if (!u.role) return false;
+    const norm = u.role.toLowerCase().trim();
+    return (
+      norm === "owner" ||
+      norm === "office_admin" ||
+      norm === "office/admin" ||
+      norm === "office-admin" ||
+      norm === "office admin"
+    );
+  });
+
+  const displayStaffUsers = eligibleStaffUsers.length > 0 ? eligibleStaffUsers : staffUsers;
 
   // Form State
   const [parentName, setParentName] = useState("");
@@ -83,11 +103,14 @@ export function LeadFormModal({ isOpen, onClose, branches, staffUsers }: LeadFor
     try {
       const result = await dispatch(createLeadThunk(payload)).unwrap();
       if (result) {
+        toast.success("Lead created successfully!");
         handleReset();
         onClose();
       }
     } catch (err: any) {
-      // Error handled by redux state, but unwrap throws it
+      const errMsg = typeof err === "string" ? err : (err?.message || "Failed to create lead.");
+      setValidationError(errMsg);
+      toast.error(errMsg);
     }
   };
 
@@ -108,99 +131,100 @@ export function LeadFormModal({ isOpen, onClose, branches, staffUsers }: LeadFor
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl bg-card border border-border/80 shadow-2xl p-6 rounded-2xl select-none max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-extrabold text-foreground flex items-center gap-2">
-            <User className="h-5 w-5 text-primary" />
+      <DialogContent className="max-w-4xl sm:max-w-4xl w-[95vw] bg-white border border-slate-200/80 shadow-2xl p-6 sm:p-8 rounded-3xl select-none max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="space-y-1">
+          <DialogTitle className="text-xl font-bold text-slate-900 flex items-center gap-2.5">
+            <User className="h-5 w-5 text-blue-600" />
             Create New Lead
           </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
+          <DialogDescription className="text-xs text-slate-500 leading-relaxed">
             Register a parent inquiry. This creates the lead in the pipeline and links it to the parent profile.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+        <form onSubmit={handleSubmit} className="space-y-5 mt-3">
           {/* Validation & Redux errors */}
           {(validationError || saveError) && (
-            <div className="p-3.5 bg-destructive/10 border border-destructive/20 text-destructive text-xs rounded-xl font-medium">
-              {validationError || saveError}
+            <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-600 text-xs rounded-xl font-medium flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
+              <span>{validationError || saveError}</span>
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Parent Section */}
-            <div className="space-y-4 bg-muted/20 border border-border/40 p-4 rounded-xl">
-              <h3 className="text-xs uppercase font-extrabold text-muted-foreground tracking-wider flex items-center gap-1.5 border-b border-border/40 pb-2">
-                <User className="h-3.5 w-3.5 text-primary" />
-                Parent Profile
-              </h3>
+            <div className="space-y-4 bg-slate-50/60 border border-slate-200/70 p-5 rounded-2xl">
+              <div className="flex items-center gap-2 text-[11px] font-extrabold tracking-wider text-slate-600 uppercase border-b border-slate-200/60 pb-2.5">
+                <User className="h-4 w-4 text-blue-600" />
+                <span>PARENT PROFILE</span>
+              </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="parentName">Parent Full Name *</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="parentName">Parent Full Name *</Label>
                 <Input
                   id="parentName"
                   placeholder="e.g. Elena Petrova"
                   value={parentName}
                   onChange={(e) => setParentName(e.target.value)}
-                  className="h-9 text-xs rounded-lg"
+                  className="h-10 text-xs rounded-2xl bg-white border-slate-200/90 px-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400"
                 />
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="phone">Phone Number</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
                   placeholder="e.g. +996 555 123 456"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="h-9 text-xs rounded-lg"
+                  className="h-10 text-xs rounded-2xl bg-white border-slate-200/90 px-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400"
                 />
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="whatsapp">WhatsApp Number</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="whatsapp">WhatsApp Number</Label>
                 <Input
                   id="whatsapp"
                   placeholder="e.g. +996 555 123 456"
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
-                  className="h-9 text-xs rounded-lg"
+                  className="h-10 text-xs rounded-2xl bg-white border-slate-200/90 px-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400"
                 />
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="email">Email Address</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="email">Email Address</Label>
                 <Input
                   id="email"
-                  type="email"
+                  type="text"
                   placeholder="e.g. parent@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-9 text-xs rounded-lg"
+                  className="h-10 text-xs rounded-2xl bg-white border-slate-200/90 px-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400"
                 />
               </div>
             </div>
 
             {/* Child & Interest Section */}
-            <div className="space-y-4 bg-muted/20 border border-border/40 p-4 rounded-xl">
-              <h3 className="text-xs uppercase font-extrabold text-muted-foreground tracking-wider flex items-center gap-1.5 border-b border-border/40 pb-2">
-                <Info className="h-3.5 w-3.5 text-primary" />
-                Child & Demographics
-              </h3>
+            <div className="space-y-4 bg-slate-50/60 border border-slate-200/70 p-5 rounded-2xl">
+              <div className="flex items-center gap-2 text-[11px] font-extrabold tracking-wider text-slate-600 uppercase border-b border-slate-200/60 pb-2.5">
+                <Info className="h-4 w-4 text-blue-600" />
+                <span>CHILD & DEMOGRAPHICS</span>
+              </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="childName">Child Name *</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="childName">Child Name *</Label>
                 <Input
                   id="childName"
                   placeholder="e.g. Artem Petrov"
                   value={childName}
                   onChange={(e) => setChildName(e.target.value)}
-                  className="h-9 text-xs rounded-lg"
+                  className="h-10 text-xs rounded-2xl bg-white border-slate-200/90 px-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400"
                 />
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="childAge">Child Age (Years)</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="childAge">Child Age (Years)</Label>
                 <Input
                   id="childAge"
                   type="number"
@@ -209,17 +233,17 @@ export function LeadFormModal({ isOpen, onClose, branches, staffUsers }: LeadFor
                   max="18"
                   value={childAge}
                   onChange={(e) => setChildAge(e.target.value)}
-                  className="h-9 text-xs rounded-lg"
+                  className="h-10 text-xs rounded-2xl bg-white border-slate-200/90 px-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400"
                 />
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="branchId">School Branch *</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="branchId">School Branch *</Label>
                 <select
                   id="branchId"
                   value={branchId}
                   onChange={(e) => setBranchId(e.target.value)}
-                  className="w-full h-9 px-3 text-xs bg-background border border-input rounded-lg focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="w-full h-10 px-4 text-xs bg-white border border-slate-200/90 rounded-2xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 cursor-pointer"
                 >
                   <option value="">Select Branch...</option>
                   {branches.map(b => (
@@ -228,34 +252,34 @@ export function LeadFormModal({ isOpen, onClose, branches, staffUsers }: LeadFor
                 </select>
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="interestedCourse">Interested Course</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="interestedCourse">Interested Course</Label>
                 <Input
                   id="interestedCourse"
                   placeholder="e.g. the Dragon"
                   value={interestedCourse}
                   onChange={(e) => setInterestedCourse(e.target.value)}
-                  className="h-9 text-xs rounded-lg"
+                  className="h-10 text-xs rounded-2xl bg-white border-slate-200/90 px-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400"
                 />
               </div>
             </div>
           </div>
 
           {/* CRM Meta Section */}
-          <div className="bg-muted/20 border border-border/40 p-4 rounded-xl space-y-4">
-            <h3 className="text-xs uppercase font-extrabold text-muted-foreground tracking-wider flex items-center gap-1.5 border-b border-border/40 pb-2">
-              <Globe className="h-3.5 w-3.5 text-primary" />
-              CRM Attribution
-            </h3>
+          <div className="bg-slate-50/60 border border-slate-200/70 p-5 rounded-2xl space-y-4">
+            <div className="flex items-center gap-2 text-[11px] font-extrabold tracking-wider text-slate-600 uppercase border-b border-slate-200/60 pb-2.5">
+              <Globe className="h-4 w-4 text-blue-600" />
+              <span>CRM ATTRIBUTION</span>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="marketingChannel">Marketing Channel</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="marketingChannel">Marketing Channel</Label>
                 <select
                   id="marketingChannel"
                   value={marketingChannel}
                   onChange={(e) => setMarketingChannel(e.target.value)}
-                  className="w-full h-9 px-3 text-xs bg-background border border-input rounded-lg focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="w-full h-10 px-4 text-xs bg-white border border-slate-200/90 rounded-2xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 cursor-pointer"
                 >
                   <option value="">Select Channel...</option>
                   {marketingChannels.map(c => (
@@ -264,35 +288,35 @@ export function LeadFormModal({ isOpen, onClose, branches, staffUsers }: LeadFor
                 </select>
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs font-bold" htmlFor="assignedStaffId">Assigned Staff User</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-800" htmlFor="assignedStaffId">Assigned Staff User</Label>
                 <select
                   id="assignedStaffId"
                   value={assignedStaffId}
                   onChange={(e) => setAssignedStaffId(e.target.value)}
-                  className="w-full h-9 px-3 text-xs bg-background border border-input rounded-lg focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="w-full h-10 px-4 text-xs bg-white border border-slate-200/90 rounded-2xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 cursor-pointer"
                 >
                   <option value="">Unassigned</option>
-                  {staffUsers.map(u => (
+                  {displayStaffUsers.map(u => (
                     <option key={u.id} value={u.id}>{u.fullName}</option>
                   ))}
                 </select>
               </div>
             </div>
 
-            <div className="space-y-1">
-              <Label className="text-xs font-bold" htmlFor="notes">Inquiry Notes</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-slate-800" htmlFor="notes">Inquiry Notes</Label>
               <Textarea
                 id="notes"
                 placeholder="Write specific details about the parent's inquiry..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="text-xs min-h-[70px] rounded-lg"
+                className="text-xs min-h-[70px] rounded-2xl bg-white border-slate-200/90 p-3.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-slate-400"
               />
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
@@ -301,14 +325,14 @@ export function LeadFormModal({ isOpen, onClose, branches, staffUsers }: LeadFor
                 onClose();
               }}
               disabled={saving}
-              className="h-9 text-xs rounded-lg"
+              className="h-10 text-xs rounded-2xl px-5 border-slate-200 hover:bg-slate-100 font-semibold"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={saving}
-              className="h-9 text-xs rounded-lg px-6 font-bold"
+              className="h-10 text-xs rounded-2xl px-6 font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
             >
               {saving ? "Creating..." : "Create Lead"}
             </Button>

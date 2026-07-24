@@ -8,6 +8,7 @@ import { TrialScheduleCard } from "./TrialScheduleCard";
 import { ActivityTimeline } from "./ActivityTimeline";
 import { AddActivityModal } from "./AddActivityModal";
 import { ConvertLeadModal } from "./ConvertLeadModal";
+import { ScheduleTrialModal } from "./ScheduleTrialModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/store/hooks";
@@ -86,6 +87,7 @@ export function LeadDrawer({
   const userRole = useAppSelector(selectAuthRole);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
+  const [isScheduleTrialModalOpen, setIsScheduleTrialModalOpen] = useState(false);
 
   if (!lead) return null;
 
@@ -95,6 +97,9 @@ export function LeadDrawer({
   const canConvert = ["owner", "office_admin"].includes(roleLower);
   const isAlreadyConverted = lead.status?.toLowerCase() === "enrolled" || lead.status?.toLowerCase() === "won";
   const isLost = lead.status?.toLowerCase() === "lost";
+  const statusLower = (lead.status || "").toLowerCase().trim();
+  const isTrialAlreadyScheduled = statusLower === "trial booked" || statusLower === "trial scheduled";
+  const canScheduleTrial = ["owner", "office_admin", "smm"].includes(roleLower) && !isAlreadyConverted && !isLost && !isTrialAlreadyScheduled;
 
   // Sort activities in reverse chronological order (newest first)
   const sortedActivities = [...activities].sort((a, b) => {
@@ -153,6 +158,31 @@ export function LeadDrawer({
             
             {/* Stage Wizard Tracker */}
             <ConvertLeadWizard status={lead.status} />
+
+            {/* Schedule Trial Button (Eligible leads only) */}
+            {canScheduleTrial && (
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 shadow-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                      Schedule Trial Lesson
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      Book a trial session for {lead.leadName}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => setIsScheduleTrialModalOpen(true)}
+                    className="shrink-0 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl"
+                  >
+                    <Calendar className="h-3.5 w-3.5 mr-1.5" />
+                    Schedule Trial
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Convert Lead Button (Owner / Office Admin only, not already converted or lost) */}
             {canConvert && !isAlreadyConverted && !isLost && (
@@ -391,6 +421,15 @@ export function LeadDrawer({
             setIsConvertModalOpen(false);
             onClose();
           }}
+        />
+
+        {/* Schedule Trial Modal */}
+        <ScheduleTrialModal
+          isOpen={isScheduleTrialModalOpen}
+          onClose={() => setIsScheduleTrialModalOpen(false)}
+          leadId={lead.id}
+          leadName={lead.leadName}
+          leadBranchIds={lead.branchIds}
         />
       </SheetContent>
     </Sheet>

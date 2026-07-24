@@ -78,7 +78,21 @@ export async function POST(request: NextRequest) {
 
     const createdActivity = await airtableProxy.createRecord("activity", activityAirtableData);
 
-    // 5. Save Activity to Prisma
+    // 5. If activity type is "Call", update lead status to "Contacted" in both Airtable and Prisma
+    if (activityType === "Call") {
+      // Update lead status in Airtable (field: Status / Статус)
+      await airtableProxy.updateRecord("lead", leadId, {
+        "fldN2dt6yL3FzUNIu": "Contacted"
+      });
+
+      // Update lead status in Prisma
+      await prisma.lead.update({
+        where: { id: leadId },
+        data: { status: "Contacted" }
+      });
+    }
+
+    // 6. Save Activity to Prisma
     const newActivity = await prisma.activity.create({
       data: {
         id: createdActivity.id,
@@ -92,7 +106,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // 6. Audit the CREATE action
+    // 7. Audit the CREATE action
     logAudit({
       userId: dbUser.id,
       role: dbUser.role || "staff",

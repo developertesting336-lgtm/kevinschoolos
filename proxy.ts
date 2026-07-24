@@ -15,9 +15,19 @@ function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
+function getPublicOrigin(req: NextRequest): string {
+  const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+  const proto = req.headers.get("x-forwarded-proto") || (host && !host.includes("localhost") && !host.includes("127.0.0.1") ? "https" : "http");
+  if (host) {
+    return `${proto}://${host}`;
+  }
+  return req.nextUrl.origin;
+}
+
 export default async function proxy(req: NextRequest) {
   const start = performance.now();
   const path = req.nextUrl.pathname;
+  const publicOrigin = getPublicOrigin(req);
 
   // Request ID — reuse from client or generate
   let requestId = req.headers.get(REQUEST_ID_HEADER);
@@ -51,7 +61,7 @@ export default async function proxy(req: NextRequest) {
       res.headers.set(REQUEST_ID_HEADER, requestId);
       return res;
     }
-    const loginUrl = new URL("/login", req.nextUrl);
+    const loginUrl = new URL("/login", publicOrigin);
     loginUrl.searchParams.set("from", path);
     const res = NextResponse.redirect(loginUrl);
     res.headers.set(REQUEST_ID_HEADER, requestId);
@@ -72,7 +82,7 @@ export default async function proxy(req: NextRequest) {
       res.headers.set(REQUEST_ID_HEADER, requestId);
       return res;
     }
-    const res = NextResponse.redirect(new URL("/login", req.nextUrl));
+    const res = NextResponse.redirect(new URL("/login", publicOrigin));
     res.headers.set(REQUEST_ID_HEADER, requestId);
     return res;
   }
@@ -85,7 +95,7 @@ export default async function proxy(req: NextRequest) {
       res.headers.set(REQUEST_ID_HEADER, requestId);
       return res;
     }
-    const response = NextResponse.redirect(new URL("/login", req.nextUrl));
+    const response = NextResponse.redirect(new URL("/login", publicOrigin));
     response.cookies.delete("session");
     response.headers.set(REQUEST_ID_HEADER, requestId);
     return response;
@@ -109,7 +119,7 @@ export default async function proxy(req: NextRequest) {
       res.headers.set(REQUEST_ID_HEADER, requestId);
       return res;
     }
-    const response = NextResponse.redirect(new URL("/login", req.nextUrl));
+    const response = NextResponse.redirect(new URL("/login", publicOrigin));
     response.cookies.delete("session");
     response.headers.set(REQUEST_ID_HEADER, requestId);
     return response;
@@ -126,7 +136,7 @@ export default async function proxy(req: NextRequest) {
       res.headers.set(REQUEST_ID_HEADER, requestId);
       return res;
     }
-    const response = NextResponse.redirect(new URL("/login", req.nextUrl));
+    const response = NextResponse.redirect(new URL("/login", publicOrigin));
     response.cookies.delete("session");
     response.headers.set(REQUEST_ID_HEADER, requestId);
     return response;
@@ -134,7 +144,7 @@ export default async function proxy(req: NextRequest) {
 
   // Redirect authenticated user trying to access /login to /dashboard
   if (path === "/login" && sessionToken) {
-    const res = NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+    const res = NextResponse.redirect(new URL("/dashboard", publicOrigin));
     res.headers.set(REQUEST_ID_HEADER, requestId);
     return res;
   }

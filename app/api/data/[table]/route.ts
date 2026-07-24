@@ -75,6 +75,7 @@ const defaultSorts: Record<string, Record<string, string>> = {
   session: { dateTime: "desc" },
   invoice: { invoiceNo: "desc" },
   payment: { date: "desc" },
+  enrollment: { enrollmentId: "asc" },
 };
 
 export async function GET(
@@ -381,6 +382,95 @@ export async function GET(
         searchConditions.push({
           classGroupIds: {
             hasSome: targetCgIds,
+          },
+        });
+      }
+
+      combinedWhere = {
+        ...combinedWhere,
+        AND: [
+          ...(combinedWhere.AND as any[] || []),
+          { OR: searchConditions }
+        ],
+      };
+    } else if (prismaModelName === "trial" && search) {
+      // Find leads matching leadName, phone, or whatsapp
+      const matchingLeads = await prisma.lead.findMany({
+        where: {
+          OR: [
+            { leadName: { contains: search, mode: "insensitive" } },
+            { phone: { contains: search, mode: "insensitive" } },
+            { whatsapp: { contains: search, mode: "insensitive" } },
+          ],
+        },
+        select: { id: true },
+      });
+      const leadIdsFromLeads = matchingLeads.map((l) => l.id);
+
+      // Find parent records matching parentName
+      const matchingParents = await prisma.parent.findMany({
+        where: {
+          parentName: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        select: { id: true },
+      });
+      const parentIds = matchingParents.map((p) => p.id);
+
+      let leadIdsFromParents: string[] = [];
+      if (parentIds.length > 0) {
+        const leadsByParents = await prisma.lead.findMany({
+          where: {
+            parentIds: {
+              hasSome: parentIds,
+            },
+          },
+          select: { id: true },
+        });
+        leadIdsFromParents = leadsByParents.map((l) => l.id);
+      }
+
+      const allTargetLeadIds = Array.from(new Set([...leadIdsFromLeads, ...leadIdsFromParents]));
+
+      const searchConditions: any[] = [
+        {
+          trialId: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          notes: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          outcome: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          confirmationMethod: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          levelAssessed: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+
+      if (allTargetLeadIds.length > 0) {
+        searchConditions.push({
+          leadIds: {
+            hasSome: allTargetLeadIds,
           },
         });
       }

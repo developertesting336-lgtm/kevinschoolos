@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -8,7 +8,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { convertLeadThunk, selectAdmissionsClassGroups, selectAdmissionsBranches, fetchAdmissionsData } from "@/store/slices/admissionsSlice";
+import { convertLeadThunk, selectAdmissionsClassGroups, selectAdmissionsBranches, selectAdmissionsParents, fetchAdmissionsData } from "@/store/slices/admissionsSlice";
 import { fetchOnboardingData } from "@/store/slices/onboardingSlice";
 import { fetchStudentsData } from "@/store/slices/studentsSlice";
 import { fetchEnrollments } from "@/store/slices/enrollmentsSlice";
@@ -55,6 +55,7 @@ export function ConvertLeadModal({ lead, isOpen, onClose, onSuccess }: ConvertLe
   const dispatch = useAppDispatch();
   const classGroups = useAppSelector(selectAdmissionsClassGroups);
   const branches = useAppSelector(selectAdmissionsBranches);
+  const parents = useAppSelector(selectAdmissionsParents);
 
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
@@ -74,6 +75,13 @@ export function ConvertLeadModal({ lead, isOpen, onClose, onSuccess }: ConvertLe
   const [enrollmentStatus, setEnrollmentStatus] = useState("Active");
   const [completeTrial, setCompleteTrial] = useState(true);
 
+  // Look up parent details from the parents store when lead has parentIds
+  const parentRecord = React.useMemo(() => {
+    if (!lead || !lead.parentIds?.length) return null;
+    const parentId = lead.parentIds[0];
+    return parents.find((p: any) => p.id === parentId) || null;
+  }, [lead, parents]);
+
   // Reset form when modal opens with a new lead
   useEffect(() => {
     if (lead && isOpen) {
@@ -82,10 +90,10 @@ export function ConvertLeadModal({ lead, isOpen, onClose, onSuccess }: ConvertLe
       setResult(null);
       setSavingError(null);
       setParentInfo({
-        name: lead.leadName || "",
-        phone: lead.phone || "",
-        whatsapp: lead.whatsapp || "",
-        email: "",
+        name: parentRecord?.parentName || lead.leadName || "",
+        phone: parentRecord?.phone || lead.phone || "",
+        whatsapp: parentRecord?.whatsapp || lead.whatsapp || "",
+        email: parentRecord?.email || "",
       });
       setStudentInfo({
         name: lead.leadName || "",

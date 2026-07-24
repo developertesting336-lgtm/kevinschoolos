@@ -22,7 +22,7 @@ export function AddActivityModal({ isOpen, onClose, leadId, leadName }: AddActiv
   const saveError = useAppSelector(selectAdmissionsSaveActivityError);
 
   // Form State
-  const [activityType, setActivityType] = useState("Phone Call");
+  const [activityType, setActivityType] = useState("Call");
   const [notes, setNotes] = useState("");
   const [nextFollowUpDate, setNextFollowUpDate] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -79,7 +79,7 @@ export function AddActivityModal({ isOpen, onClose, leadId, leadName }: AddActiv
   };
 
   const handleReset = () => {
-    setActivityType("Phone Call");
+    setActivityType("Call");
     setNotes("");
     setNextFollowUpDate("");
     setValidationError(null);

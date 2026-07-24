@@ -2,9 +2,9 @@ import { headers, cookies } from "next/headers";
 
 export async function apiFetch(endpoint: string) {
   const headersList = await headers();
-  const host = headersList.get("host") || "localhost:3000";
-  const protocol = headersList.get("x-forwarded-proto") || "http";
-  const baseUrl = `${protocol}://${host}`;
+  const host = headersList.get("x-forwarded-host") || headersList.get("host");
+  const protocol = headersList.get("x-forwarded-proto") || (host && !host.includes("localhost") && !host.includes("127.0.0.1") ? "https" : "http");
+  const baseUrl = host ? `${protocol}://${host}` : "http://127.0.0.1:3000";
 
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.getAll()

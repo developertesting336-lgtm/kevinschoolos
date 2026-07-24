@@ -31,6 +31,7 @@ export interface ParentData {
 export interface UserData {
   id: string;
   fullName: string;
+  role?: string | null;
 }
 
 export interface BranchData {
@@ -95,8 +96,10 @@ interface AdmissionsState {
   error: string | null;
   savingLead: boolean;
   savingActivity: boolean;
+  savingTrial: boolean;
   saveLeadError: string | null;
   saveActivityError: string | null;
+  saveTrialError: string | null;
   filters: {
     search?: string;
     branch?: string;
@@ -127,8 +130,10 @@ const initialState: AdmissionsState = {
   error: null,
   savingLead: false,
   savingActivity: false,
+  savingTrial: false,
   saveLeadError: null,
   saveActivityError: null,
+  saveTrialError: null,
   filters: {},
 };
 
@@ -274,6 +279,39 @@ export const createActivityThunk = createAsyncThunk(
 );
 
 
+export const createTrialThunk = createAsyncThunk(
+  "admissions/createTrial",
+  async (
+    trialData: {
+      leadId: string;
+      classGroupId: string;
+      teacherId: string;
+      trialDate: string;
+      trialTime: string;
+      confirmationMethod?: string;
+      notes?: string;
+    },
+    { dispatch, rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch("/api/admissions/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(trialData),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to schedule Trial.");
+      }
+      // Refresh admissions data
+      dispatch(fetchAdmissionsData({ forceRefetch: true }));
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to schedule Trial");
+    }
+  }
+);
+
 export const convertLeadThunk = createAsyncThunk(
   "admissions/convertLead",
   async (
@@ -370,6 +408,19 @@ const admissionsSlice = createSlice({
       .addCase(createActivityThunk.rejected, (state, action) => {
         state.savingActivity = false;
         state.saveActivityError = action.payload as string;
+      })
+      // Create Trial Thunk cases
+      .addCase(createTrialThunk.pending, (state) => {
+        state.savingTrial = true;
+        state.saveTrialError = null;
+      })
+      .addCase(createTrialThunk.fulfilled, (state) => {
+        state.savingTrial = false;
+        state.saveTrialError = null;
+      })
+      .addCase(createTrialThunk.rejected, (state, action) => {
+        state.savingTrial = false;
+        state.saveTrialError = action.payload as string;
       });
   },
 });
@@ -393,6 +444,8 @@ export const selectAdmissionsError = (state: any) => state.admissions.error;
 export const selectAdmissionsFilters = (state: any) => state.admissions.filters;
 export const selectAdmissionsSavingLead = (state: any) => state.admissions.savingLead;
 export const selectAdmissionsSavingActivity = (state: any) => state.admissions.savingActivity;
+export const selectAdmissionsSavingTrial = (state: any) => state.admissions.savingTrial;
 export const selectAdmissionsSaveLeadError = (state: any) => state.admissions.saveLeadError;
 export const selectAdmissionsSaveActivityError = (state: any) => state.admissions.saveActivityError;
+export const selectAdmissionsSaveTrialError = (state: any) => state.admissions.saveTrialError;
 

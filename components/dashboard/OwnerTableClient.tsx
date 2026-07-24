@@ -96,6 +96,153 @@ export function OwnerTableClient({
     }
   }, [config.modelName]);
 
+  // Reference Lookup Maps for displaying names instead of IDs across tables
+  const [lookupMaps, setLookupMaps] = useState<{
+    parents: Record<string, string>;
+    students: Record<string, string>;
+    users: Record<string, string>;
+    branches: Record<string, string>;
+    classGroups: Record<string, string>;
+    rooms: Record<string, string>;
+    courses: Record<string, string>;
+    enrollments: Record<string, string>;
+    leads: Record<string, string>;
+    tuitionPlans: Record<string, string>;
+  }>({
+    parents: {},
+    students: {},
+    users: {},
+    branches: {},
+    classGroups: {},
+    rooms: {},
+    courses: {},
+    enrollments: {},
+    leads: {},
+    tuitionPlans: {},
+  });
+
+  useEffect(() => {
+    const branchMap: Record<string, string> = {};
+    if (Array.isArray(branches)) {
+      branches.forEach((b) => {
+        if (b && b.id && b.name) branchMap[b.id] = b.name;
+      });
+    }
+
+    let isMounted = true;
+
+    Promise.allSettled([
+      fetch("/api/data/parent").then((r) => r.json()),
+      fetch("/api/data/student").then((r) => r.json()),
+      fetch("/api/data/user").then((r) => r.json()),
+      fetch("/api/data/classgroup").then((r) => r.json()),
+      fetch("/api/data/room").then((r) => r.json()),
+      fetch("/api/data/course").then((r) => r.json()),
+      fetch("/api/data/enrollment").then((r) => r.json()),
+      fetch("/api/data/lead").then((r) => r.json()),
+      fetch("/api/data/tuitionplan").then((r) => r.json()),
+    ]).then((results) => {
+      if (!isMounted) return;
+
+      const parentMap: Record<string, string> = {};
+      const studentMap: Record<string, string> = {};
+      const userMap: Record<string, string> = {};
+      const classGroupMap: Record<string, string> = {};
+      const roomMap: Record<string, string> = {};
+      const courseMap: Record<string, string> = {};
+      const enrollmentMap: Record<string, string> = {};
+      const leadMap: Record<string, string> = {};
+      const tuitionPlanMap: Record<string, string> = {};
+
+      const getData = (res: PromiseSettledResult<any>) =>
+        res.status === "fulfilled"
+          ? res.value?.data || (Array.isArray(res.value) ? res.value : [])
+          : [];
+
+      getData(results[0]).forEach((p: any) => {
+        if (p && p.id) parentMap[p.id] = p.parentName || p.id;
+      });
+      getData(results[1]).forEach((s: any) => {
+        if (s && s.id) studentMap[s.id] = s.studentName || s.id;
+      });
+      getData(results[2]).forEach((u: any) => {
+        if (u && u.id) userMap[u.id] = u.fullName || u.email || u.id;
+      });
+      getData(results[3]).forEach((cg: any) => {
+        if (cg && cg.id) classGroupMap[cg.id] = cg.groupName || cg.id;
+      });
+      getData(results[4]).forEach((r: any) => {
+        if (r && r.id) roomMap[r.id] = r.roomName || r.id;
+      });
+      getData(results[5]).forEach((c: any) => {
+        if (c && c.id) courseMap[c.id] = c.courseName || c.id;
+      });
+      getData(results[6]).forEach((e: any) => {
+        if (e && e.id) enrollmentMap[e.id] = e.enrollmentId || e.id;
+      });
+      getData(results[7]).forEach((l: any) => {
+        if (l && l.id) leadMap[l.id] = l.leadName || l.id;
+      });
+      getData(results[8]).forEach((tp: any) => {
+        if (tp && tp.id) tuitionPlanMap[tp.id] = tp.planName || tp.id;
+      });
+
+      setLookupMaps({
+        parents: parentMap,
+        students: studentMap,
+        users: userMap,
+        branches: branchMap,
+        classGroups: classGroupMap,
+        rooms: roomMap,
+        courses: courseMap,
+        enrollments: enrollmentMap,
+        leads: leadMap,
+        tuitionPlans: tuitionPlanMap,
+      });
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [branches]);
+
+  const getItemDisplayName = (colKey: string, id: string): string => {
+    if (!id || typeof id !== "string") return String(id || "");
+    const key = colKey.toLowerCase();
+
+    if (key.includes("parent")) {
+      return lookupMaps.parents[id] || id;
+    }
+    if (key.includes("student")) {
+      return lookupMaps.students[id] || id;
+    }
+    if (key.includes("branch")) {
+      return lookupMaps.branches[id] || id;
+    }
+    if (key.includes("teacher") || key.includes("owner") || key.includes("user") || key.includes("staff")) {
+      return lookupMaps.users[id] || id;
+    }
+    if (key.includes("classgroup") || key.includes("group")) {
+      return lookupMaps.classGroups[id] || id;
+    }
+    if (key.includes("room")) {
+      return lookupMaps.rooms[id] || id;
+    }
+    if (key.includes("course")) {
+      return lookupMaps.courses[id] || id;
+    }
+    if (key.includes("enrollment")) {
+      return lookupMaps.enrollments[id] || id;
+    }
+    if (key.includes("lead")) {
+      return lookupMaps.leads[id] || id;
+    }
+    if (key.includes("tuitionplan") || key.includes("plan")) {
+      return lookupMaps.tuitionPlans[id] || id;
+    }
+    return id;
+  };
+
   // Hydrate auth session state on component mount
   useEffect(() => {
     dispatch(validateSessionThunk());
@@ -445,8 +592,8 @@ export function OwnerTableClient({
         return <span className="text-muted-foreground/60">—</span>;
       }
       const displayItems = col.key === "courseIds" && config.modelName === "tuitionPlan"
-        ? val.map((id: string) => coursesList.find((c) => c.id === id)?.courseName || id)
-        : val;
+        ? val.map((id: string) => coursesList.find((c) => c.id === id)?.courseName || getItemDisplayName(col.key, id))
+        : val.map((item: any) => typeof item === "string" ? getItemDisplayName(col.key, item) : String(item));
       return (
         <div className="flex flex-wrap gap-1 max-w-50">
           {displayItems.slice(0, 3).map((item: any, idx: number) => (
@@ -472,8 +619,9 @@ export function OwnerTableClient({
       return <span className="font-mono text-foreground">{val.toString()}</span>;
     }
 
-    // Default string rendering
-    return <span className="text-foreground truncate max-w-xs">{val.toString()}</span>;
+    // Default string rendering with display name lookup for reference IDs
+    const displayVal = typeof val === "string" ? getItemDisplayName(col.key, val) : val.toString();
+    return <span className="text-foreground truncate max-w-xs">{displayVal}</span>;
   };
 
   return (
@@ -519,7 +667,11 @@ export function OwnerTableClient({
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={`Search ${config.label.toLowerCase()}...`}
+              placeholder={
+                config.modelName?.toLowerCase() === "trial" || config.label?.toLowerCase() === "trials"
+                  ? "Search trials by lead name..."
+                  : `Search ${config.label.toLowerCase()}...`
+              }
               className="pl-9 h-9 text-sm rounded-lg"
             />
           </div>
@@ -826,7 +978,7 @@ export function OwnerTableClient({
                             {Array.isArray(isObjVal) && isObjVal.length > 0 ? (
                               isObjVal.map((item: any, idx: number) => (
                                 <Badge key={idx} variant="secondary" className="text-[10px] font-medium py-0.5 px-2 bg-muted text-foreground border border-border">
-                                  {String(item)}
+                                  {typeof item === "string" ? getItemDisplayName(col.key, item) : String(item)}
                                 </Badge>
                               ))
                             ) : (
@@ -853,7 +1005,7 @@ export function OwnerTableClient({
                         ) : col.type === "number" && ["amount", "grossPay", "rate", "debit", "credit", "revenueBase"].includes(col.key) ? (
                           `$${Number(isObjVal).toLocaleString("en-US", { minimumFractionDigits: 2 })}`
                         ) : isObjVal !== null && isObjVal !== undefined ? (
-                          String(isObjVal)
+                          typeof isObjVal === "string" ? getItemDisplayName(col.key, isObjVal) : String(isObjVal)
                         ) : (
                           "—"
                         )

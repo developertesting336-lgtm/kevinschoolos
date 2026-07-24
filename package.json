@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev -p 8002 -H 127.0.0.1",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start -p 8002 -H 127.0.0.1",
     "lint": "eslint",
     "format": "eslint --fix"
