@@ -103,7 +103,6 @@ const ownerGroups = [
       { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
       { title: "Trials", url: "/dashboard/owner/trial", icon: Play },
       { title: "Classes", url: "/dashboard/owner/classgroup", icon: Users },
-      { title: "Sessions", url: "/dashboard/owner/session", icon: Calendar },
       { title: "Attendance", url: "/dashboard/owner/attendance", icon: FileCheck },
       { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
     ],
@@ -144,7 +143,6 @@ const teacherGroups = [
     label: "Academic & Scheduling",
     items: [
       { title: "Classes", url: "/dashboard/owner/classgroup", icon: Users },
-      { title: "Sessions", url: "/dashboard/owner/session", icon: Calendar },
       { title: "Attendance", url: "/dashboard/owner/attendance", icon: FileCheck },
       { title: "Trials", url: "/dashboard/owner/trial", icon: Play },
       { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
@@ -184,7 +182,6 @@ const officeAdminGroups = [
       { title: "Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
       { title: "Trials", url: "/dashboard/owner/trial", icon: Play },
       { title: "Classes", url: "/dashboard/owner/classgroup", icon: Users },
-      { title: "Sessions", url: "/dashboard/owner/session", icon: Calendar },
       { title: "Attendance", url: "/dashboard/owner/attendance", icon: FileCheck },
       { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
     ],

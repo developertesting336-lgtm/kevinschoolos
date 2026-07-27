@@ -139,3 +139,188 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message || "Internal server error." }, { status: 500 });
   }
 }
+
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const session = await validateSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.userId }
+    });
+
+    if (!dbUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 401 });
+    }
+
+    // Role check: Only Owner and Office Admin can update trial outcomes
+    const normRole = normalizeRole(dbUser.role || "staff");
+    if (!["owner", "office_admin"].includes(normRole)) {
+      return NextResponse.json({ error: "Forbidden: Insufficient permissions to update trial outcome." }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { trialId, outcome, notes, newTrialDate, newTrialTime } = body;
+
+    if (!trialId) {
+      return NextResponse.json({ error: "Trial ID is required." }, { status: 400 });
+    }
+
+    const validOutcomes = ["Attended", "No-show","Declined", "Rescheduled"];
+    if (!outcome || !validOutcomes.includes(outcome)) {
+      return NextResponse.json(
+        { error: `Invalid outcome. Must be one of: ${validOutcomes.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    // 1. Verify Trial exists
+    const existingTrial = await prisma.trial.findUnique({
+      where: { id: trialId }
+    });
+    if (!existingTrial) {
+      return NextResponse.json({ error: "Trial record not found." }, { status: 404 });
+    }
+
+    // 1b. Time-based validation: Attended and No-show cannot be set before the scheduled trial date/time
+    if (outcome === "Attended" || outcome === "No-show") {
+      if (existingTrial.dateTime) {
+        const now = new Date();
+        const trialDateTime = new Date(existingTrial.dateTime);
+        if (now < trialDateTime) {
+          const formattedDate = trialDateTime.toLocaleDateString("en-US", {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+          const formattedTime = trialDateTime.toLocaleTimeString("en-US", {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          return NextResponse.json(
+            {
+              error: `This trial is scheduled for ${formattedDate} at ${formattedTime}. You cannot mark it as '${outcome}' before the scheduled time.`
+            },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
+    // 1c. Rescheduled requires a new future date/time
+    let rescheduledDateTime: Date | null = null;
+    if (outcome === "Rescheduled") {
+      if (!newTrialDate || !newTrialTime) {
+        return NextResponse.json(
+          { error: "New Trial Date and Time are required when rescheduling." },
+          { status: 400 }
+        );
+      }
+      const dateTimeStr = `${newTrialDate}T${newTrialTime}:00`;
+      rescheduledDateTime = new Date(dateTimeStr);
+      if (isNaN(rescheduledDateTime.getTime())) {
+        return NextResponse.json({ error: "Invalid new trial date or time format." }, { status: 400 });
+      }
+      const now = new Date();
+      if (rescheduledDateTime <= now) {
+        return NextResponse.json(
+          { error: "The rescheduled trial date and time must be in the future." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 2. Branch scoping check
+    if (normRole !== "owner") {
+      const leadIds = existingTrial.leadIds;
+      if (leadIds.length > 0) {
+        const lead = await prisma.lead.findUnique({ where: { id: leadIds[0] } });
+        if (lead) {
+          const hasBranchAccess = lead.branchIds.some(bid => dbUser.branchIds.includes(bid));
+          if (!hasBranchAccess) {
+            return NextResponse.json({ error: "Forbidden: You do not have access to this branch." }, { status: 403 });
+          }
+        }
+      }
+    }
+
+    // 3. Build update payload for Airtable
+    const airtableUpdateData: Record<string, any> = {
+      "fldGIxMvvMpf96UoR": outcome,
+    };
+    if (rescheduledDateTime) {
+      // Update trial date/time in Airtable as well
+      airtableUpdateData["fldzCGpZO8q3iNw3K"] = rescheduledDateTime.toISOString();
+    }
+    if (notes !== undefined) {
+      airtableUpdateData["fld7yy1pPPTqXkphS"] = notes ? String(notes).trim() : null;
+    }
+
+    // 4. Update Trial in Airtable
+    await airtableProxy.updateRecord("trial", trialId, airtableUpdateData);
+
+    // 5. Update Trial in Prisma
+    const updateData: Record<string, any> = { outcome };
+    if (rescheduledDateTime) {
+      updateData.dateTime = rescheduledDateTime;
+    }
+    if (notes !== undefined) {
+      updateData.notes = notes ? String(notes).trim() : null;
+    }
+    const updatedTrial = await prisma.trial.update({
+      where: { id: trialId },
+      data: updateData
+    });
+
+    // 6. Auto-transition lead status based on outcome
+    let updatedLead = null;
+    const leadId = existingTrial.leadIds[0];
+    if (leadId) {
+      let newLeadStatus: string | null = null;
+
+      if (outcome === "Attended") {
+        newLeadStatus = "Trial Done";
+      } 
+       else if (outcome === "Declined" || outcome === "No-show") {
+        newLeadStatus = "Lost";
+      } else if (outcome === "Rescheduled") {
+        newLeadStatus = "Trial Booked";
+      }
+
+      if (newLeadStatus) {
+        // Update Airtable
+        await airtableProxy.updateRecord("lead", leadId, {
+          "fldN2dt6yL3FzUNIu": newLeadStatus
+        });
+
+        // Update Prisma
+        updatedLead = await prisma.lead.update({
+          where: { id: leadId },
+          data: { status: newLeadStatus }
+        });
+      }
+    }
+
+    // 7. Audit log
+    logAudit({
+      userId: dbUser.id,
+      role: dbUser.role || "staff",
+      action: "update",
+      target: "Trial",
+      status: "APPROVED",
+      details: `Updated Trial ${trialId} outcome to "${outcome}".${updatedLead ? ` Lead ${leadId} status auto-transitioned to "${updatedLead.status}".` : ""}${rescheduledDateTime ? ` Trial rescheduled to ${rescheduledDateTime.toISOString()}.` : ""}`
+    }, request);
+
+    return NextResponse.json({
+      trial: updatedTrial,
+      lead: updatedLead
+    });
+  } catch (error: any) {
+    console.error("[Update Trial Outcome Error]", error);
+    return NextResponse.json({ error: error.message || "Internal server error." }, { status: 500 });
+  }
+}

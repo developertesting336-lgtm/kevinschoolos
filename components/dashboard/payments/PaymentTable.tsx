@@ -97,10 +97,8 @@ export function PaymentTable({
         <TableHeader className="bg-muted/15">
           <TableRow className="border-b border-border/50 hover:bg-transparent">
             <TableHead className="text-[10px] uppercase font-bold tracking-wider py-3 px-4">Receipt Ref</TableHead>
-            <TableHead className="text-[10px] uppercase font-bold tracking-wider py-3 px-4">Student</TableHead>
             <TableHead className="text-[10px] uppercase font-bold tracking-wider py-3 px-4">Parent</TableHead>
             <TableHead className="text-[10px] uppercase font-bold tracking-wider py-3 px-4">Invoice No</TableHead>
-            <TableHead className="text-[10px] uppercase font-bold tracking-wider py-3 px-4">Enrollment</TableHead>
             <TableHead className="text-[10px] uppercase font-bold tracking-wider py-3 px-4">Type</TableHead>
             <TableHead className="text-[10px] uppercase font-bold tracking-wider py-3 px-4">Method</TableHead>
             <TableHead className="text-[10px] uppercase font-bold tracking-wider py-3 px-4 text-right">Amount</TableHead>
@@ -111,16 +109,12 @@ export function PaymentTable({
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            // Skeleton rows — 8 shimmer rows matching the 11-column layout
+            // Skeleton rows — 8 shimmer rows matching the 9-column layout
             Array.from({ length: 8 }).map((_, i) => (
               <TableRow key={i} className="border-b border-border/40">
                 {/* Receipt Ref */}
                 <TableCell className="py-3 px-4">
                   <Skeleton className="h-3.5 w-28 rounded" />
-                </TableCell>
-                {/* Student */}
-                <TableCell className="py-3 px-4">
-                  <Skeleton className="h-3.5 w-24 rounded" />
                 </TableCell>
                 {/* Parent */}
                 <TableCell className="py-3 px-4">
@@ -129,10 +123,6 @@ export function PaymentTable({
                 {/* Invoice No */}
                 <TableCell className="py-3 px-4">
                   <Skeleton className="h-3.5 w-20 rounded" />
-                </TableCell>
-                {/* Enrollment */}
-                <TableCell className="py-3 px-4">
-                  <Skeleton className="h-3.5 w-28 rounded" />
                 </TableCell>
                 {/* Type */}
                 <TableCell className="py-3 px-4">
@@ -162,13 +152,13 @@ export function PaymentTable({
             ))
           ) : payments.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={11} className="text-center py-8 text-xs text-muted-foreground italic">
+              <TableCell colSpan={9} className="text-center py-8 text-xs text-muted-foreground italic">
                 No payments found matching the selected search or filter criteria.
               </TableCell>
             </TableRow>
           ) : (
             payments.map((p) => {
-              const { invoiceNo, parentName, studentName, enrollmentNo, status, period } = getRelationDetails(p);
+              const { invoiceNo, parentName, status, period } = getRelationDetails(p);
               const isSelected = p.id === selectedPaymentId;
               const formattedDate = p.date ? format(new Date(p.date), "yyyy-MM-dd") : "—";
               
@@ -186,10 +176,8 @@ export function PaymentTable({
                     )}
                     {p.paymentRef}
                   </TableCell>
-                  <TableCell className="py-3 px-4 truncate max-w-30 font-semibold text-foreground">{studentName}</TableCell>
                   <TableCell className="py-3 px-4 truncate max-w-30 text-muted-foreground">{parentName}</TableCell>
-                  <TableCell className="py-3 px-4 text-muted-foreground">{invoiceNo}</TableCell>
-                  <TableCell className="py-3 px-4 text-muted-foreground">{enrollmentNo}</TableCell>
+                  <TableCell className="py-3 px-4 text-muted-foreground font-mono">{invoiceNo}</TableCell>
                   <TableCell className="py-3 px-4 capitalize font-medium text-foreground">{p.paymentType || "Tuition"}</TableCell>
                   <TableCell className="py-3 px-4 text-muted-foreground">{p.method}</TableCell>
                   <TableCell className="py-3 px-4 text-right font-bold text-foreground">

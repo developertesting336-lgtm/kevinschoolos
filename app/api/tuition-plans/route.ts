@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { normalizeRole } from "@/lib/rbac";
 import * as airtableProxy from "@/lib/airtableProxy";
 import { logAudit } from "@/lib/audit";
+import { resolveOwnerTableLookups } from "@/lib/ownerTableLookups";
 
 export const dynamic = "force-dynamic";
 
@@ -111,6 +112,8 @@ export async function GET(request: NextRequest) {
       })
     );
 
+    const lookups = await resolveOwnerTableLookups(recordsWithCount);
+
     return NextResponse.json({
       data: recordsWithCount,
       pagination: {
@@ -118,7 +121,8 @@ export async function GET(request: NextRequest) {
         page,
         limit,
         totalPages: Math.ceil(total / limit)
-      }
+      },
+      lookups,
     });
   } catch (error: any) {
     console.error("[Tuition Plans GET Error]", error);

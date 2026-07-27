@@ -318,6 +318,10 @@ export async function POST(request: NextRequest) {
 
     const isDuplicateConfirmed = !!duplicate && force;
 
+    const finalParentIds = (parentIds && Array.isArray(parentIds) && parentIds.length > 0)
+      ? parentIds
+      : (invoice.parentIds && invoice.parentIds.length > 0 ? invoice.parentIds : [parent.id]);
+
     // 3. Write to Airtable Proxy
     // Field IDs sourced from field-map.json for table tbliFcGpMbqnMaD9S (16 Payments)
     const airtableData: Record<string, any> = {
@@ -325,9 +329,9 @@ export async function POST(request: NextRequest) {
       "fldBtNTeQVfZk1sWL": new Date(date).toISOString().split("T")[0], // Date / Дата
       "fldNRFTgAgktyLZ4V": Number(amount),       // Amount (KGS) / Сумма (сом)
       "fldvC8KDDOXvuavro": method,               // Method / Способ оплаты
-      "fld22tf9Mn0HGsmzN": invoiceIds,           // Invoice
-      "fldNVXBMA6RO2Xovb": parentIds,            // Parent
-      "fldTkBn9cMAnnA0YF": branchIds,            // Branch
+      "fld22tf9Mn0HGsmzN": [invoice.id],         // Invoice
+      "fldNVXBMA6RO2Xovb": finalParentIds,       // Parent
+      "fldTkBn9cMAnnA0YF": [branchRecord.id],    // Branch
       "fld1dSpRaL2A6EK6Q": paymentType,          // Payment Type / Тип платежа
     };
     if (isDuplicateConfirmed) {
@@ -351,21 +355,46 @@ export async function POST(request: NextRequest) {
         amount: Number(amount),
         method,
         paymentType,
-        invoiceIds,
-        parentIds,
-        branchIds,
+        invoiceIds: [invoice.id],
+        parentIds: finalParentIds,
+        branchIds: [branchRecord.id],
         possibleDuplicate: isDuplicateConfirmed
       }
     });
 
-    // 5. Log Audit
+    // 5. Calculate total paid for invoice and update Invoice record in Postgres & Airtable
+    const existingPayments = await prisma.payment.findMany({
+      where: { invoiceIds: { has: invoice.id } }
+    });
+    const totalAmountPaid = existingPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    try {
+      await prisma.invoice.update({
+        where: { id: invoice.id },
+        data: {
+          status: "Paid"
+        }
+      });
+    } catch (invErr: any) {
+      console.error("[Invoice Postgres Update Error]", invErr);
+    }
+
+    try {
+      await airtableProxy.updateRecord("invoice", invoice.id, {
+        "fldqJey7ciPEqd59k": "Paid", // Status field in Airtable
+      });
+    } catch (err: any) {
+      console.error("[Invoice Airtable Sync Error]", err);
+    }
+
+    // 6. Log Audit
     logAudit({
       userId: dbUser.id,
       role: dbUser.role || "staff",
       action: "create",
       target: "Payment",
       status: "APPROVED",
-      details: `Recorded payment of ${amount} KGS against Invoice ID ${invoiceIds[0]}. Ref: ${paymentRef}. Duplicate: ${isDuplicateConfirmed}.`
+      details: `Recorded payment of ${amount} KGS against Invoice ID ${invoice.id} (${invoice.invoiceNo}). Marked invoice status as Paid and updated Amount Paid to ${totalAmountPaid} KGS.`
     }, request);
 
     return NextResponse.json(newPayment);

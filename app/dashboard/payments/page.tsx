@@ -20,6 +20,7 @@ import { validateSessionThunk, selectAuthRole } from "@/store/slices/authSlice";
 import { PaymentsClient } from "@/components/dashboard/payments/PaymentsClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function PaymentsPage() {
   const dispatch = useAppDispatch();
@@ -106,13 +107,12 @@ export default function PaymentsPage() {
     );
   }
 
-  if (error) {
-    return (
-      <Card className="border-destructive/20 bg-destructive/5 text-destructive p-4 text-sm font-medium m-6">
-        {error}
-      </Card>
-    );
-  }
+  // Show toast notification for errors instead of full-screen error banner
+  useEffect(() => {
+    if (error) {
+      toast.error(typeof error === "string" ? error : "An error occurred with Payments.");
+    }
+  }, [error]);
 
   return (
     <div className="p-6">

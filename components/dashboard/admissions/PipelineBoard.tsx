@@ -60,7 +60,7 @@ export function PipelineBoard({
   ];
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4 h-full min-h-[50vh] scrollbar-thin select-none">
+    <div className="flex gap-3.5 overflow-x-auto pb-4 pt-1 w-full scrollbar-thin scrollbar-thumb-muted-foreground/20 hover:scrollbar-thumb-muted-foreground/40 select-none">
       {columns.map((col) => (
         <PipelineColumn
           key={col.title}
@@ -78,3 +78,4 @@ export function PipelineBoard({
     </div>
   );
 }
+

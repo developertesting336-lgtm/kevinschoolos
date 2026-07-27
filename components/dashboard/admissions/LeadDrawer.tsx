@@ -98,7 +98,7 @@ export function LeadDrawer({
   const isAlreadyConverted = lead.status?.toLowerCase() === "enrolled" || lead.status?.toLowerCase() === "won";
   const isLost = lead.status?.toLowerCase() === "lost";
   const statusLower = (lead.status || "").toLowerCase().trim();
-  const isTrialAlreadyScheduled = statusLower === "trial booked" || statusLower === "trial scheduled";
+  const isTrialAlreadyScheduled = statusLower === "trial booked" || statusLower === "trial scheduled" || statusLower === "trial done";
   const canScheduleTrial = ["owner", "office_admin", "smm"].includes(roleLower) && !isAlreadyConverted && !isLost && !isTrialAlreadyScheduled;
 
   // Sort activities in reverse chronological order (newest first)
@@ -227,11 +227,13 @@ export function LeadDrawer({
             </div>
 
             {/* Trial Information Section */}
-            <TrialScheduleCard
-              trial={trial}
-              teacherName={teacherName}
-              roomName={roomName}
-            />
+            {!isAlreadyConverted && (trial?.outcome || "").toLowerCase().trim() !== "converted" && (
+              <TrialScheduleCard
+                trial={trial}
+                teacherName={teacherName}
+                roomName={roomName}
+              />
+            )}
 
             {/* Lead & Parent Bio Info Details */}
             <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">

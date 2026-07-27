@@ -4,7 +4,7 @@ import React, { useState, useTransition, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectAuthRole, validateSessionThunk } from "@/store/slices/authSlice";
-import { createTuitionPlanThunk, updateTuitionPlanThunk, fetchOwnerTableData } from "@/store/slices/ownerTableSlice";
+import { createTuitionPlanThunk, updateTuitionPlanThunk, fetchOwnerTableData, selectOwnerTableLookups } from "@/store/slices/ownerTableSlice";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import {
@@ -206,40 +206,43 @@ export function OwnerTableClient({
     };
   }, [branches]);
 
+  const serverLookups = useAppSelector(selectOwnerTableLookups);
+
   const getItemDisplayName = (colKey: string, id: string): string => {
     if (!id || typeof id !== "string") return String(id || "");
     const key = colKey.toLowerCase();
 
+    let resolvedName: string | undefined;
+
     if (key.includes("parent")) {
-      return lookupMaps.parents[id] || id;
+      resolvedName = serverLookups?.parents?.[id] || lookupMaps.parents[id];
+    } else if (key.includes("student")) {
+      resolvedName = serverLookups?.students?.[id] || lookupMaps.students[id];
+    } else if (key.includes("branch")) {
+      resolvedName = serverLookups?.branches?.[id] || lookupMaps.branches[id];
+    } else if (key.includes("teacher") || key.includes("owner") || key.includes("user") || key.includes("staff")) {
+      resolvedName = serverLookups?.users?.[id] || lookupMaps.users[id];
+    } else if (key.includes("classgroup") || key.includes("group")) {
+      resolvedName = serverLookups?.classGroups?.[id] || lookupMaps.classGroups[id];
+    } else if (key.includes("room")) {
+      resolvedName = serverLookups?.rooms?.[id] || lookupMaps.rooms[id];
+    } else if (key.includes("course")) {
+      resolvedName = serverLookups?.courses?.[id] || lookupMaps.courses[id];
+    } else if (key.includes("enrollment")) {
+      resolvedName = serverLookups?.enrollments?.[id] || lookupMaps.enrollments[id];
+    } else if (key.includes("lead")) {
+      resolvedName = serverLookups?.leads?.[id] || lookupMaps.leads[id];
+    } else if (key.includes("tuitionplan") || key.includes("plan")) {
+      resolvedName = serverLookups?.tuitionPlans?.[id] || lookupMaps.tuitionPlans[id];
     }
-    if (key.includes("student")) {
-      return lookupMaps.students[id] || id;
+
+    if (resolvedName) return resolvedName;
+
+    // Fallback: If it's a raw ID string (starts with rec... or ENR-...) and hasn't resolved yet, show a clean ellipsis
+    if (id.startsWith("rec") || id.startsWith("ENR-")) {
+      return "...";
     }
-    if (key.includes("branch")) {
-      return lookupMaps.branches[id] || id;
-    }
-    if (key.includes("teacher") || key.includes("owner") || key.includes("user") || key.includes("staff")) {
-      return lookupMaps.users[id] || id;
-    }
-    if (key.includes("classgroup") || key.includes("group")) {
-      return lookupMaps.classGroups[id] || id;
-    }
-    if (key.includes("room")) {
-      return lookupMaps.rooms[id] || id;
-    }
-    if (key.includes("course")) {
-      return lookupMaps.courses[id] || id;
-    }
-    if (key.includes("enrollment")) {
-      return lookupMaps.enrollments[id] || id;
-    }
-    if (key.includes("lead")) {
-      return lookupMaps.leads[id] || id;
-    }
-    if (key.includes("tuitionplan") || key.includes("plan")) {
-      return lookupMaps.tuitionPlans[id] || id;
-    }
+
     return id;
   };
 
@@ -624,6 +627,9 @@ export function OwnerTableClient({
     return <span className="text-foreground truncate max-w-xs">{displayVal}</span>;
   };
 
+  // Filter out raw Record ID column from table display
+  const displayColumns = config.columns.filter((col) => col.key !== "id");
+
   return (
     <div className="space-y-6">
       {/* Constraints Alerts / Badges */}
@@ -641,7 +647,7 @@ export function OwnerTableClient({
               Append-Only Financial Ledger (Locked)
             </Badge>
           )}
-          {config.columns.some((c) => c.isComputed) && (
+          {displayColumns.some((c) => c.isComputed) && (
             <Badge className="bg-blue-500/10 border-blue-500/20 text-blue-600 flex items-center gap-1.5 font-bold uppercase tracking-wider py-1 text-[10px]">
               <Calculator className="h-3 w-3" />
               Includes Computed Values
@@ -679,7 +685,7 @@ export function OwnerTableClient({
           {/* Right: Select filters & reset */}
           <div className="flex flex-wrap items-center gap-3">
             {/* Branch Filter (if applicable) */}
-            {(config.columns.some((c) => c.key === "branchIds") ||
+            {(displayColumns.some((c) => c.key === "branchIds") ||
               config.modelName === "branch" ||
               config.modelName === "tuitionPlan") &&
               branches.length > 0 && (
@@ -691,8 +697,8 @@ export function OwnerTableClient({
                     size="sm"
                   >
                     <NativeSelectOption value="">All Branches</NativeSelectOption>
-                    {branches.map((b) => (
-                      <NativeSelectOption key={b.id} value={b.id}>
+                    {branches.map((b, idx) => (
+                      <NativeSelectOption key={b.id ? `branch-opt-${b.id}-${idx}` : `branch-opt-${idx}`} value={b.id}>
                         {b.name}
                       </NativeSelectOption>
                     ))}
@@ -710,8 +716,8 @@ export function OwnerTableClient({
                   size="sm"
                 >
                   <NativeSelectOption value="">All Courses</NativeSelectOption>
-                  {coursesList.map((c) => (
-                    <NativeSelectOption key={c.id} value={c.id}>
+                  {coursesList.map((c, idx) => (
+                    <NativeSelectOption key={c.id ? `course-opt-${c.id}-${idx}` : `course-opt-${idx}`} value={c.id}>
                       {c.courseName}
                     </NativeSelectOption>
                   ))}
@@ -737,8 +743,8 @@ export function OwnerTableClient({
                       <NativeSelectOption value="false">No</NativeSelectOption>
                     </>
                   ) : (
-                    filter.options?.map((opt) => (
-                      <NativeSelectOption key={opt} value={opt}>
+                    filter.options?.map((opt, idx) => (
+                      <NativeSelectOption key={opt ? `filter-${filter.key}-${opt}-${idx}` : `filter-${filter.key}-${idx}`} value={opt}>
                         {opt}
                       </NativeSelectOption>
                     ))
@@ -833,7 +839,7 @@ export function OwnerTableClient({
               <Table className="min-w-full">
                 <TableHeader className="sticky top-0 bg-card z-10 border-b border-border shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
                   <TableRow className="hover:bg-transparent">
-                    {config.columns.map((col) => (
+                    {displayColumns.map((col) => (
                       <TableHead
                         key={col.key}
                         className={`px-5 py-3.5 font-bold text-xs text-muted-foreground uppercase select-none ${
@@ -856,17 +862,17 @@ export function OwnerTableClient({
                   {data.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={config.columns.length + 1}
+                        colSpan={displayColumns.length + 1}
                         className="h-48 text-center text-sm text-muted-foreground leading-relaxed"
                       >
                         No records found matching filters.
                       </TableCell>
                     </TableRow>
                   ) : (
-                    data.map((row) => (
-                      <TableRow key={row.id} className="hover:bg-muted/20 transition-colors border-b border-border/40">
-                        {config.columns.map((col) => (
-                          <TableCell key={col.key} className="px-5 py-4 text-sm font-medium">
+                    data.map((row, index) => (
+                      <TableRow key={row.id ? `row-${row.id}-${index}` : `row-idx-${index}`} className="hover:bg-muted/20 transition-colors border-b border-border/40">
+                        {displayColumns.map((col, colIdx) => (
+                          <TableCell key={col.key ? `cell-${col.key}-${colIdx}` : `cell-idx-${colIdx}`} className="px-5 py-4 text-sm font-medium">
                             <div className="flex items-center gap-1.5">
                               {renderCellValue(row, col)}
                               {col.isComputed && (
@@ -1074,8 +1080,8 @@ export function OwnerTableClient({
                 size="sm"
               >
                 <option value="">Select a course...</option>
-                {coursesList.map((c) => (
-                  <option key={c.id} value={c.id}>
+                {coursesList.map((c, idx) => (
+                  <option key={c.id ? `modal-course-${c.id}-${idx}` : `modal-course-${idx}`} value={c.id}>
                     {c.courseName}
                   </option>
                 ))}

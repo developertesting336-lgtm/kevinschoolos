@@ -57,13 +57,13 @@ export function EnrollmentTable({
       <Table>
         <TableHeader className="bg-muted/10">
           <TableRow>
-            <TableHead className="w-[110px] text-[10px] uppercase font-bold tracking-wider">Enrollment ID</TableHead>
+            <TableHead className="w-27.5 text-[10px] uppercase font-bold tracking-wider">Enrollment ID</TableHead>
             <TableHead className="text-[10px] uppercase font-bold tracking-wider">Student & Parent</TableHead>
             <TableHead className="text-[10px] uppercase font-bold tracking-wider">Branch & Course</TableHead>
-            <TableHead className="w-[120px] text-[10px] uppercase font-bold tracking-wider">Enroll Date</TableHead>
+            <TableHead className="w-30 text-[10px] uppercase font-bold tracking-wider">Enroll Date</TableHead>
             <TableHead className="text-[10px] uppercase font-bold tracking-wider">Assigned Staff</TableHead>
-            <TableHead className="w-[130px] text-[10px] uppercase font-bold tracking-wider">Completion</TableHead>
-            <TableHead className="w-[135px] text-[10px] uppercase font-bold tracking-wider text-right">Onboarding Status</TableHead>
+            <TableHead className="w-32.5 text-[10px] uppercase font-bold tracking-wider">Completion</TableHead>
+            <TableHead className="w-33.75 text-[10px] uppercase font-bold tracking-wider text-right">Onboarding Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -121,7 +121,7 @@ export function EnrollmentTable({
                 {/* Branch & Course */}
                 <TableCell className="py-3.5">
                   <div className="space-y-0.5">
-                    <p className="text-xs font-semibold text-foreground truncate max-w-[150px]">
+                    <p className="text-xs font-semibold text-foreground truncate max-w-37.5">
                       {courseName}
                     </p>
                     <p className="text-[10px] text-muted-foreground/80 font-medium">
@@ -142,13 +142,13 @@ export function EnrollmentTable({
                 <TableCell className="py-3.5 text-xs font-semibold text-muted-foreground/80">
                   <div className="flex items-center gap-1.5">
                     <UserCheck className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
-                    <span className="truncate max-w-[120px]">{staffName}</span>
+                    <span className="truncate max-w-30">{staffName}</span>
                   </div>
                 </TableCell>
 
                 {/* Completion progress bar */}
                 <TableCell className="py-3.5">
-                  <div className="space-y-1 w-[110px]">
+                  <div className="space-y-1 w-27.5">
                     <div className="flex justify-between items-center text-[10px] font-bold text-muted-foreground">
                       <span className="flex items-center gap-0.5">
                         <FileCheck className="h-3 w-3 shrink-0" />

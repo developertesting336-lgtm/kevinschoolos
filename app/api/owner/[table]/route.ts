@@ -3,6 +3,7 @@ import { validateSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { auditService, getVisibleFieldIds } from "@/lib/audit";
 import { ownerTablesConfig } from "@/lib/owner-schema";
+import { resolveOwnerTableLookups } from "@/lib/ownerTableLookups";
 
 export const dynamic = "force-dynamic";
 
@@ -325,6 +326,8 @@ export async function GET(
       details: `Owner accessed sensitive table ${prismaModelName} (page ${page}, limit ${limit}, search "${search}").`,
     }, request);
 
+    const lookups = await resolveOwnerTableLookups(records);
+
     return NextResponse.json({
       data: records,
       pagination: {
@@ -333,6 +336,7 @@ export async function GET(
         limit,
         totalPages: Math.ceil(total / limit),
       },
+      lookups,
     });
   } catch (error: any) {
     console.error(`[Owner API GET Error] Table: ${table}`, error);

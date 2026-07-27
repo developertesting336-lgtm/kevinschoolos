@@ -228,6 +228,7 @@ model Invoice {
   issueDate     DateTime?
   dueDate       DateTime?
   amount        Float?
+  amountPaid    Float?
   status        String?
   parentIds     String[]
   studentIds    String[]

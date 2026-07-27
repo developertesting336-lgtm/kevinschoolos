@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 interface OwnerTableState {
   data: any[];
+  lookups: Record<string, Record<string, string>>;
+  currentTable: string | null;
   pagination: {
     total: number;
     page: number;
@@ -15,6 +17,8 @@ interface OwnerTableState {
 
 const initialState: OwnerTableState = {
   data: [],
+  lookups: {},
+  currentTable: null,
   pagination: {
     total: 0,
     page: 1,
@@ -65,7 +69,9 @@ export const fetchOwnerTableData = createAsyncThunk(
       ]);
 
       return {
+        table,
         data: dataRes.data || [],
+        lookups: dataRes.lookups || {},
         pagination: dataRes.pagination || { total: 0, page: 1, limit: 10, totalPages: 1 },
         branches: branchRes.data || [],
       };
@@ -127,17 +133,29 @@ const ownerTableSlice = createSlice({
   reducers: {
     clearOwnerTable: (state) => {
       state.data = [];
+      state.lookups = {};
+      state.currentTable = null;
+      state.loading = true;
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchOwnerTableData.pending, (state) => {
+      .addCase(fetchOwnerTableData.pending, (state, action) => {
+        const targetTable = action.meta.arg.table;
+        if (state.currentTable !== targetTable) {
+          state.data = [];
+          state.lookups = {};
+          state.currentTable = targetTable;
+          state.pagination = { total: 0, page: 1, limit: 10, totalPages: 1 };
+        }
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchOwnerTableData.fulfilled, (state, action) => {
+        state.currentTable = action.payload.table;
         state.data = action.payload.data;
+        state.lookups = action.payload.lookups || {};
         state.pagination = action.payload.pagination;
         state.branches = action.payload.branches;
         state.loading = false;
@@ -179,6 +197,8 @@ export default ownerTableSlice.reducer;
 
 // Selectors
 export const selectOwnerTableData = (state: any) => state.ownerTable.data;
+export const selectOwnerTableLookups = (state: any) => state.ownerTable.lookups;
+export const selectOwnerTableCurrentTable = (state: any) => state.ownerTable.currentTable;
 export const selectOwnerTablePagination = (state: any) => state.ownerTable.pagination;
 export const selectOwnerTableBranches = (state: any) => state.ownerTable.branches;
 export const selectOwnerTableLoading = (state: any) => state.ownerTable.loading;

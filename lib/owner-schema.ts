@@ -37,7 +37,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "status", label: "Status", type: "select", options: ["Active", "Inactive"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "name", label: "Branch Name", type: "string", sortable: true },
       { key: "city", label: "City", type: "string", sortable: true },
       { key: "address", label: "Address", type: "string", sortable: true },
@@ -59,7 +58,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "role", label: "Role", type: "select", options: ["Owner", "Teacher", "SMM", "Office Admin", "Finance", "Tech Admin"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "fullName", label: "Full Name", type: "string", sortable: true },
       { key: "role", label: "Role", type: "string", sortable: true },
       { key: "email", label: "Email", type: "string", sortable: true },
@@ -81,7 +79,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "whatsappGroupAdded", label: "WhatsApp Group Added", type: "boolean" }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "parentName", label: "Parent Name", type: "string", sortable: true },
       { key: "phone", label: "Phone", type: "string" },
       { key: "whatsapp", label: "WhatsApp", type: "string" },
@@ -107,7 +104,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "gender", label: "Gender", type: "select", options: ["Male", "Female"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "studentName", label: "Student Name", type: "string", sortable: true },
       { key: "dateOfBirth", label: "DOB", type: "date", sortable: true },
       { key: "gender", label: "Gender", type: "string", sortable: true },
@@ -131,7 +127,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "contractSigned", label: "Contract Signed", type: "boolean" }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "enrollmentId", label: "Enrollment ID", type: "string", sortable: true },
       { key: "enrollDate", label: "Enroll Date", type: "date", sortable: true },
       { key: "status", label: "Status", type: "string", sortable: true },
@@ -158,7 +153,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "status", label: "Status", type: "select", options: ["Upcoming", "Active", "Closed"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "termName", label: "Term Name", type: "string", sortable: true },
       { key: "nameRussian", label: "Russian Name", type: "string", sortable: true },
       { key: "startDate", label: "Start Date", type: "date", sortable: true },
@@ -175,7 +169,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     searchableFields: ["roomName", "nameRussian"],
     filterableFields: [],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "roomName", label: "Room Name", type: "string", sortable: true },
       { key: "nameRussian", label: "Russian Name", type: "string", sortable: true },
       { key: "capacity", label: "Capacity", type: "number", sortable: true },
@@ -194,7 +187,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "preferredLanguage", label: "Language", type: "select", options: ["Russian", "Kyrgyz", "English"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "leadName", label: "Lead Name", type: "string", sortable: true },
       { key: "inquiryDate", label: "Inquiry Date", type: "date", sortable: true },
       { key: "phone", label: "Phone", type: "string" },
@@ -221,7 +213,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "outcome", label: "Outcome", type: "select", options: ["Scheduled", "Attended", "No-show", "Converted", "Declined", "Rescheduled"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "trialId", label: "Trial ID", type: "string", sortable: true },
       { key: "dateTime", label: "DateTime", type: "date", sortable: true },
       { key: "outcome", label: "Outcome", type: "string", sortable: true },
@@ -248,7 +239,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "status", label: "Status", type: "select", options: ["Forming", "Active", "Finished"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "groupName", label: "Class Name", type: "string", sortable: true },
       { key: "weekdays", label: "Weekdays", type: "array" },
       { key: "startTime", label: "Start Time", type: "string" },
@@ -272,7 +262,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "status", label: "Status", type: "select", options: ["Scheduled", "Held", "Cancelled"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "sessionId", label: "Session ID", type: "string", sortable: true },
       { key: "dateTime", label: "Date & Time", type: "date", sortable: true },
       { key: "status", label: "Status", type: "string", sortable: true },
@@ -292,7 +281,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "status", label: "Status", type: "select", options: ["Present", "Absent", "Excused", "Late"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "attendanceId", label: "Attendance ID", type: "string", sortable: true },
       { key: "status", label: "Status", type: "string", sortable: true },
       { key: "sessionIds", label: "Sessions", type: "array" },
@@ -310,7 +298,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "active", label: "Active", type: "boolean" }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "courseName", label: "Course Name", type: "string", sortable: true },
       { key: "nameRussian", label: "Russian Name", type: "string" },
       { key: "nameKyrgyz", label: "Kyrgyz Name", type: "string" },
@@ -355,7 +342,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "status", label: "Status", type: "select", options: ["Paid", "Unpaid", "Overdue", "Draft", "Cancelled"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "invoiceNo", label: "Invoice No", type: "string", sortable: true },
       { key: "issueDate", label: "Issue Date", type: "date", sortable: true },
       { key: "dueDate", label: "Due Date", type: "date", sortable: true },
@@ -382,7 +368,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "normalSide", label: "Normal Side", type: "select", options: ["Debit", "Credit"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "accountNo", label: "Account No", type: "string", sortable: true },
       { key: "accountName", label: "Account Name", type: "string", sortable: true },
       { key: "nameRussian", label: "Russian Name", type: "string" },
@@ -406,7 +391,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "posted", label: "Posted", type: "boolean" }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "entryNo", label: "Entry No", type: "string", sortable: true },
       { key: "date", label: "Date", type: "date", sortable: true },
       { key: "memo", label: "Memo", type: "string" },
@@ -425,7 +409,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     searchableFields: ["line", "memo"],
     filterableFields: [],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "line", label: "Line No", type: "string", sortable: true },
       { key: "debit", label: "Debit", type: "number", sortable: true, isReadOnly: true },
       { key: "credit", label: "Credit", type: "number", sortable: true, isReadOnly: true },
@@ -444,7 +427,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     searchableFields: ["vendorName", "category", "phone", "email", "notes", "nameRussian"],
     filterableFields: [],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "vendorName", label: "Vendor Name", type: "string", sortable: true },
       { key: "category", label: "Category", type: "string", sortable: true },
       { key: "phone", label: "Phone", type: "string" },
@@ -466,7 +448,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "paymentMethod", label: "Payment Method", type: "select", options: ["Cash", "Bank Transfer", "HQ Payment", "Card"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "expenseNo", label: "Expense No", type: "string", sortable: true },
       { key: "date", label: "Date", type: "date", sortable: true },
       { key: "description", label: "Description", type: "string" },
@@ -490,7 +471,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "status", label: "Status", type: "select", options: ["Draft", "Submitted", "Paid", "Pending"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "royaltyNo", label: "Royalty No", type: "string", sortable: true },
       { key: "period", label: "Period", type: "date", sortable: true },
       { key: "revenueBase", label: "Revenue Base", type: "number", sortable: true },
@@ -516,7 +496,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "payType", label: "Pay Type", type: "select", options: ["Hourly", "Salary", "Bonus"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "payRunNo", label: "Pay Run No", type: "string", sortable: true },
       { key: "period", label: "Period", type: "date", sortable: true },
       { key: "payType", label: "Pay Type", type: "string" },
@@ -542,7 +521,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "type", label: "Type", type: "select", options: ["Lesson", "Preparation", "Meeting", "Subbing"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "entry", label: "Entry", type: "string", sortable: true },
       { key: "date", label: "Date", type: "date", sortable: true },
       { key: "hours", label: "Hours", type: "number", sortable: true },
@@ -567,7 +545,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "outcome", label: "Outcome", type: "select", options: ["Reached", "No Answer", "Left VM", "Scheduled Trial", "Requested Callback", "Not Interested"] }
     ],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "activityId", label: "Activity ID", type: "string", sortable: true },
       { key: "dateTime", label: "Date & Time", type: "date", sortable: true },
       { key: "type", label: "Type", type: "string", sortable: true },
@@ -589,7 +566,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
     searchableFields: ["channel", "month"],
     filterableFields: [],
     columns: [
-      { key: "id", label: "ID", type: "string" },
       { key: "rowKey", label: "Row Key", type: "string" },
       { key: "channel", label: "Channel", type: "string", sortable: true },
       { key: "month", label: "Month", type: "string", sortable: true },

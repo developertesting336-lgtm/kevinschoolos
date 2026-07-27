@@ -238,9 +238,9 @@ export async function POST(request: NextRequest) {
       // Non-blocking: enrollment succeeded, invoice can be retried later.
     }
 
-    // ========== OPTIONAL: Trial Completion ==========
+    // ========== OPTIONAL: Trial Completion / Conversion ==========
     let trialCompleted = false;
-    if (completeTrial && lead.parentIds?.length) {
+    if (completeTrial !== false) {
       // Find trial linked to this lead
       const trial = await prisma.trial.findFirst({
         where: { leadIds: { has: leadId } },
@@ -249,23 +249,32 @@ export async function POST(request: NextRequest) {
 
       if (trial) {
         try {
+          const classGroupTeachers = classGroup.teacherIds || [];
+
+          // Merge studentIds, enrollmentIds, and assigned teacherIds
+          const updatedStudentIds = Array.from(new Set([...(trial.studentIds || []), studentId!]));
+          const updatedEnrollmentIds = Array.from(new Set([...(trial.enrollmentIds || []), enrollmentId!]));
+          const updatedTeacherIds = Array.from(new Set([...(trial.teacherIds || []), ...classGroupTeachers]));
+
           await airtableProxy.updateRecord("trial", trial.id, {
-            "fldGIxMvvMpf96UoR": "Completed",
-            "fldo1WQXaLhCpRss0": [studentId!],
-            "fld7qKBZvQj5sRjgW": [enrollmentId!],
+            "fldGIxMvvMpf96UoR": "Converted",
+            "fldo1WQXaLhCpRss0": updatedStudentIds,
+            "fld7qKBZvQj5sRjgW": updatedEnrollmentIds,
+            "fldvnLeHapzr4TSyB": updatedTeacherIds,
           });
 
           await prisma.trial.update({
             where: { id: trial.id },
             data: {
-              outcome: "Completed",
-              studentIds: [studentId!],
-              enrollmentIds: [enrollmentId!],
+              outcome: "Converted",
+              studentIds: updatedStudentIds,
+              enrollmentIds: updatedEnrollmentIds,
+              teacherIds: updatedTeacherIds,
             },
           });
           trialCompleted = true;
         } catch (err: any) {
-          console.error("[Convert Lead] Trial completion failed (non-blocking):", err.message);
+          console.error("[Convert Lead] Trial outcome update to Converted failed (non-blocking):", err.message);
         }
       }
     }

@@ -458,7 +458,7 @@ export function OnboardingDrawer({
                   </h4>
                   <div className="space-y-1">
                     <p className="text-muted-foreground">
-                      Staff: <span className="font-semibold text-foreground truncate max-w-[120px] inline-block">{staffName || "Unassigned"}</span>
+                      Staff: <span className="font-semibold text-foreground truncate max-w-30 inline-block">{staffName || "Unassigned"}</span>
                     </p>
                   </div>
                 </div>

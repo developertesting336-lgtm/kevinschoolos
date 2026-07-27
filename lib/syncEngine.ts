@@ -284,6 +284,7 @@ export const SYNC_CONFIGS: {
       issueDate: getDate(f["fldZ2vfOggiAbm0fC"]),
       dueDate: getDate(f["fldj95LOGimRgZ4Vj"]),
       amount: getNum(f["fldRiqHHe5aqGoyif"]),
+      amountPaid: getNum(f["fldAmountPaid"]),
       status: getStr(f["fldqJey7ciPEqd59k"]),
       parentIds: getArr(f["fldAzvJxxt46d7oi5"]),
       studentIds: getArr(f["fldgkxO5Yu98qW3wi"]),

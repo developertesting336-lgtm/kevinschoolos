@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchOwnerTableData, selectOwnerTableData, selectOwnerTablePagination, selectOwnerTableBranches, selectOwnerTableLoading, selectOwnerTableError } from "@/store/slices/ownerTableSlice";
+import { fetchOwnerTableData, clearOwnerTable, selectOwnerTableData, selectOwnerTableCurrentTable, selectOwnerTablePagination, selectOwnerTableBranches, selectOwnerTableLoading, selectOwnerTableError } from "@/store/slices/ownerTableSlice";
 import { OwnerTableClient } from "@/components/dashboard/OwnerTableClient";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,6 +26,7 @@ interface OwnerTableReduxViewProps {
 export function OwnerTableReduxView({ table, config, initialQueryParams }: OwnerTableReduxViewProps) {
   const dispatch = useAppDispatch();
   const data = useAppSelector(selectOwnerTableData);
+  const currentTable = useAppSelector(selectOwnerTableCurrentTable);
   const pagination = useAppSelector(selectOwnerTablePagination);
   const branches = useAppSelector(selectOwnerTableBranches);
   const loading = useAppSelector(selectOwnerTableLoading);
@@ -36,10 +37,14 @@ export function OwnerTableReduxView({ table, config, initialQueryParams }: Owner
 
   useEffect(() => {
     dispatch(fetchOwnerTableData({ table, ...initialQueryParams }));
-  }, [dispatch, paramsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Only show full skeleton on the very first load — not during search re-fetches
-  const isInitialLoading = loading && data.length === 0;
+    return () => {
+      dispatch(clearOwnerTable());
+    };
+  }, [dispatch, table, paramsKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Show loading skeleton whenever loading or when switching tables / waiting for current table data
+  const isInitialLoading = loading || currentTable !== table;
 
   if (isInitialLoading) {
     return (

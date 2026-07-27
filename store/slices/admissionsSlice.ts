@@ -48,6 +48,8 @@ export interface TrialData {
   leadIds: string[];
   teacherIds: string[];
   classGroupIds: string[];
+  confirmationMethod?: string | null;
+  confirmationSent?: boolean;
 }
 
 export interface ActivityData {
@@ -278,6 +280,37 @@ export const createActivityThunk = createAsyncThunk(
   }
 );
 
+
+export const updateTrialOutcomeThunk = createAsyncThunk(
+  "admissions/updateTrialOutcome",
+  async (
+    payload: {
+      trialId: string;
+      outcome: string;
+      notes?: string;
+      newTrialDate?: string;
+      newTrialTime?: string;
+    },
+    { dispatch, rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch("/api/admissions/trial", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to update trial outcome.");
+      }
+      // Refresh admissions data to reflect lead status changes
+      dispatch(fetchAdmissionsData({ forceRefetch: true }));
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to update trial outcome");
+    }
+  }
+);
 
 export const createTrialThunk = createAsyncThunk(
   "admissions/createTrial",
