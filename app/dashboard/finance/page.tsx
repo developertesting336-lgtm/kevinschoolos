@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchFinanceData, selectFinanceLoading, selectFinanceError, selectFinanceBranches, selectFinanceUserRole, selectFinanceUserName, selectFinanceUserEmail } from "@/store/slices/financeSlice";
 import { validateSessionThunk } from "@/store/slices/authSlice";
 import { FinanceConsoleClient } from "@/components/dashboard/finance/FinanceConsoleClient";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FinanceConsolePage() {

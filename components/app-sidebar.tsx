@@ -176,6 +176,7 @@ const officeAdminGroups = [
       { title: "Admissions", url: "/dashboard/admissions", icon: LayoutDashboard },
       { title: "Onboarding", url: "/dashboard/onboarding", icon: ClipboardCheck },
       { title: "Payments & Receipts", url: "/dashboard/payments", icon: Wallet },
+      { title: "Expenses", url: "/dashboard/office-admin/expenses", icon: Receipt },
       { title: "Schedule Console", url: "/dashboard/schedule", icon: Calendar },
       { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
       { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },

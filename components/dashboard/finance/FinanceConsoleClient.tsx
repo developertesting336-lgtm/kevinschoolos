@@ -1,16 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
-  Landmark,
   Percent,
   DollarSign,
   CreditCard,
   BookOpen,
   Wallet,
-  Receipt,
   Users,
   Clock,
   Filter,
@@ -53,9 +50,16 @@ export function FinanceConsoleClient({
   const [selectedBranch, setSelectedBranch] = useState<string>("");
   const [activeTab, setActiveTab] = useState<ActiveTab>("ledger");
 
-  useEffect(() => {
-    fetchStats();
-  }, [selectedBranch]);
+  const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedBranch(val);
+    dispatch(fetchFinanceData({
+      branchId: val || undefined,
+      userRole,
+      userName,
+      userEmail,
+    }));
+  };
 
   const fetchStats = () => {
     dispatch(fetchFinanceData({
@@ -64,10 +68,6 @@ export function FinanceConsoleClient({
       userName,
       userEmail,
     }));
-  };
-
-  const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedBranch(e.target.value);
   };
 
   const formatCurrency = (val: number) => {
@@ -125,10 +125,6 @@ export function FinanceConsoleClient({
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-primary" : ""}`} />
           </button>
-
-          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
-            Role: {userRole === "owner" ? "Owner" : "Finance Specialist"}
-          </Badge>
         </div>
       </div>
 
@@ -285,7 +281,7 @@ export function FinanceConsoleClient({
             }`}
           >
             <BookOpen className="h-4 w-4" />
-            Ledger Viewer
+            Journal Entries & Ledger
           </button>
           <button
             onClick={() => setActiveTab("royalties")}

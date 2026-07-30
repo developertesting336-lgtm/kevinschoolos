@@ -102,6 +102,7 @@ export function OfficeAdminDashboardClient({
         { name: "Courses Catalog", url: "/dashboard/owner/course", count: stats.coursesCount, icon: Award },
         { name: "Tuition Plans", url: "/dashboard/owner/tuitionplan", count: null, icon: Receipt },
         { name: "Performance Charts", url: "/dashboard/owner/channelperformance", count: null, icon: TrendingUp },
+        { name: "Expense Submission", url: "/dashboard/office-admin/expenses", count: null, icon: Receipt },
       ],
     },
   ];

@@ -1,0 +1,15 @@
+{
+  "allowRead": [
+    "/"
+  ],
+  "allowWrite": [
+    "/"
+  ],
+  "allowExecute": [
+    "npm",
+    "npx",
+    "node",
+    "git",
+    "next"
+  ]
+}

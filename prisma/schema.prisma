@@ -321,6 +321,18 @@ model Expense {
   updatedAt         DateTime  @updatedAt
 }
 
+// Application-level approval record for Expenses (stored in PostgreSQL, not Airtable)
+model ExpenseApproval {
+  id              String    @id
+  expenseId       String    @unique
+  status          String    @default("Pending Approval") // Pending Approval, Approved, Rejected
+  approvedById    String?
+  approvedDate    DateTime?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
 // 22 Franchise Royalties / Роялти франшизы
 model FranchiseRoyalty {
   id                      String    @id
