@@ -166,16 +166,30 @@ export async function getScopingFilter(
       const leadIds = branchLeads.map((l: any) => l.id);
       where.leadIds = { hasSome: leadIds };
     } else {
+      // Models carrying a branchIds[] column, so a branch-scoped user can be
+      // filtered to their own branches.
+      //
+      // A model that HAS branchIds but is missing from this list silently
+      // returns every branch's rows. Keep it in sync with prisma/schema.prisma;
+      // tests/table-registry.test.mjs asserts the two agree.
       const modelsWithBranchIds = [
         "user", "room", "lead", "parent", "student", "classgroup",
         "enrollment", "session", "invoice", "payment", "account", "journalentry",
         "ledgerline", "vendor", "expense", "franchiseroyalty", "teacherpay",
-        "teacherhours", "channelperformance", "notificationlog"
+        "teacherhours", "channelperformance", "notificationlog",
+        // Tables 28–39 (adopted 2026-08-06) that carry branchIds
+        "backpackinventory", "ttc", "budgettarget", "fixedasset",
+        "buildoutproject", "marketingcampaign", "document"
       ];
 
       if (modelsWithBranchIds.includes(tableName.toLowerCase())) {
         where.branchIds = { hasSome: user.branchIds };
       }
+
+      // SubFranchisee, SubFranchiseRoyalty, SelfEmployedTeacher, MinimumGoal and
+      // FranchiseObligation have no branchIds column — they are HQ/franchise-level
+      // records, not branch-scoped. They stay unscoped by design; access is
+      // controlled by tier alone (T1/T2), so keep their role grants tight.
     }
   }
 
@@ -295,6 +309,52 @@ export function applyRedactions(
   // 4. Activity redactions: Hide notes from Teacher
   if (tableName.toLowerCase() === "activity") {
     if (normRole === "teacher") {
+      delete result.notes;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tables 28–39 (adopted 2026-08-06). The three T2 tables below hold personal
+  // data on named individuals and fall under KG Personal Data Law No. 97.
+  // Only owner sees them unredacted.
+  // ---------------------------------------------------------------------------
+
+  // 5. Sub-Franchisees: named partners with direct contact details.
+  if (tableName.toLowerCase() === "subfranchisee") {
+    if (normRole !== "owner") {
+      delete result.contactName;
+      delete result.phone;
+      delete result.email;
+    }
+    // Commercial terms are owner/finance only.
+    if (!["owner", "finance"].includes(normRole)) {
+      delete result.franchiseFeeEur;
+      delete result.lessonFeeKgs;
+      delete result.royaltyRatePct;
+      delete result.actualFixedRoyaltyAnnualKgs;
+      delete result.mfFeeShareToHqEur;
+    }
+  }
+
+  // 6. Self-employed teachers (SETs): contact details for named individuals.
+  if (tableName.toLowerCase() === "selfemployedteacher") {
+    if (normRole !== "owner") {
+      delete result.phone;
+      delete result.email;
+      delete result.notes;
+    }
+    // Commercial terms are owner/finance only.
+    if (!["owner", "finance"].includes(normRole)) {
+      delete result.royaltyRatePct;
+    }
+  }
+
+  // 7. Documents: may reference scans of minors' records. The attachment itself
+  // is never mirrored into Postgres (see lib/syncEngine.ts), but the surrounding
+  // metadata still identifies the subject.
+  if (tableName.toLowerCase() === "document") {
+    if (!["owner", "office_admin"].includes(normRole)) {
+      delete result.party;
       delete result.notes;
     }
   }

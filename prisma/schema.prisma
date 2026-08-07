@@ -17,6 +17,13 @@ model Branch {
   status     String?
   notes      String?
   openedDate DateTime?
+  backpackInventoryIds String[]
+  ttcsIds String[]
+  budgetAndTargetsIds String[]
+  fixedAssetsIds String[]
+  buildOutProjectsIds String[]
+  marketingCampaignsIds String[]
+  documentsIds String[]
   updatedAt  DateTime  @updatedAt
 }
 
@@ -30,6 +37,11 @@ model User {
   workingLanguage String?
   status          String?
   branchIds       String[]
+  ttcsIds String[]
+  programmesCertified String[]
+  ttcCompletedDate DateTime?
+  teacherLevel String?
+  qualificationStatus String?
   updatedAt       DateTime @updatedAt
 }
 
@@ -105,6 +117,8 @@ model Lead {
   branchIds         String[]
   ownerIds          String[]
   lastActivityDate  DateTime?
+  referredBy String?
+  marketingCampaignsIds String[]
   updatedAt         DateTime  @updatedAt
 }
 
@@ -155,6 +169,12 @@ model Student {
   parentIds    String[]
   branchIds    String[]
   medicalNotes String?
+  withdrawalDate DateTime?
+  reasonForLeaving String?
+  pauseReason String?
+  firstEnrollDate DateTime?   // rollup — computed in Airtable, never written back
+  cohortMonth String?   // formula — computed in Airtable, never written back
+  ageAtWithdrawal Float?   // formula — computed in Airtable, never written back
   updatedAt    DateTime  @updatedAt
 }
 
@@ -171,6 +191,8 @@ model ClassGroup {
   roomIds       String[]
   termIds       String[]
   branchIds     String[]
+  enrolledCount Float?   // count — computed in Airtable, never written back
+  utilisationPct Float?   // formula — computed in Airtable, never written back
   updatedAt     DateTime @updatedAt
 }
 
@@ -196,6 +218,9 @@ model Enrollment {
   firstLessonConfirmed          Boolean   @default(false)
   firstLessonDate               DateTime?
   onboardingStatus              String?
+  nextPaymentDate DateTime?
+  endDate DateTime?
+  tenureMonths Float?   // formula — computed in Airtable, never written back
   updatedAt                     DateTime  @updatedAt
 }
 
@@ -234,6 +259,8 @@ model Invoice {
   studentIds    String[]
   enrollmentIds String[]
   branchIds     String[]
+  amountPaidKgs Float?   // rollup — computed in Airtable, never written back
+  balanceKgs Float?   // formula — computed in Airtable, never written back
   updatedAt     DateTime  @updatedAt
 }
 
@@ -264,6 +291,7 @@ model Account {
   active      Boolean  @default(false)
   notes       String?
   branchIds   String[]
+  balanceKgs Float?   // rollup — computed in Airtable, never written back
   updatedAt   DateTime @updatedAt
 }
 
@@ -302,6 +330,7 @@ model Vendor {
   notes       String?
   branchIds   String[]
   nameRussian String?
+  fixedAssetsIds String[]
   updatedAt   DateTime @updatedAt
 }
 
@@ -347,6 +376,8 @@ model FranchiseRoyalty {
   notes                   String?
   branchIds               String[]
   vendorHQIds             String[]
+  fxRateKgsPerEur Float?
+  totalDueHqEur Float?   // formula — computed in Airtable, never written back
   updatedAt               DateTime  @updatedAt
 }
 
@@ -470,4 +501,236 @@ model AuditLog {
   createdAt  DateTime @default(now()) @map("created_at")
 
   @@map("audit_log")
+}
+
+// ===========================================================================
+// Tables 28–39 — adopted 2026-08-06 (docs/schema-adoption-guide.md §4)
+// ===========================================================================
+
+// 28 Backpack Inventory / Инвентарь рюкзаков
+model BackpackInventory {
+  id                            String @id
+  levelName                     String
+  totalBackpacks                Float?
+  sold                          Float?
+  sellingPriceKgs               Float?
+  dateReceived                  DateTime?
+  supplier                      String?
+  purchaseCostKgs               Float?
+  notes                         String?
+  remaining                     Float?   // formula — computed in Airtable, never written back
+  grossProfitPerBackpackKgs     Float?   // formula — computed in Airtable, never written back
+  branchIds                     String[]
+  relatedServicesRoyalty8PctKgs Float?   // formula — computed in Airtable, never written back
+  netProfitPerBackpackKgs       Float?   // formula — computed in Airtable, never written back
+  updatedAt                     DateTime @updatedAt
+}
+
+// 29 TTCs / Курсы подготовки преподавателей
+model Ttc {
+  id                   String @id
+  ttcId                String
+  programme            String?
+  startDate            DateTime?
+  endDate              DateTime?
+  location             String?
+  trainer              String?
+  participants         Float?
+  feePerParticipantKgs Float?
+  materialsCostKgs     Float?
+  status               String?
+  notes                String?
+  branchIds            String[]
+  teachersTrainedIds   String[]
+  totalRevenueKgs      Float?   // formula — computed in Airtable, never written back
+  netRevenueKgs        Float?   // formula — computed in Airtable, never written back
+  updatedAt            DateTime @updatedAt
+}
+
+// 30 Budget &amp; Targets / Бюджет и цели
+model BudgetTarget {
+  id              String @id
+  line            String
+  period          DateTime?
+  type            String?
+  category        String?
+  targetAmountKgs Float?
+  actualAmountKgs Float?
+  notes           String?
+  branchIds       String[]
+  varianceKgs     Float?   // formula — computed in Airtable, never written back
+  variancePct     Float?   // formula — computed in Airtable, never written back
+  updatedAt       DateTime @updatedAt
+}
+
+// 31 Fixed Assets / Основные средства
+model FixedAsset {
+  id                         String @id
+  asset                      String
+  category                   String?
+  acquisitionDate            DateTime?
+  costKgs                    Float?
+  usefulLifeYears            Float?
+  accumulatedDepreciationKgs Float?
+  status                     String?
+  notes                      String?
+  branchIds                  String[]
+  vendorIds                  String[]
+  bookValueKgs               Float?   // formula — computed in Airtable, never written back
+  annualDepreciationKgs      Float?   // formula — computed in Airtable, never written back
+  buildOutProjectIds         String[]
+  updatedAt                  DateTime @updatedAt
+}
+
+// 32 Build-Out Projects / Проекты открытия центров
+model BuildOutProject {
+  id                   String @id
+  project              String
+  subArea              String?
+  type                 String?
+  status               String?
+  targetOpenDate       DateTime?
+  actualOpenDate       DateTime?
+  budgetKgs            Float?
+  actualSpendKgs       Float?
+  notes                String?
+  branchIds            String[]
+  varianceKgs          Float?   // formula — computed in Airtable, never written back
+  fixedAssetsIds       String[]
+  subFranchiseesLcfIds String[]
+  updatedAt            DateTime @updatedAt
+}
+
+// 33 Marketing Campaigns / Маркетинговые кампании
+model MarketingCampaign {
+  id             String @id
+  campaign       String
+  channel        String?
+  startDate      DateTime?
+  endDate        DateTime?
+  spendKgs       Float?
+  status         String?
+  objective      String?
+  leadsIds       String[]
+  branchIds      String[]
+  leadsGenerated Float?   // count — computed in Airtable, never written back
+  costPerLeadKgs Float?   // formula — computed in Airtable, never written back
+  updatedAt      DateTime @updatedAt
+}
+
+// 34 Documents / Документы
+model Document {
+  id                   String @id
+  document             String
+  type                 String?
+  party                String?
+  effectiveDate        DateTime?
+  expiry               DateTime?
+  status               String?
+  notes                String?
+  branchIds            String[]
+  daysToRenewal        Float?   // formula — computed in Airtable, never written back
+  subFranchiseesLcfIds String[]
+  updatedAt            DateTime @updatedAt
+}
+
+// 35 Sub-Franchisees (LCF/LSF) / Субфранчайзи
+model SubFranchisee {
+  id                           String @id
+  franchiseeName               String
+  type                         String?
+  subArea                      String?
+  populationServed             Float?
+  contactName                  String?
+  phone                        String?
+  email                        String?
+  status                       String?
+  agreementSignedDate          DateTime?
+  openDate                     DateTime?
+  gracePeriodEnd               DateTime?
+  franchiseFeeEur              Float?
+  expectedStudentsRoyaltyBasis Float?
+  studentsReported             Float?
+  lessonFeeKgs                 Float?
+  annualLessonCount            Float?
+  royaltyRatePct               Float?
+  notes                        String?
+  buildOutProjectIds           String[]
+  documentsIds                 String[]
+  subFranchiseRoyaltiesIds     String[]
+  setsIds                      String[]
+  actualFixedRoyaltyAnnualKgs  Float?   // formula — computed in Airtable, never written back
+  mfFeeShareToHqEur            Float?   // formula — computed in Airtable, never written back
+  inGracePeriod                String?   // formula — computed in Airtable, never written back
+  updatedAt                    DateTime @updatedAt
+}
+
+// 36 Sub-Franchise Royalties / Роялти субфранчайзи
+model SubFranchiseRoyalty {
+  id                   String @id
+  royaltyNo            String
+  period               DateTime?
+  franchiseeIds        String[]
+  monthlyRoyaltyDueKgs Float?
+  amountReceivedKgs    Float?
+  status               String?
+  dueDate              DateTime?
+  receivedDate         DateTime?
+  hqSharePct           Float?
+  notes                String?
+  setsIds              String[]
+  balanceKgs           Float?   // formula — computed in Airtable, never written back
+  hqShareKgs           Float?   // formula — computed in Airtable, never written back
+  updatedAt            DateTime @updatedAt
+}
+
+// 37 SETs / Самозанятые преподаватели
+model SelfEmployedTeacher {
+  id                       String @id
+  setName                  String
+  phone                    String?
+  email                    String?
+  status                   String?
+  reportsToIds             String[]
+  students                 Float?
+  royaltyRatePct           Float?
+  startDate                DateTime?
+  notes                    String?
+  subFranchiseRoyaltiesIds String[]
+  updatedAt                DateTime @updatedAt
+}
+
+// 38 Minimum Goals / Минимальные цели
+model MinimumGoal {
+  id                String @id
+  goalYear          String
+  schoolYear        String?
+  targetStudents    Float?
+  startDate         DateTime?
+  endDate           DateTime?
+  mfOwnedStudents   Float?
+  lcf               Float?
+  setStudents       Float?
+  notes             String?
+  totalAreaStudents Float?   // formula — computed in Airtable, never written back
+  gapToGoal         Float?   // formula — computed in Airtable, never written back
+  pctOfGoal         Float?   // formula — computed in Airtable, never written back
+  status            String?   // formula — computed in Airtable, never written back
+  updatedAt         DateTime @updatedAt
+}
+
+// 39 Franchise Obligations / Обязательства франшизы
+model FranchiseObligation {
+  id          String @id
+  obligation  String
+  category    String?
+  mfaClause   String?
+  cadence     String?
+  nextDueDate DateTime?
+  amountEur   Float?
+  penalty     String?
+  status      String?
+  notes       String?
+  daysToDue   Float?   // formula — computed in Airtable, never written back
+  updatedAt   DateTime @updatedAt
 }

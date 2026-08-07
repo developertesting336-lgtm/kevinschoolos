@@ -119,8 +119,33 @@ const ownerGroups = [
       { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
+      { title: "Backpack Inventory", url: "/dashboard/owner/backpackinventory", icon: Receipt },
       { title: "Channel Performance", url: "/dashboard/channel-performance", icon: TrendingUp },
       { title: "Schema Diagnostics", url: "/dashboard/admin/schema-diagnostics", icon: Shield },
+    ],
+  },
+  {
+    // Tables 28-39, adopted 2026-08-06. Owner-only for now: these links are NOT
+    // filtered by checkRBAC, so adding them to another role's group would render
+    // a link that lands on "Access Restricted".
+    label: "Franchise & Expansion",
+    items: [
+      { title: "Sub-Franchisees", url: "/dashboard/owner/subfranchisee", icon: Building2 },
+      { title: "Sub-Franchise Royalties", url: "/dashboard/owner/subfranchiseroyalty", icon: Landmark },
+      { title: "Franchise Obligations", url: "/dashboard/owner/franchiseobligation", icon: Shield },
+      { title: "Self-Employed Teachers", url: "/dashboard/owner/selfemployedteacher", icon: Award },
+      { title: "Build-Out Projects", url: "/dashboard/owner/buildoutproject", icon: Building2 },
+      { title: "Fixed Assets", url: "/dashboard/owner/fixedasset", icon: Receipt },
+      { title: "Documents", url: "/dashboard/owner/document", icon: Shield },
+    ],
+  },
+  {
+    label: "Planning & Growth",
+    items: [
+      { title: "Budget & Targets", url: "/dashboard/owner/budgettarget", icon: Landmark },
+      { title: "Minimum Goals", url: "/dashboard/owner/minimumgoal", icon: TrendingUp },
+      { title: "Marketing Campaigns", url: "/dashboard/owner/marketingcampaign", icon: TrendingUp },
+      { title: "TTCs", url: "/dashboard/owner/ttc", icon: Award },
     ],
   },
 ];

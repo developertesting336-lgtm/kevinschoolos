@@ -69,10 +69,10 @@
     }
   },
   "tiers": {
-    "T1": ["Account", "JournalEntry", "LedgerLine", "Vendor", "Expense", "FranchiseRoyalty", "TeacherPay", "TeacherHours"],
-    "T2": ["User", "Parent", "Student", "Enrollment", "Invoice", "Payment", "NotificationLog"],
-    "T3": ["Term", "Room", "Lead", "Trial", "ClassGroup", "Session", "Attendance", "Activity"],
-    "T4": ["Branch", "Course", "TuitionPlan"],
+    "T1": ["Account", "JournalEntry", "LedgerLine", "Vendor", "Expense", "FranchiseRoyalty", "TeacherPay", "TeacherHours", "BudgetTarget", "FixedAsset", "BuildOutProject", "SubFranchiseRoyalty", "FranchiseObligation"],
+    "T2": ["User", "Parent", "Student", "Enrollment", "Invoice", "Payment", "NotificationLog", "Document", "SubFranchisee", "SelfEmployedTeacher"],
+    "T3": ["Term", "Room", "Lead", "Trial", "ClassGroup", "Session", "Attendance", "Activity", "Ttc", "MarketingCampaign", "MinimumGoal"],
+    "T4": ["Branch", "Course", "TuitionPlan", "BackpackInventory"],
     "T4-RO": ["ChannelPerformance"]
   }
 }

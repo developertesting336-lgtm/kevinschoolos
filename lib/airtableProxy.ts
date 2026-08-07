@@ -11,6 +11,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { logger } from "./logger";
+import { buildPrismaToTableId } from "./table-registry.mjs";
 
 // ---------------------------------------------------------------------------
 // Base Allow-list & Credentials Configuration
@@ -77,36 +78,10 @@ let fieldMap: FieldMap | null = null;
 const tablesById: Record<string, TableSchema> = {};
 const tablesByName: Record<string, TableSchema> = {};
 
-// Hardcoded Prisma model to Airtable Table ID mapping for integration ease
-const prismaToTableId: Record<string, string> = {
-  branch: "tbl2utdNdP9usMXLf",
-  user: "tblUkEhqFJBFTvRN5",
-  course: "tblgvltY5JtmMZs1q",
-  tuitionplan: "tbldiIHLyH7bup2XG",
-  term: "tblVSaneGtUOq5Xzr",
-  room: "tblunCF2EX30onveH",
-  lead: "tblItZ3B7d4YRO9ih",
-  trial: "tblfvl5TjmWtr24Yp",
-  parent: "tblRJNw4S6o1WPjBI",
-  student: "tbl9Ddw4uRQ3i6e1B",
-  classgroup: "tblpUJni7tMvO2QBs",
-  enrollment: "tblVA5O7fnBx5cAnJ",
-  session: "tblUE4gfr8en6lfUS",
-  attendance: "tblbOAIuMZHgtsjEP",
-  invoice: "tblTB6N6jNqSFvEER",
-  payment: "tbliFcGpMbqnMaD9S",
-  account: "tblLkuBm7zVJKpzzu",
-  journalentry: "tblRf3mdeZmzp2mnf",
-  ledgerline: "tbl0A506K9OVCorYv",
-  vendor: "tblAu08dz4NZJ5HDs",
-  expense: "tblZPcDPnzTxp0sol",
-  franchiseroyalty: "tbl2YiFYDq00gJIrF",
-  teacherpay: "tblGVA0enM9oxS9C0",
-  teacherhours: "tblcOJdLkCBXXJ3AL",
-  activity: "tblbGzoGxZVLRPB7k",
-  channelperformance: "tblJQ9zndF47zIBVg",
-  notificationlog: "tblMsyDxS6ltliuU1"
-};
+// Prisma model -> Airtable table ID, derived from the single source of truth
+// in lib/table-registry.mjs. Previously a hand-maintained 27-entry literal that
+// could silently drift from the registry, field-map, and rbac-matrix.
+const prismaToTableId: Record<string, string> = buildPrismaToTableId();
 
 try {
   const fieldMapPath = resolve(process.cwd(), "config", "field-map.json");
@@ -188,9 +163,6 @@ export function mapRecord(
     for (const field of Object.values(table.fields)) {
       nameToId[field.fieldName] = field.fieldId;
     }
-    // Specific hotfix for Normal Side encoding truncation in baseline
-    nameToId["Normal Side / Но保留"] = "fld2mqd9QfmRkTgxs";
-
     for (const [key, value] of Object.entries(fields)) {
       const fieldId = nameToId[key];
       if (fieldId) {

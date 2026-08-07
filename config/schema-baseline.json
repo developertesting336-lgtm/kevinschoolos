@@ -1,10 +1,10 @@
 {
   "baseId": "appT1VyuwHzKGhOId",
-  "generatedAt": "2026-07-16T08:27:43.645Z",
+  "generatedAt": "2026-08-06T23:15:37.956Z",
   "schemaVersion": "1.0.0",
-  "schemaHash": "44bb45e22634576c6fd30278219db0be4608ca76f61a43ef9ce4a70b67adc71a",
-  "totalTables": 27,
-  "totalFields": 336,
+  "schemaHash": "195d377203f9ef81a2a92faf9be780d84a246f71d573ec59b501b13e796183c0",
+  "totalTables": 39,
+  "totalFields": 529,
   "tables": [
     {
       "tableId": "tbl0A506K9OVCorYv",
@@ -54,9 +54,71 @@
       ]
     },
     {
+      "tableId": "tbl1JpraNHlYrvYU0",
+      "tableName": "34 Documents / Документы",
+      "fieldCount": 11,
+      "fields": [
+        {
+          "fieldId": "fld0JUTH3vPU96j2w",
+          "fieldName": "Days to Renewal / Дней до продления",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fld1MaHn2Q18IYQmW",
+          "fieldName": "Type / Тип",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fld6vt5wjYwqOb2ir",
+          "fieldName": "Expiry / Renewal Date / Дата окончания",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldJVPoiiaJ9zYoFO",
+          "fieldName": "35 Sub-Franchisees (LCF/LSF) / Субфранчайзи",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldKS8rOWoyxxp6iO",
+          "fieldName": "Effective Date / Дата вступления",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldT8eX9TJvF0DGJQ",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldUH05b6xUuPpgMS",
+          "fieldName": "Document / Документ",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldVV3L5iX4pYQEjn",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldZtZylTOEDDn121",
+          "fieldName": "File / Файл",
+          "fieldType": "multipleAttachments"
+        },
+        {
+          "fieldId": "fldosENiG3kipLyfB",
+          "fieldName": "Branch / Филиал",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldv53DtsaF1yC7s7",
+          "fieldName": "Party / Сторона",
+          "fieldType": "singleLineText"
+        }
+      ]
+    },
+    {
       "tableId": "tbl2YiFYDq00gJIrF",
       "tableName": "22 Franchise Royalties / Роялти франшизы",
-      "fieldCount": 15,
+      "fieldCount": 17,
       "fields": [
         {
           "fieldId": "fld0h1a9Ft4YZ144b",
@@ -72,6 +134,11 @@
           "fieldId": "fld9QhA5Wxyd3rzZC",
           "fieldName": "Royalty Amount (KGS) / Сумма роялти (сом)",
           "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldEBJmNPvPRGsdIw",
+          "fieldName": "FX Rate (KGS per EUR) / Курс (сом за EUR)",
+          "fieldType": "number"
         },
         {
           "fieldId": "fldGFKJtr8KtrD7OP",
@@ -92,6 +159,11 @@
           "fieldId": "fldOkHNxjOAlWwJxZ",
           "fieldName": "Notes / Заметки",
           "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldUmEKHHxeKCKgzf",
+          "fieldName": "Total Due HQ (EUR) / Итого к оплате HQ (EUR)",
+          "fieldType": "formula"
         },
         {
           "fieldId": "fldYq1yXbNxHE4ps4",
@@ -138,7 +210,7 @@
     {
       "tableId": "tbl2utdNdP9usMXLf",
       "tableName": "01 Branches / Филиалы",
-      "fieldCount": 28,
+      "fieldCount": 35,
       "fields": [
         {
           "fieldId": "fld0JlE09kRgxbduQ",
@@ -153,6 +225,11 @@
         {
           "fieldId": "fld4Di2PlErMdGRfw",
           "fieldName": "Ledger Lines",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fld697jJsf0IjqXmg",
+          "fieldName": "34 Documents / Документы",
           "fieldType": "multipleRecordLinks"
         },
         {
@@ -178,6 +255,11 @@
         {
           "fieldId": "fldEM2yAuxm03pZaY",
           "fieldName": "Sessions",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldJk1iXRaHsm86El",
+          "fieldName": "31 Fixed Assets / Основные средства",
           "fieldType": "multipleRecordLinks"
         },
         {
@@ -209,6 +291,11 @@
           "fieldId": "fldOSx76SK1oCsHwq",
           "fieldName": "Name (Russian) / Название",
           "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldS83P29TmgKEyHS",
+          "fieldName": "33 Marketing Campaigns / Маркетинговые кампании",
+          "fieldType": "multipleRecordLinks"
         },
         {
           "fieldId": "fldT5JlLwUIMonS3W",
@@ -246,9 +333,24 @@
           "fieldType": "multipleRecordLinks"
         },
         {
+          "fieldId": "fldk4KZO6sldUZ0Gn",
+          "fieldName": "28 Backpack Inventory / Инвентарь рюкзаков",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldosZpLkodnBKl5P",
+          "fieldName": "29 TTCs / Курсы подготовки преподавателей",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
           "fieldId": "fldpWUoqTZGKcfZsY",
           "fieldName": "Status / Статус",
           "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldqTJqyJyZioGRL3",
+          "fieldName": "32 Build-Out Projects / Проекты открытия центров",
+          "fieldType": "multipleRecordLinks"
         },
         {
           "fieldId": "fldstr7xhKppw0U7f",
@@ -279,18 +381,110 @@
           "fieldId": "fldyuvm7pjpfHE9fw",
           "fieldName": "27 Notifications Log / Журнал уведомлений",
           "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldzbf7FuWiT5UyG8",
+          "fieldName": "30 Budget &amp; Targets / Бюджет и цели",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tbl5P27dUHrKWOMw2",
+      "tableName": "31 Fixed Assets / Основные средства",
+      "fieldCount": 13,
+      "fields": [
+        {
+          "fieldId": "fld2P1d0E7Kt9My8L",
+          "fieldName": "Useful Life (years) / Срок службы (лет)",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fld3cWaXmN6XuezMQ",
+          "fieldName": "Acquisition Date / Дата приобретения",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fld41DEO1wCOv2Tdx",
+          "fieldName": "Cost (KGS) / Стоимость (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldB645tnnRW78pKH",
+          "fieldName": "Category / Категория",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldGE11vfx7ddT3IU",
+          "fieldName": "Asset / Актив",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldLSMRO4GZRHSUqP",
+          "fieldName": "Build-Out Project / Проект открытия",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldSxTpgHZYQRiU4r",
+          "fieldName": "Annual Depreciation (KGS) / Годовая амортизация (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldeNb0slXS6tac2o",
+          "fieldName": "Book Value (KGS) / Балансовая стоимость (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldj1tSnsxRqxCLXe",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldjOQcMr9BlZbfzu",
+          "fieldName": "Branch / Филиал",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldkuwDLD1ITmzmgK",
+          "fieldName": "Accumulated Depreciation (KGS) / Накопленная амортизация (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldlT5JntDYj1HpLE",
+          "fieldName": "Vendor / Поставщик",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldmOrpvyKIUqXXXC",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
         }
       ]
     },
     {
       "tableId": "tbl9Ddw4uRQ3i6e1B",
       "tableName": "10 Students / Ученики",
-      "fieldCount": 13,
+      "fieldCount": 19,
       "fields": [
+        {
+          "fieldId": "fld1mmys4N9MGjsEf",
+          "fieldName": "Reason for Leaving / Причина ухода",
+          "fieldType": "singleSelect"
+        },
         {
           "fieldId": "fld5mAXd41sVpQzlp",
           "fieldName": "Attendance",
           "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldFJtT0mMHcQuEC4",
+          "fieldName": "Pause Reason / Причина паузы",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldJ9WPx3YGLaZhEU",
+          "fieldName": "Withdrawal Date / Дата отчисления",
+          "fieldType": "date"
         },
         {
           "fieldId": "fldTeS3Yg44gCGB90",
@@ -306,6 +500,16 @@
           "fieldId": "fldY0norcWBqukttE",
           "fieldName": "Status / Статус",
           "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldZCMbjKfOHBhPa9",
+          "fieldName": "First Enroll Date / Дата первого зачисления",
+          "fieldType": "rollup"
+        },
+        {
+          "fieldId": "fldaYH29vzzSvYi8D",
+          "fieldName": "Age at Withdrawal / Возраст при отчислении",
+          "fieldType": "formula"
         },
         {
           "fieldId": "flddPunThQwHvRVkF",
@@ -351,13 +555,18 @@
           "fieldId": "fldxSWZkOB3asgNkP",
           "fieldName": "Trials",
           "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldzpHQOs0EyG2uuO",
+          "fieldName": "Cohort Month / Месяц когорты",
+          "fieldType": "formula"
         }
       ]
     },
     {
       "tableId": "tblAu08dz4NZJ5HDs",
       "tableName": "20 Vendors / Поставщики",
-      "fieldCount": 9,
+      "fieldCount": 10,
       "fields": [
         {
           "fieldId": "fld1ESQQ52ldthXxZ",
@@ -390,6 +599,11 @@
           "fieldType": "singleLineText"
         },
         {
+          "fieldId": "fldhZBJYSnjsT0qeB",
+          "fieldName": "31 Fixed Assets / Основные средства",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
           "fieldId": "fldrUAaCEBNxGMyx5",
           "fieldName": "Vendor Name / Поставщик",
           "fieldType": "singleLineText"
@@ -403,6 +617,88 @@
           "fieldId": "fldvMafCcYRRdjy2t",
           "fieldName": "Franchise Royalties",
           "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblBbv8UPCF6TAYqy",
+      "tableName": "29 TTCs / Курсы подготовки преподавателей",
+      "fieldCount": 15,
+      "fields": [
+        {
+          "fieldId": "fld1xWv24l4lPqcGJ",
+          "fieldName": "Materials Cost (KGS) / Стоимость материалов (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fld9Z88uGQ4GrOHm7",
+          "fieldName": "Teachers Trained / Обученные преподаватели",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldARO0bEv6fhx2IZ",
+          "fieldName": "End Date / Дата окончания",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldBCHqqw3yICMtHs",
+          "fieldName": "Start Date / Дата начала",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldE5jMOGEydLRfch",
+          "fieldName": "Participants / Участников",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldHkbOnXiycnrUpX",
+          "fieldName": "Net Revenue (KGS) / Чистая выручка (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldNijmSlTcK6JVjV",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldOqNr6Mo4SkyiQZ",
+          "fieldName": "Programme / Программа",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldX07yAv1ASg4jgZ",
+          "fieldName": "Total Revenue (KGS) / Выручка (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldaAIl60DkkTh8tE",
+          "fieldName": "Branch / Филиал",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldat06pEmLbXXX77",
+          "fieldName": "Location / Место",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "flde1b7oQixFbjHXz",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldm2P1bn0q6DUzs7",
+          "fieldName": "Fee per Participant (KGS) / Стоимость за участника (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldnYxluPJk4ZcpnB",
+          "fieldName": "TTC ID / ID курса",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldwdkSifeVDlzwew",
+          "fieldName": "Trainer / Тренер",
+          "fieldType": "singleLineText"
         }
       ]
     },
@@ -491,12 +787,17 @@
     {
       "tableId": "tblItZ3B7d4YRO9ih",
       "tableName": "07 Leads / Лиды",
-      "fieldCount": 19,
+      "fieldCount": 21,
       "fields": [
         {
           "fieldId": "fld0JO43zpFkf6N4M",
           "fieldName": "Lost Reason / Причина отказа",
           "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fld0XM2wfroNux6qt",
+          "fieldName": "Referred By / Кто порекомендовал",
+          "fieldType": "singleLineText"
         },
         {
           "fieldId": "fldCmaAEjCR6Q2wvH",
@@ -586,6 +887,11 @@
         {
           "fieldId": "fldtqwoAM6vOeQhVr",
           "fieldName": "Branch",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldx4CMfZ2WbIsZsi",
+          "fieldName": "33 Marketing Campaigns / Маркетинговые кампании",
           "fieldType": "multipleRecordLinks"
         }
       ]
@@ -690,7 +996,7 @@
     {
       "tableId": "tblLkuBm7zVJKpzzu",
       "tableName": "17 Chart of Accounts / План счетов",
-      "fieldCount": 11,
+      "fieldCount": 12,
       "fields": [
         {
           "fieldId": "fld2mqd9QfmRkTgxs",
@@ -736,6 +1042,11 @@
           "fieldId": "flduueVpbzU9Zi3Lz",
           "fieldName": "Type / Тип",
           "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldzWQA33bCm31avg",
+          "fieldName": "Balance (KGS) / Баланс (сом)",
+          "fieldType": "rollup"
         },
         {
           "fieldId": "fldzaMxKxPt9rmkFi",
@@ -822,6 +1133,140 @@
       ]
     },
     {
+      "tableId": "tblO38n2QCCEdey10",
+      "tableName": "28 Backpack Inventory / Инвентарь рюкзаков",
+      "fieldCount": 13,
+      "fields": [
+        {
+          "fieldId": "fld8aVSU2lg5WzqHR",
+          "fieldName": "Sold / Продано",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldBfxbNuTe2xIvFD",
+          "fieldName": "Date Received / Дата получения",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldD6Gs0uL2FsqrtP",
+          "fieldName": "Net Profit per Backpack (KGS) / Чистая прибыль (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldHfOvTMq5n5FXxk",
+          "fieldName": "Branch / Филиал",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldW2aLYeRFRSTvFP",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldhpOnpoEnXXN8RL",
+          "fieldName": "Total Backpacks / Всего рюкзаков",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldjumjFFrvc0Ze9b",
+          "fieldName": "Gross Profit per Backpack (KGS) / Валовая прибыль (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldktMnyEsVaF03ii",
+          "fieldName": "Selling Price (KGS) / Цена продажи (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldmPwxp41lxT1lc2",
+          "fieldName": "Related Services Royalty 8% (KGS) / Роялти 8% (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldtouN3wXqMeVs9V",
+          "fieldName": "Purchase Cost (KGS) / Себестоимость (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldtuQS6u6Tri48ve",
+          "fieldName": "Supplier / Поставщик",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldwaW8Hsu9r4soBd",
+          "fieldName": "Remaining / Остаток",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldx5KbfjYmIF1AiN",
+          "fieldName": "Level Name / Уровень",
+          "fieldType": "singleLineText"
+        }
+      ]
+    },
+    {
+      "tableId": "tblPSNnBHuyRj9C6N",
+      "tableName": "33 Marketing Campaigns / Маркетинговые кампании",
+      "fieldCount": 11,
+      "fields": [
+        {
+          "fieldId": "fld2EoNKaZnxcqqfD",
+          "fieldName": "Channel / Канал",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldDdnPVgYNyAg4dP",
+          "fieldName": "Cost per Lead (KGS) / Стоимость лида (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldIkbgSd3ez4vu3e",
+          "fieldName": "Spend (KGS) / Затраты (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldbazbAhOEp2NCwz",
+          "fieldName": "Objective / Цель",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldgvaZu402noU8BZ",
+          "fieldName": "Branch / Филиал",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldhkqNAhj0GbwA1y",
+          "fieldName": "Leads Generated / Привлечено лидов",
+          "fieldType": "count"
+        },
+        {
+          "fieldId": "fldkCgK0Pop8zOli9",
+          "fieldName": "Campaign / Кампания",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldp4LpOLasnalJJl",
+          "fieldName": "Start Date / Дата начала",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldqHUOKuVJvGgr64",
+          "fieldName": "End Date / Дата окончания",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldtHMk8UylxoQm8j",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldxz1w8btL8MFrTp",
+          "fieldName": "Leads / Лиды",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
       "tableId": "tblRJNw4S6o1WPjBI",
       "tableName": "09 Parents / Родители",
       "fieldCount": 15,
@@ -904,6 +1349,63 @@
       ]
     },
     {
+      "tableId": "tblRMtJRf9oYfWtqt",
+      "tableName": "30 Budget &amp; Targets / Бюджет и цели",
+      "fieldCount": 10,
+      "fields": [
+        {
+          "fieldId": "fldAfOXzE4oPGKOMD",
+          "fieldName": "Line / Строка",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldIJLbtAN5Y64Sns",
+          "fieldName": "Branch / Филиал",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldMmstdSVkwhkwby",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldSBljGfPZDqWZol",
+          "fieldName": "Period / Период",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldVkjfw1AblBeYsb",
+          "fieldName": "Category / Категория",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "flde3bCL9gvxEz5oE",
+          "fieldName": "Variance % / Отклонение %",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldf0Pqo7b5Jhhp1d",
+          "fieldName": "Type / Тип",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldkH0BkC7SqqAwbk",
+          "fieldName": "Variance (KGS) / Отклонение (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldt9G33hSN6qDRco",
+          "fieldName": "Actual Amount (KGS) / Факт (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "flduL47ASUjGOuRgA",
+          "fieldName": "Target Amount (KGS) / План (сом)",
+          "fieldType": "currency"
+        }
+      ]
+    },
+    {
       "tableId": "tblRf3mdeZmzp2mnf",
       "tableName": "18 Journal Entries / Журнальные записи",
       "fieldCount": 12,
@@ -973,7 +1475,7 @@
     {
       "tableId": "tblTB6N6jNqSFvEER",
       "tableName": "15 Invoices / Счета",
-      "fieldCount": 12,
+      "fieldCount": 14,
       "fields": [
         {
           "fieldId": "fld9gBMYbKHjrloEs",
@@ -1011,6 +1513,11 @@
           "fieldType": "currency"
         },
         {
+          "fieldId": "fldY6vKlBdfd4oZ8q",
+          "fieldName": "Amount Paid (KGS) / Оплачено (сом)",
+          "fieldType": "rollup"
+        },
+        {
           "fieldId": "fldZ2vfOggiAbm0fC",
           "fieldName": "Issue Date / Дата выставления",
           "fieldType": "date"
@@ -1034,6 +1541,11 @@
           "fieldId": "fldqJey7ciPEqd59k",
           "fieldName": "Status / Статус",
           "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldxRzzNfggP9ezbT",
+          "fieldName": "Balance (KGS) / Остаток (сом)",
+          "fieldType": "formula"
         }
       ]
     },
@@ -1087,8 +1599,18 @@
     {
       "tableId": "tblUkEhqFJBFTvRN5",
       "tableName": "02 Users / Сотрудники",
-      "fieldCount": 14,
+      "fieldCount": 19,
       "fields": [
+        {
+          "fieldId": "fld3oHpTSq7X00jIB",
+          "fieldName": "TTC Completed Date / Дата прохождения TTC",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fld5fsjtkR1E2BcHc",
+          "fieldName": "Qualification Status / Статус квалификации",
+          "fieldType": "singleSelect"
+        },
         {
           "fieldId": "fld6cRQ0hWQ7eoJxl",
           "fieldName": "Teacher Hours",
@@ -1110,6 +1632,11 @@
           "fieldType": "singleLineText"
         },
         {
+          "fieldId": "fldLPVzms9txNdTpX",
+          "fieldName": "Teacher Level / Уровень преподавателя",
+          "fieldType": "singleSelect"
+        },
+        {
           "fieldId": "fldO0dXiGejfosngj",
           "fieldName": "25 Activities / Действия",
           "fieldType": "multipleRecordLinks"
@@ -1118,6 +1645,16 @@
           "fieldId": "fldPDnXM1aCwXc7Bk",
           "fieldName": "Working Language / Рабочий язык",
           "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldVuWgqDXynqLYJc",
+          "fieldName": "29 TTCs / Курсы подготовки преподавателей",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldk7VkXF4NEE5Zn1",
+          "fieldName": "Programmes Certified / Сертифицированные программы",
+          "fieldType": "multipleSelects"
         },
         {
           "fieldId": "fldoxjXB6LlfBLbAA",
@@ -1164,7 +1701,7 @@
     {
       "tableId": "tblVA5O7fnBx5cAnJ",
       "tableName": "12 Enrollments / Зачисления",
-      "fieldCount": 23,
+      "fieldCount": 26,
       "fields": [
         {
           "fieldId": "fld0tk6w9UAtCKrWA",
@@ -1217,6 +1754,11 @@
           "fieldType": "singleSelect"
         },
         {
+          "fieldId": "fldV6NE7X3PWFU0tR",
+          "fieldName": "Tenure (months) / Длительность (мес.)",
+          "fieldType": "formula"
+        },
+        {
           "fieldId": "fldV9CDG6hTBsoPyP",
           "fieldName": "Student",
           "fieldType": "multipleRecordLinks"
@@ -1262,9 +1804,19 @@
           "fieldType": "multipleRecordLinks"
         },
         {
+          "fieldId": "fldj4rnd6RcQrZEWf",
+          "fieldName": "Next Payment Date / Дата следующего платежа",
+          "fieldType": "date"
+        },
+        {
           "fieldId": "fldm9VVVEVGgSsBOM",
           "fieldName": "27 Notifications Log / Журнал уведомлений",
           "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldsTa7YnJYNyUOEt",
+          "fieldName": "End Date / Дата окончания",
+          "fieldType": "date"
         },
         {
           "fieldId": "fldtgJU9259Sf78x9",
@@ -1516,8 +2068,28 @@
     {
       "tableId": "tbldiIHLyH7bup2XG",
       "tableName": "04 Tuition Plans / Тарифные планы",
-      "fieldCount": 8,
+      "fieldCount": 13,
       "fields": [
+        {
+          "fieldId": "fld5Lop5tmv9f6JC8",
+          "fieldName": "Discount Value / Размер скидки",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fld8euHTkCd4gutyg",
+          "fieldName": "Discount Type / Тип скидки",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldEEn1ydkLEWDDfn",
+          "fieldName": "Discount / Скидка",
+          "fieldType": "checkbox"
+        },
+        {
+          "fieldId": "fldEc5zcubOQAN5yz",
+          "fieldName": "Discount Reason / Причина скидки",
+          "fieldType": "singleSelect"
+        },
         {
           "fieldId": "fldJah9AdenE3lzDY",
           "fieldName": "Name (Kyrgyz) / Аталышы",
@@ -1549,6 +2121,11 @@
           "fieldType": "singleLineText"
         },
         {
+          "fieldId": "fldhBe0Mg9IPel7AZ",
+          "fieldName": "Net Amount (KGS) / Итого к оплате (сом)",
+          "fieldType": "formula"
+        },
+        {
           "fieldId": "fldzJoaYdz7VwF6r2",
           "fieldName": "Billing Period / Период оплаты",
           "fieldType": "singleSelect"
@@ -1557,6 +2134,63 @@
           "fieldId": "fldzWFoNsJ4Fva7IR",
           "fieldName": "Name (Russian) / Название",
           "fieldType": "singleLineText"
+        }
+      ]
+    },
+    {
+      "tableId": "tbleVIIZdAmIlFcZS",
+      "tableName": "39 Franchise Obligations / Обязательства франшизы",
+      "fieldCount": 10,
+      "fields": [
+        {
+          "fieldId": "fldAtrbSX5jwIaiiV",
+          "fieldName": "Obligation / Обязательство",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldMBiDFZNjcBPhKa",
+          "fieldName": "Next Due Date / Следующий срок",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldPUsrFu7WsfofWG",
+          "fieldName": "Cadence / Периодичность",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldSqWzQqVGN9Gr5J",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldT4FKMIIOMHNIxv",
+          "fieldName": "Penalty / Штраф",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldUCzXFRcBLu4qA5",
+          "fieldName": "Amount (EUR) / Сумма (EUR)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldVnGlS0KmnVNak6",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldeY8IzBHdqS9AeL",
+          "fieldName": "MFA Clause / Пункт MFA",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldvtxbqVmUxMCVoR",
+          "fieldName": "Category / Категория",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldy72CE5dDtW5yJX",
+          "fieldName": "Days to Due / Дней до срока",
+          "fieldType": "formula"
         }
       ]
     },
@@ -1772,9 +2406,141 @@
       ]
     },
     {
+      "tableId": "tblns9BnLFvsJrdOW",
+      "tableName": "35 Sub-Franchisees (LCF/LSF) / Субфранчайзи",
+      "fieldCount": 25,
+      "fields": [
+        {
+          "fieldId": "fld1GrC3L1P2bg0Ln",
+          "fieldName": "Students Reported / Учеников в отчёте",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fld3IOK2RksquIWPh",
+          "fieldName": "Population Served / Население района",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fld4WsId9rybFMXnU",
+          "fieldName": "In Grace Period? / В льготном периоде?",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldAf8wtYhOvB5kD8",
+          "fieldName": "Open Date / Дата открытия",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldBxTXZJ3qhohzO1",
+          "fieldName": "Documents / Документы",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldE4NfboA0xCXgnJ",
+          "fieldName": "Actual Fixed Royalty (Annual, KGS) / Годовое фикс. роялти (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldFMSZkmBA4sMUXk",
+          "fieldName": "Sub-Area / Район",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldFOLmmfRN4nvWoB",
+          "fieldName": "Type / Тип",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldHtqBTlorpoZUWX",
+          "fieldName": "Franchisee Name / Название франчайзи",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldIDGondp9YdBHfK",
+          "fieldName": "Agreement Signed Date / Дата подписания",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldLhesvU6n9vtCL9",
+          "fieldName": "MF Fee Share to HQ (EUR) / Доля взноса HQ (EUR)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldRRKaykqEQCOotl",
+          "fieldName": "Annual Lesson Count / Уроков в год",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldXC4fN4FiSmFsxK",
+          "fieldName": "37 SETs / Самозанятые преподаватели",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldeAMr13XqAE6yzX",
+          "fieldName": "Franchise Fee (EUR) / Франшизный взнос (EUR)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldfIvpsxZlcOAPXS",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldfgr13W1677d8q3",
+          "fieldName": "Expected Students (Royalty Basis) / Ожидаемых учеников",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldggf1KurmdeFH6H",
+          "fieldName": "Phone / Телефон",
+          "fieldType": "phoneNumber"
+        },
+        {
+          "fieldId": "fldjG72A7V62RPB9e",
+          "fieldName": "Lesson Fee (KGS) / Стоимость урока (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldlXP9y2prsgGqID",
+          "fieldName": "36 Sub-Franchise Royalties / Роялти субфранчайзи",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldpVqQCyxjM3lDoy",
+          "fieldName": "Royalty Rate % / Ставка роялти %",
+          "fieldType": "percent"
+        },
+        {
+          "fieldId": "fldqlcfdGkQg0jjag",
+          "fieldName": "Email / Эл. почта",
+          "fieldType": "email"
+        },
+        {
+          "fieldId": "fldr7MzbE89PI2EUv",
+          "fieldName": "Contact Name / Контактное лицо",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldscs0gsnlmKRe5Q",
+          "fieldName": "Build-Out Project / Проект открытия",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldvQOQUNeXqHgw0b",
+          "fieldName": "Grace Period End / Конец льготного периода",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldyZS8xNhrfTf6bJ",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        }
+      ]
+    },
+    {
       "tableId": "tblpUJni7tMvO2QBs",
       "tableName": "11 Class Groups / Группы",
-      "fieldCount": 13,
+      "fieldCount": 15,
       "fields": [
         {
           "fieldId": "fld0hugbTJfWykog6",
@@ -1817,6 +2583,11 @@
           "fieldType": "multipleRecordLinks"
         },
         {
+          "fieldId": "fldPJpcz3xsIYc4IK",
+          "fieldName": "Utilisation % / Заполненность %",
+          "fieldType": "formula"
+        },
+        {
           "fieldId": "fldPvtA1ugZitmSkT",
           "fieldName": "Teacher",
           "fieldType": "multipleRecordLinks"
@@ -1832,6 +2603,11 @@
           "fieldType": "multipleRecordLinks"
         },
         {
+          "fieldId": "fldrPYdkK20io4VVo",
+          "fieldName": "Enrolled Count / Зачислено",
+          "fieldType": "count"
+        },
+        {
           "fieldId": "fldzQWsTvAK9VkcxC",
           "fieldName": "Branch",
           "fieldType": "multipleRecordLinks"
@@ -1839,6 +2615,207 @@
         {
           "fieldId": "fldzmR8v8uue3Ce0Q",
           "fieldName": "Term",
+          "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblpepGaPbfVlBv74",
+      "tableName": "38 Minimum Goals / Минимальные цели",
+      "fieldCount": 13,
+      "fields": [
+        {
+          "fieldId": "fld2MO7BHJwJZ51yd",
+          "fieldName": "SET Students / Учеников SET",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldFEUi4m3hRy1L5x",
+          "fieldName": "MF-owned Students / Учеников собств. центра",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldJuMgnBugPKzAXz",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldKofnyDx0Mz7xKN",
+          "fieldName": "LCF/LSF Students / Учеников франчайзи",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldKwiTeHqOrcnwpT",
+          "fieldName": "Target Students / Цель (учеников)",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldXfU0CPUXVMjlXw",
+          "fieldName": "% of Goal / % цели",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldXiNSWzs3SFbV9p",
+          "fieldName": "Gap to Goal / Разрыв до цели",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldYpnEUjmowVHJoB",
+          "fieldName": "Goal Year / Год цели",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldbaI3f0EPXhHhCd",
+          "fieldName": "End Date / Конец",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldh5XS5jbjlknOui",
+          "fieldName": "School Year / Учебный год",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldmwlbVzkynyqVOG",
+          "fieldName": "Status / Статус",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldo6uLFbbEb2j4RF",
+          "fieldName": "Start Date / Начало",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldxT09L5HSOeJCT3",
+          "fieldName": "Total Area Students / Всего учеников",
+          "fieldType": "formula"
+        }
+      ]
+    },
+    {
+      "tableId": "tblqJGJRambPzTePj",
+      "tableName": "32 Build-Out Projects / Проекты открытия центров",
+      "fieldCount": 13,
+      "fields": [
+        {
+          "fieldId": "fld6gnBF7JNnrZP7M",
+          "fieldName": "Branch / Филиал",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldHLfFokfWDUiCXl",
+          "fieldName": "35 Sub-Franchisees (LCF/LSF) / Субфранчайзи",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldM6EW8YlQcWV2dn",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldNz804wF8IWUUkh",
+          "fieldName": "31 Fixed Assets / Основные средства",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldVtlpRGMhIoFZM3",
+          "fieldName": "Sub-Area / Район",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldc4Vfe0oWjFrsnz",
+          "fieldName": "Budget (KGS) / Бюджет (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldfpxbHAcxDxIW5R",
+          "fieldName": "Type / Тип",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldiSdxGbTcfRPHB4",
+          "fieldName": "Actual Spend (KGS) / Фактические затраты (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldmbtA39UbwIMlAI",
+          "fieldName": "Variance (KGS) / Отклонение (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fldo0VcPaOOCn1rn4",
+          "fieldName": "Actual Open Date / Фактическая дата открытия",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldpGCqvVv3uO8fPi",
+          "fieldName": "Project / Проект",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldqHZHHyayUCKvue",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldwfnxzjaXwvnOeb",
+          "fieldName": "Target Open Date / Плановая дата открытия",
+          "fieldType": "date"
+        }
+      ]
+    },
+    {
+      "tableId": "tbltNBkGhwTiItU6B",
+      "tableName": "37 SETs / Самозанятые преподаватели",
+      "fieldCount": 10,
+      "fields": [
+        {
+          "fieldId": "fld4OGF7gwHsFvhUO",
+          "fieldName": "Email / Эл. почта",
+          "fieldType": "email"
+        },
+        {
+          "fieldId": "fldKvYeaxeN9JCLZ4",
+          "fieldName": "Royalty Rate % / Ставка роялти %",
+          "fieldType": "percent"
+        },
+        {
+          "fieldId": "fldO5VT31d6CSywYh",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldTaQWjGuIVeyXXa",
+          "fieldName": "Phone / Телефон",
+          "fieldType": "phoneNumber"
+        },
+        {
+          "fieldId": "fldU61dlU5u1dWkD2",
+          "fieldName": "Students / Учеников",
+          "fieldType": "number"
+        },
+        {
+          "fieldId": "fldYUk6XgVmjl1uvM",
+          "fieldName": "SET Name / ФИО",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fldZvKDcDITnObkBD",
+          "fieldName": "Start Date / Дата начала",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldaz7VZIrWioat4A",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
+        },
+        {
+          "fieldId": "fldeapEgFxxJQJj8j",
+          "fieldName": "Sub-Franchise Royalties / Роялти",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldzQopiJPUzlAURg",
+          "fieldName": "Reports To / Относится к",
           "fieldType": "multipleRecordLinks"
         }
       ]
@@ -1872,6 +2849,78 @@
           "fieldId": "fldnUe4DwO8wd7HKQ",
           "fieldName": "Branch",
           "fieldType": "multipleRecordLinks"
+        }
+      ]
+    },
+    {
+      "tableId": "tblx5V0x0s6kbr56l",
+      "tableName": "36 Sub-Franchise Royalties / Роялти субфранчайзи",
+      "fieldCount": 13,
+      "fields": [
+        {
+          "fieldId": "fld1Q5bVie7krlrEG",
+          "fieldName": "HQ Share (KGS) / Доля HQ (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "fld64NGZ78KyXqplO",
+          "fieldName": "Royalty No / Номер роялти",
+          "fieldType": "singleLineText"
+        },
+        {
+          "fieldId": "fld7Pv17ijta1Yjkv",
+          "fieldName": "Period / Период",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fld7aD2c90ZGHDzRQ",
+          "fieldName": "Notes / Заметки",
+          "fieldType": "multilineText"
+        },
+        {
+          "fieldId": "fldCyof6PP304xcl7",
+          "fieldName": "Monthly Royalty Due (KGS) / Роялти к получению (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldRkLsCCIpm52YMz",
+          "fieldName": "Due Date / Срок оплаты",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldTmN6y8jVTCp8LF",
+          "fieldName": "Received Date / Дата получения",
+          "fieldType": "date"
+        },
+        {
+          "fieldId": "fldchsxtKEUrg60Bp",
+          "fieldName": "Franchisee / Франчайзи",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldlPGjcmC1ybgtxw",
+          "fieldName": "37 SETs / Самозанятые преподаватели",
+          "fieldType": "multipleRecordLinks"
+        },
+        {
+          "fieldId": "fldpd2VqxDcsvixei",
+          "fieldName": "Balance (KGS) / Остаток (сом)",
+          "fieldType": "formula"
+        },
+        {
+          "fieldId": "flduaqSYY0ZrkVMN6",
+          "fieldName": "Amount Received (KGS) / Получено (сом)",
+          "fieldType": "currency"
+        },
+        {
+          "fieldId": "fldun6oJ8MwQ91dX8",
+          "fieldName": "HQ Share % / Доля HQ %",
+          "fieldType": "percent"
+        },
+        {
+          "fieldId": "fldzppXXT9Wk0xSPk",
+          "fieldName": "Status / Статус",
+          "fieldType": "singleSelect"
         }
       ]
     }

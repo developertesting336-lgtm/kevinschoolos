@@ -328,7 +328,10 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "billingPeriod", label: "Billing Period", type: "string", sortable: true },
       { key: "discount", label: "Discount", type: "boolean", sortable: true },
       { key: "active", label: "Active", type: "boolean", sortable: true },
-      { key: "enrollmentsCount", label: "Enrollments Count", type: "number", isComputed: true },
+      // `enrollmentsCount` was listed here but exists on neither the Prisma model
+      // nor the Airtable table, so it put an unknown key into the Prisma `select`
+      // and made /api/owner/tuitionplan throw. Removed 2026-08-06.
+      { key: "netAmount", label: "Net Amount (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
       { key: "createdAt", label: "Created Date", type: "date", sortable: true }
     ]
   },
@@ -582,6 +585,317 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "lostOther", label: "Lost - Other", type: "number" },
       { key: "branchIds", label: "Branches", type: "array" },
       { key: "updatedAt", label: "Last Updated", type: "date", sortable: true }
+    ]
+  },
+
+  // ==========================================================================
+  // Tables 28-39 - adopted 2026-08-06 (docs/schema-adoption-guide.md §6.1).
+  // All read-only in Phase 1. Columns redacted in lib/rbac.ts are omitted here
+  // entirely, because the owner generic renderer builds its Prisma `select`
+  // from this list and never calls applyRedactions().
+  // ==========================================================================
+  backpackinventory: {
+    label: "Backpack Inventory",
+    modelName: "backpackInventory",
+    defaultSortBy: "levelName",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["levelName", "supplier", "notes"],
+    filterableFields: [],
+    columns: [
+      { key: "levelName", label: "Level Name", type: "string", sortable: true },
+      { key: "totalBackpacks", label: "Total Backpacks", type: "number", sortable: true },
+      { key: "sold", label: "Sold", type: "number", sortable: true },
+      { key: "sellingPriceKgs", label: "Selling Price (KGS)", type: "number", sortable: true },
+      { key: "dateReceived", label: "Date Received", type: "date", sortable: true },
+      { key: "supplier", label: "Supplier", type: "string", sortable: true },
+      { key: "purchaseCostKgs", label: "Purchase Cost (KGS)", type: "number", sortable: true },
+      { key: "notes", label: "Notes", type: "string", sortable: true },
+      { key: "remaining", label: "Remaining", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "grossProfitPerBackpackKgs", label: "Gross Profit Per Backpack (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "branchIds", label: "Branch", type: "array" },
+      { key: "relatedServicesRoyalty8PctKgs", label: "Related Services Royalty8 % (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "netProfitPerBackpackKgs", label: "Net Profit Per Backpack (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  ttc: {
+    label: "TTCs",
+    modelName: "ttc",
+    defaultSortBy: "ttcId",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["ttcId", "programme", "location"],
+    filterableFields: [],
+    columns: [
+      { key: "ttcId", label: "TTC Id", type: "string", sortable: true },
+      { key: "programme", label: "Programme", type: "string", sortable: true },
+      { key: "startDate", label: "Start Date", type: "date", sortable: true },
+      { key: "endDate", label: "End Date", type: "date", sortable: true },
+      { key: "location", label: "Location", type: "string", sortable: true },
+      { key: "trainer", label: "Trainer", type: "string", sortable: true },
+      { key: "participants", label: "Participants", type: "number", sortable: true },
+      { key: "feePerParticipantKgs", label: "Fee Per Participant (KGS)", type: "number", sortable: true },
+      { key: "materialsCostKgs", label: "Materials Cost (KGS)", type: "number", sortable: true },
+      { key: "status", label: "Status", type: "string", sortable: true },
+      { key: "notes", label: "Notes", type: "string", sortable: true },
+      { key: "branchIds", label: "Branch", type: "array" },
+      { key: "teachersTrainedIds", label: "Teachers Trained", type: "array" },
+      { key: "totalRevenueKgs", label: "Total Revenue (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "netRevenueKgs", label: "Net Revenue (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  budgettarget: {
+    label: "Budget & Targets",
+    modelName: "budgetTarget",
+    defaultSortBy: "line",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["line", "type", "category"],
+    filterableFields: [],
+    columns: [
+      { key: "line", label: "Line", type: "string", sortable: true },
+      { key: "period", label: "Period", type: "date", sortable: true },
+      { key: "type", label: "Type", type: "string", sortable: true },
+      { key: "category", label: "Category", type: "string", sortable: true },
+      { key: "targetAmountKgs", label: "Target Amount (KGS)", type: "number", sortable: true },
+      { key: "actualAmountKgs", label: "Actual Amount (KGS)", type: "number", sortable: true },
+      { key: "notes", label: "Notes", type: "string", sortable: true },
+      { key: "branchIds", label: "Branch", type: "array" },
+      { key: "varianceKgs", label: "Variance (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "variancePct", label: "Variance %", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  fixedasset: {
+    label: "Fixed Assets",
+    modelName: "fixedAsset",
+    defaultSortBy: "asset",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["asset", "category", "status"],
+    filterableFields: [],
+    columns: [
+      { key: "asset", label: "Asset", type: "string", sortable: true },
+      { key: "category", label: "Category", type: "string", sortable: true },
+      { key: "acquisitionDate", label: "Acquisition Date", type: "date", sortable: true },
+      { key: "costKgs", label: "Cost (KGS)", type: "number", sortable: true },
+      { key: "usefulLifeYears", label: "Useful Life Years", type: "number", sortable: true },
+      { key: "accumulatedDepreciationKgs", label: "Accumulated Depreciation (KGS)", type: "number", sortable: true },
+      { key: "status", label: "Status", type: "string", sortable: true },
+      { key: "notes", label: "Notes", type: "string", sortable: true },
+      { key: "branchIds", label: "Branch", type: "array" },
+      { key: "vendorIds", label: "Vendor", type: "array" },
+      { key: "bookValueKgs", label: "Book Value (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "annualDepreciationKgs", label: "Annual Depreciation (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "buildOutProjectIds", label: "Build Out Project", type: "array" },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  buildoutproject: {
+    label: "Build-Out Projects",
+    modelName: "buildOutProject",
+    defaultSortBy: "project",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["project", "subArea", "type"],
+    filterableFields: [],
+    columns: [
+      { key: "project", label: "Project", type: "string", sortable: true },
+      { key: "subArea", label: "Sub Area", type: "string", sortable: true },
+      { key: "type", label: "Type", type: "string", sortable: true },
+      { key: "status", label: "Status", type: "string", sortable: true },
+      { key: "targetOpenDate", label: "Target Open Date", type: "date", sortable: true },
+      { key: "actualOpenDate", label: "Actual Open Date", type: "date", sortable: true },
+      { key: "budgetKgs", label: "Budget (KGS)", type: "number", sortable: true },
+      { key: "actualSpendKgs", label: "Actual Spend (KGS)", type: "number", sortable: true },
+      { key: "notes", label: "Notes", type: "string", sortable: true },
+      { key: "branchIds", label: "Branch", type: "array" },
+      { key: "varianceKgs", label: "Variance (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "fixedAssetsIds", label: "Fixed Assets", type: "array" },
+      { key: "subFranchiseesLcfIds", label: "Sub Franchisees Lcf", type: "array" },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  marketingcampaign: {
+    label: "Marketing Campaigns",
+    modelName: "marketingCampaign",
+    defaultSortBy: "campaign",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["campaign", "channel", "status"],
+    filterableFields: [],
+    columns: [
+      { key: "campaign", label: "Campaign", type: "string", sortable: true },
+      { key: "channel", label: "Channel", type: "string", sortable: true },
+      { key: "startDate", label: "Start Date", type: "date", sortable: true },
+      { key: "endDate", label: "End Date", type: "date", sortable: true },
+      { key: "spendKgs", label: "Spend (KGS)", type: "number", sortable: true },
+      { key: "status", label: "Status", type: "string", sortable: true },
+      { key: "objective", label: "Objective", type: "string", sortable: true },
+      { key: "leadsIds", label: "Leads", type: "array" },
+      { key: "branchIds", label: "Branch", type: "array" },
+      { key: "leadsGenerated", label: "Leads Generated", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "costPerLeadKgs", label: "Cost Per Lead (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  document: {
+    label: "Documents",
+    modelName: "document",
+    defaultSortBy: "document",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["document", "type", "party"],
+    filterableFields: [],
+    columns: [
+      { key: "document", label: "Document", type: "string", sortable: true },
+      { key: "type", label: "Type", type: "string", sortable: true },
+      // party/notes are owner + office_admin only (lib/rbac.ts §7).
+      { key: "party", label: "Party", type: "string", sortable: true },
+      { key: "notes", label: "Notes", type: "string" },
+      { key: "effectiveDate", label: "Effective Date", type: "date", sortable: true },
+      { key: "expiry", label: "Expiry", type: "date", sortable: true },
+      { key: "status", label: "Status", type: "string", sortable: true },
+      { key: "branchIds", label: "Branch", type: "array" },
+      { key: "daysToRenewal", label: "Days To Renewal", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "subFranchiseesLcfIds", label: "Sub Franchisees Lcf", type: "array" },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  subfranchisee: {
+    label: "Sub-Franchisees",
+    modelName: "subFranchisee",
+    defaultSortBy: "franchiseeName",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["franchiseeName", "type", "subArea"],
+    filterableFields: [],
+    columns: [
+      { key: "franchiseeName", label: "Franchisee Name", type: "string", sortable: true },
+      // Contact details are visible to owner only; applyRedactions() strips them
+      // for every other role (lib/rbac.ts §5).
+      { key: "contactName", label: "Contact Name", type: "string", sortable: true },
+      { key: "phone", label: "Phone", type: "string" },
+      { key: "email", label: "Email", type: "string" },
+      { key: "type", label: "Type", type: "string", sortable: true },
+      { key: "subArea", label: "Sub Area", type: "string", sortable: true },
+      { key: "populationServed", label: "Population Served", type: "number", sortable: true },
+      { key: "status", label: "Status", type: "string", sortable: true },
+      { key: "agreementSignedDate", label: "Agreement Signed Date", type: "date", sortable: true },
+      { key: "openDate", label: "Open Date", type: "date", sortable: true },
+      { key: "gracePeriodEnd", label: "Grace Period End", type: "date", sortable: true },
+      { key: "franchiseFeeEur", label: "Franchise Fee (EUR)", type: "number", sortable: true },
+      { key: "expectedStudentsRoyaltyBasis", label: "Expected Students Royalty Basis", type: "number", sortable: true },
+      { key: "studentsReported", label: "Students Reported", type: "number", sortable: true },
+      { key: "lessonFeeKgs", label: "Lesson Fee (KGS)", type: "number", sortable: true },
+      { key: "annualLessonCount", label: "Annual Lesson Count", type: "number", sortable: true },
+      { key: "royaltyRatePct", label: "Royalty Rate %", type: "number", sortable: true },
+      { key: "notes", label: "Notes", type: "string", sortable: true },
+      { key: "buildOutProjectIds", label: "Build Out Project", type: "array" },
+      { key: "documentsIds", label: "Documents", type: "array" },
+      { key: "subFranchiseRoyaltiesIds", label: "Sub Franchise Royalties", type: "array" },
+      { key: "setsIds", label: "Sets", type: "array" },
+      { key: "actualFixedRoyaltyAnnualKgs", label: "Actual Fixed Royalty Annual (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "mfFeeShareToHqEur", label: "Mf Fee Share To HQ (EUR)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "inGracePeriod", label: "In Grace Period", type: "string", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  subfranchiseroyalty: {
+    label: "Sub-Franchise Royalties",
+    modelName: "subFranchiseRoyalty",
+    defaultSortBy: "royaltyNo",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["royaltyNo", "status", "notes"],
+    filterableFields: [],
+    columns: [
+      { key: "royaltyNo", label: "Royalty No", type: "string", sortable: true },
+      { key: "period", label: "Period", type: "date", sortable: true },
+      { key: "franchiseeIds", label: "Franchisee", type: "array" },
+      { key: "monthlyRoyaltyDueKgs", label: "Monthly Royalty Due (KGS)", type: "number", sortable: true },
+      { key: "amountReceivedKgs", label: "Amount Received (KGS)", type: "number", sortable: true },
+      { key: "status", label: "Status", type: "string", sortable: true },
+      { key: "dueDate", label: "Due Date", type: "date", sortable: true },
+      { key: "receivedDate", label: "Received Date", type: "date", sortable: true },
+      { key: "hqSharePct", label: "HQ Share %", type: "number", sortable: true },
+      { key: "notes", label: "Notes", type: "string", sortable: true },
+      { key: "setsIds", label: "Sets", type: "array" },
+      { key: "balanceKgs", label: "Balance (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "hqShareKgs", label: "HQ Share (KGS)", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  selfemployedteacher: {
+    label: "Self-Employed Teachers",
+    modelName: "selfEmployedTeacher",
+    defaultSortBy: "setName",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["setName", "status"],
+    filterableFields: [],
+    columns: [
+      { key: "setName", label: "SET Name", type: "string", sortable: true },
+      // Owner only; redacted for other roles by applyRedactions() (lib/rbac.ts §6).
+      { key: "phone", label: "Phone", type: "string" },
+      { key: "email", label: "Email", type: "string" },
+      { key: "notes", label: "Notes", type: "string" },
+      { key: "status", label: "Status", type: "string", sortable: true },
+      { key: "reportsToIds", label: "Reports To", type: "array" },
+      { key: "students", label: "Students", type: "number", sortable: true },
+      { key: "royaltyRatePct", label: "Royalty Rate %", type: "number", sortable: true },
+      { key: "startDate", label: "Start Date", type: "date", sortable: true },
+      { key: "subFranchiseRoyaltiesIds", label: "Sub Franchise Royalties", type: "array" },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  minimumgoal: {
+    label: "Minimum Goals",
+    modelName: "minimumGoal",
+    defaultSortBy: "goalYear",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["goalYear", "schoolYear", "notes"],
+    filterableFields: [],
+    columns: [
+      { key: "goalYear", label: "Goal Year", type: "string", sortable: true },
+      { key: "schoolYear", label: "School Year", type: "string", sortable: true },
+      { key: "targetStudents", label: "Target Students", type: "number", sortable: true },
+      { key: "startDate", label: "Start Date", type: "date", sortable: true },
+      { key: "endDate", label: "End Date", type: "date", sortable: true },
+      { key: "mfOwnedStudents", label: "Mf Owned Students", type: "number", sortable: true },
+      { key: "lcf", label: "Lcf", type: "number", sortable: true },
+      { key: "setStudents", label: "Set Students", type: "number", sortable: true },
+      { key: "notes", label: "Notes", type: "string", sortable: true },
+      { key: "totalAreaStudents", label: "Total Area Students", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "gapToGoal", label: "Gap To Goal", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "pctOfGoal", label: "% Of Goal", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "status", label: "Status", type: "string", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "updatedAt", label: "Updated At", type: "date" }
+    ]
+  },
+  franchiseobligation: {
+    label: "Franchise Obligations",
+    modelName: "franchiseObligation",
+    defaultSortBy: "obligation",
+    defaultSortOrder: "asc",
+    isReadOnlyTable: true,
+    searchableFields: ["obligation", "category", "mfaClause"],
+    filterableFields: [],
+    columns: [
+      { key: "obligation", label: "Obligation", type: "string", sortable: true },
+      { key: "category", label: "Category", type: "string", sortable: true },
+      { key: "mfaClause", label: "Mfa Clause", type: "string", sortable: true },
+      { key: "cadence", label: "Cadence", type: "string", sortable: true },
+      { key: "nextDueDate", label: "Next Due Date", type: "date", sortable: true },
+      { key: "amountEur", label: "Amount (EUR)", type: "number", sortable: true },
+      { key: "penalty", label: "Penalty", type: "string", sortable: true },
+      { key: "status", label: "Status", type: "string", sortable: true },
+      { key: "notes", label: "Notes", type: "string", sortable: true },
+      { key: "daysToDue", label: "Days To Due", type: "number", sortable: true, isComputed: true, isReadOnly: true },
+      { key: "updatedAt", label: "Updated At", type: "date" }
     ]
   }
 };

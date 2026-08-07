@@ -35,6 +35,13 @@ export const SYNC_CONFIGS: {
       status: getStr(f["fldpWUoqTZGKcfZsY"]),
       notes: getStr(f["fldNFVnSoifEBuAoG"]),
       openedDate: getDate(f["fldT5JlLwUIMonS3W"]),
+      backpackInventoryIds: getArr(f["fldk4KZO6sldUZ0Gn"]),
+      ttcsIds: getArr(f["fldosZpLkodnBKl5P"]),
+      budgetAndTargetsIds: getArr(f["fldzbf7FuWiT5UyG8"]),
+      fixedAssetsIds: getArr(f["fldJk1iXRaHsm86El"]),
+      buildOutProjectsIds: getArr(f["fldqTJqyJyZioGRL3"]),
+      marketingCampaignsIds: getArr(f["fldS83P29TmgKEyHS"]),
+      documentsIds: getArr(f["fld697jJsf0IjqXmg"]),
     }),
   },
   {
@@ -50,6 +57,11 @@ export const SYNC_CONFIGS: {
       workingLanguage: getStr(f["fldPDnXM1aCwXc7Bk"]),
       status: getStr(f["fldEHvzfg1t5j5LHb"]),
       branchIds: getArr(f["fldtcpukcdFqHp8wi"]),
+      ttcsIds: getArr(f["fldVuWgqDXynqLYJc"]),
+      programmesCertified: getArr(f["fldk7VkXF4NEE5Zn1"]),
+      ttcCompletedDate: getDate(f["fld3oHpTSq7X00jIB"]),
+      teacherLevel: getStr(f["fldLPVzms9txNdTpX"]),
+      qualificationStatus: getStr(f["fld5fsjtkR1E2BcHc"]),
     }),
   },
   {
@@ -82,6 +94,11 @@ export const SYNC_CONFIGS: {
       courseIds: getArr(f["fldUmXiXvDOqVevAy"]),
       nameRussian: getStr(f["fldzWFoNsJ4Fva7IR"]),
       nameKyrgyz: getStr(f["fldJah9AdenE3lzDY"]),
+      discount: getBool(f["fldEEn1ydkLEWDDfn"]),
+      discountType: getStr(f["fld8euHTkCd4gutyg"]),
+      discountValue: getNum(f["fld5Lop5tmv9f6JC8"]),
+      discountReason: getStr(f["fldEc5zcubOQAN5yz"]),
+      netAmount: getNum(f["fldhBe0Mg9IPel7AZ"]),  // formula
     }),
   },
   {
@@ -129,6 +146,8 @@ export const SYNC_CONFIGS: {
       branchIds: getArr(f["fldtqwoAM6vOeQhVr"]),
       ownerIds: getArr(f["fldUfDRXRPnW3mIoD"]),
       lastActivityDate: getDate(f["fldgkqtYg9wHE0iw4"]),
+      referredBy: getStr(f["fld0XM2wfroNux6qt"]),
+      marketingCampaignsIds: getArr(f["fldx4CMfZ2WbIsZsi"]),
     }),
   },
   {
@@ -191,6 +210,12 @@ export const SYNC_CONFIGS: {
       parentIds: getArr(f["fldwzFCeLGUPaZovG"]),
       branchIds: getArr(f["fldTeS3Yg44gCGB90"]),
       medicalNotes: getStr(f["fldfYXrdppjO16EcQ"]),
+      withdrawalDate: getDate(f["fldJ9WPx3YGLaZhEU"]),
+      reasonForLeaving: getStr(f["fld1mmys4N9MGjsEf"]),
+      pauseReason: getStr(f["fldFJtT0mMHcQuEC4"]),
+      firstEnrollDate: getDate(f["fldZCMbjKfOHBhPa9"]),  // rollup
+      cohortMonth: getStr(f["fldzpHQOs0EyG2uuO"]),  // formula
+      ageAtWithdrawal: getNum(f["fldaYH29vzzSvYi8D"]),  // formula
     }),
   },
   {
@@ -209,6 +234,8 @@ export const SYNC_CONFIGS: {
       roomIds: getArr(f["fldVRgnzmNG4SWcAS"]),
       termIds: getArr(f["fldzmR8v8uue3Ce0Q"]),
       branchIds: getArr(f["fldzQWsTvAK9VkcxC"]),
+      enrolledCount: getNum(f["fldrPYdkK20io4VVo"]),  // count
+      utilisationPct: getNum(f["fldPJpcz3xsIYc4IK"]),  // formula
     }),
   },
   {
@@ -245,6 +272,9 @@ export const SYNC_CONFIGS: {
       ),
       firstLessonDate: getDate(f["fldMIiRIiEkU32lGv"]),
       onboardingStatus: getStr(f["fldV0VR7E7xehetvI"]),
+      nextPaymentDate: getDate(f["fldj4rnd6RcQrZEWf"]),
+      endDate: getDate(f["fldsTa7YnJYNyUOEt"]),
+      tenureMonths: getNum(f["fldV6NE7X3PWFU0tR"]),  // formula
     }),
   },
   {
@@ -290,6 +320,8 @@ export const SYNC_CONFIGS: {
       studentIds: getArr(f["fldgkxO5Yu98qW3wi"]),
       enrollmentIds: getArr(f["fldJqNHYliWVxveD4"]),
       branchIds: getArr(f["fld9gBMYbKHjrloEs"]),
+      amountPaidKgs: getNum(f["fldY6vKlBdfd4oZ8q"]),  // rollup
+      balanceKgs: getNum(f["fldxRzzNfggP9ezbT"]),  // formula
     }),
   },
   {
@@ -326,6 +358,7 @@ export const SYNC_CONFIGS: {
       active: getBool(f["fldg5vMJ4S2dt4qNM"]),
       notes: getStr(f["fldpTAyVttb9KTjI2"]),
       branchIds: getArr(f["fldPFo8Bpn2h7GjhH"]),
+      balanceKgs: getNum(f["fldzWQA33bCm31avg"]),  // rollup
     }),
   },
   {
@@ -370,6 +403,7 @@ export const SYNC_CONFIGS: {
       notes: getStr(f["fld1ESQQ52ldthXxZ"]),
       branchIds: getArr(f["fldLw7vxkQtZkpSdx"]),
       nameRussian: getStr(f["fldbeK1OH5EWpmOdO"]),
+      fixedAssetsIds: getArr(f["fldhZBJYSnjsT0qeB"]),
     }),
   },
   {
@@ -409,6 +443,8 @@ export const SYNC_CONFIGS: {
       notes: getStr(f["fldOkHNxjOAlWwJxZ"]),
       branchIds: getArr(f["fldnIfCGj9gKH6uBA"]),
       vendorHQIds: getArr(f["fld0h1a9Ft4YZ144b"]),
+      fxRateKgsPerEur: getNum(f["fldEBJmNPvPRGsdIw"]),
+      totalDueHqEur: getNum(f["fldUmEKHHxeKCKgzf"]),  // formula
     }),
   },
   {
@@ -508,6 +544,260 @@ export const SYNC_CONFIGS: {
       invoiceIds: getArr(f["fldkUrOowRBmMGX01"]),
       enrollmentIds: getArr(f["fldVqWHc8M9FDXbmt"]),
       branchIds: getArr(f["fldDLq6PSWWxvVXDu"]),
+    }),
+  },
+
+  // ---- Tables 28–39, adopted 2026-08-06 ----
+  {
+    airtableTableId: "tblO38n2QCCEdey10",
+    airtableTable: "28 Backpack Inventory / Инвентарь рюкзаков",
+    prismaModel: "backpackInventory",
+    mapFields: (id, f) => ({
+      id,
+      levelName:                     getStr(f["fldx5KbfjYmIF1AiN"]) || "Unnamed BackpackInventory",
+      totalBackpacks:                getNum(f["fldhpOnpoEnXXN8RL"]),
+      sold:                          getNum(f["fld8aVSU2lg5WzqHR"]),
+      sellingPriceKgs:               getNum(f["fldktMnyEsVaF03ii"]),
+      dateReceived:                  getDate(f["fldBfxbNuTe2xIvFD"]),
+      supplier:                      getStr(f["fldtuQS6u6Tri48ve"]),
+      purchaseCostKgs:               getNum(f["fldtouN3wXqMeVs9V"]),
+      notes:                         getStr(f["fldW2aLYeRFRSTvFP"]),
+      remaining:                     getNum(f["fldwaW8Hsu9r4soBd"]),  // formula
+      grossProfitPerBackpackKgs:     getNum(f["fldjumjFFrvc0Ze9b"]),  // formula
+      branchIds:                     getArr(f["fldHfOvTMq5n5FXxk"]),
+      relatedServicesRoyalty8PctKgs: getNum(f["fldmPwxp41lxT1lc2"]),  // formula
+      netProfitPerBackpackKgs:       getNum(f["fldD6Gs0uL2FsqrtP"]),  // formula
+    }),
+  },
+  {
+    airtableTableId: "tblBbv8UPCF6TAYqy",
+    airtableTable: "29 TTCs / Курсы подготовки преподавателей",
+    prismaModel: "ttc",
+    mapFields: (id, f) => ({
+      id,
+      ttcId:                getStr(f["fldnYxluPJk4ZcpnB"]) || "Unnamed Ttc",
+      programme:            getStr(f["fldOqNr6Mo4SkyiQZ"]),
+      startDate:            getDate(f["fldBCHqqw3yICMtHs"]),
+      endDate:              getDate(f["fldARO0bEv6fhx2IZ"]),
+      location:             getStr(f["fldat06pEmLbXXX77"]),
+      trainer:              getStr(f["fldwdkSifeVDlzwew"]),
+      participants:         getNum(f["fldE5jMOGEydLRfch"]),
+      feePerParticipantKgs: getNum(f["fldm2P1bn0q6DUzs7"]),
+      materialsCostKgs:     getNum(f["fld1xWv24l4lPqcGJ"]),
+      status:               getStr(f["fldNijmSlTcK6JVjV"]),
+      notes:                getStr(f["flde1b7oQixFbjHXz"]),
+      branchIds:            getArr(f["fldaAIl60DkkTh8tE"]),
+      teachersTrainedIds:   getArr(f["fld9Z88uGQ4GrOHm7"]),
+      totalRevenueKgs:      getNum(f["fldX07yAv1ASg4jgZ"]),  // formula
+      netRevenueKgs:        getNum(f["fldHkbOnXiycnrUpX"]),  // formula
+    }),
+  },
+  {
+    airtableTableId: "tblRMtJRf9oYfWtqt",
+    airtableTable: "30 Budget &amp; Targets / Бюджет и цели",
+    prismaModel: "budgetTarget",
+    mapFields: (id, f) => ({
+      id,
+      line:            getStr(f["fldAfOXzE4oPGKOMD"]) || "Unnamed BudgetTarget",
+      period:          getDate(f["fldSBljGfPZDqWZol"]),
+      type:            getStr(f["fldf0Pqo7b5Jhhp1d"]),
+      category:        getStr(f["fldVkjfw1AblBeYsb"]),
+      targetAmountKgs: getNum(f["flduL47ASUjGOuRgA"]),
+      actualAmountKgs: getNum(f["fldt9G33hSN6qDRco"]),
+      notes:           getStr(f["fldMmstdSVkwhkwby"]),
+      branchIds:       getArr(f["fldIJLbtAN5Y64Sns"]),
+      varianceKgs:     getNum(f["fldkH0BkC7SqqAwbk"]),  // formula
+      variancePct:     getNum(f["flde3bCL9gvxEz5oE"]),  // formula
+    }),
+  },
+  {
+    airtableTableId: "tbl5P27dUHrKWOMw2",
+    airtableTable: "31 Fixed Assets / Основные средства",
+    prismaModel: "fixedAsset",
+    mapFields: (id, f) => ({
+      id,
+      asset:                      getStr(f["fldGE11vfx7ddT3IU"]) || "Unnamed FixedAsset",
+      category:                   getStr(f["fldB645tnnRW78pKH"]),
+      acquisitionDate:            getDate(f["fld3cWaXmN6XuezMQ"]),
+      costKgs:                    getNum(f["fld41DEO1wCOv2Tdx"]),
+      usefulLifeYears:            getNum(f["fld2P1d0E7Kt9My8L"]),
+      accumulatedDepreciationKgs: getNum(f["fldkuwDLD1ITmzmgK"]),
+      status:                     getStr(f["fldmOrpvyKIUqXXXC"]),
+      notes:                      getStr(f["fldj1tSnsxRqxCLXe"]),
+      branchIds:                  getArr(f["fldjOQcMr9BlZbfzu"]),
+      vendorIds:                  getArr(f["fldlT5JntDYj1HpLE"]),
+      bookValueKgs:               getNum(f["fldeNb0slXS6tac2o"]),  // formula
+      annualDepreciationKgs:      getNum(f["fldSxTpgHZYQRiU4r"]),  // formula
+      buildOutProjectIds:         getArr(f["fldLSMRO4GZRHSUqP"]),
+    }),
+  },
+  {
+    airtableTableId: "tblqJGJRambPzTePj",
+    airtableTable: "32 Build-Out Projects / Проекты открытия центров",
+    prismaModel: "buildOutProject",
+    mapFields: (id, f) => ({
+      id,
+      project:              getStr(f["fldpGCqvVv3uO8fPi"]) || "Unnamed BuildOutProject",
+      subArea:              getStr(f["fldVtlpRGMhIoFZM3"]),
+      type:                 getStr(f["fldfpxbHAcxDxIW5R"]),
+      status:               getStr(f["fldM6EW8YlQcWV2dn"]),
+      targetOpenDate:       getDate(f["fldwfnxzjaXwvnOeb"]),
+      actualOpenDate:       getDate(f["fldo0VcPaOOCn1rn4"]),
+      budgetKgs:            getNum(f["fldc4Vfe0oWjFrsnz"]),
+      actualSpendKgs:       getNum(f["fldiSdxGbTcfRPHB4"]),
+      notes:                getStr(f["fldqHZHHyayUCKvue"]),
+      branchIds:            getArr(f["fld6gnBF7JNnrZP7M"]),
+      varianceKgs:          getNum(f["fldmbtA39UbwIMlAI"]),  // formula
+      fixedAssetsIds:       getArr(f["fldNz804wF8IWUUkh"]),
+      subFranchiseesLcfIds: getArr(f["fldHLfFokfWDUiCXl"]),
+    }),
+  },
+  {
+    airtableTableId: "tblPSNnBHuyRj9C6N",
+    airtableTable: "33 Marketing Campaigns / Маркетинговые кампании",
+    prismaModel: "marketingCampaign",
+    mapFields: (id, f) => ({
+      id,
+      campaign:       getStr(f["fldkCgK0Pop8zOli9"]) || "Unnamed MarketingCampaign",
+      channel:        getStr(f["fld2EoNKaZnxcqqfD"]),
+      startDate:      getDate(f["fldp4LpOLasnalJJl"]),
+      endDate:        getDate(f["fldqHUOKuVJvGgr64"]),
+      spendKgs:       getNum(f["fldIkbgSd3ez4vu3e"]),
+      status:         getStr(f["fldtHMk8UylxoQm8j"]),
+      objective:      getStr(f["fldbazbAhOEp2NCwz"]),
+      leadsIds:       getArr(f["fldxz1w8btL8MFrTp"]),
+      branchIds:      getArr(f["fldgvaZu402noU8BZ"]),
+      leadsGenerated: getNum(f["fldhkqNAhj0GbwA1y"]),  // count
+      costPerLeadKgs: getNum(f["fldDdnPVgYNyAg4dP"]),  // formula
+    }),
+  },
+  {
+    airtableTableId: "tbl1JpraNHlYrvYU0",
+    airtableTable: "34 Documents / Документы",
+    prismaModel: "document",
+    mapFields: (id, f) => ({
+      id,
+      document:             getStr(f["fldUH05b6xUuPpgMS"]) || "Unnamed Document",
+      type:                 getStr(f["fld1MaHn2Q18IYQmW"]),
+      party:                getStr(f["fldv53DtsaF1yC7s7"]),
+      effectiveDate:        getDate(f["fldKS8rOWoyxxp6iO"]),
+      expiry:               getDate(f["fld6vt5wjYwqOb2ir"]),
+      status:               getStr(f["fldVV3L5iX4pYQEjn"]),
+      notes:                getStr(f["fldT8eX9TJvF0DGJQ"]),
+      branchIds:            getArr(f["fldosENiG3kipLyfB"]),
+      daysToRenewal:        getNum(f["fld0JUTH3vPU96j2w"]),  // formula
+      subFranchiseesLcfIds: getArr(f["fldJVPoiiaJ9zYoFO"]),
+    }),
+  },
+  {
+    airtableTableId: "tblns9BnLFvsJrdOW",
+    airtableTable: "35 Sub-Franchisees (LCF/LSF) / Субфранчайзи",
+    prismaModel: "subFranchisee",
+    mapFields: (id, f) => ({
+      id,
+      franchiseeName:               getStr(f["fldHtqBTlorpoZUWX"]) || "Unnamed SubFranchisee",
+      type:                         getStr(f["fldFOLmmfRN4nvWoB"]),
+      subArea:                      getStr(f["fldFMSZkmBA4sMUXk"]),
+      populationServed:             getNum(f["fld3IOK2RksquIWPh"]),
+      contactName:                  getStr(f["fldr7MzbE89PI2EUv"]),
+      phone:                        getStr(f["fldggf1KurmdeFH6H"]),
+      email:                        getStr(f["fldqlcfdGkQg0jjag"]),
+      status:                       getStr(f["fldyZS8xNhrfTf6bJ"]),
+      agreementSignedDate:          getDate(f["fldIDGondp9YdBHfK"]),
+      openDate:                     getDate(f["fldAf8wtYhOvB5kD8"]),
+      gracePeriodEnd:               getDate(f["fldvQOQUNeXqHgw0b"]),
+      franchiseFeeEur:              getNum(f["fldeAMr13XqAE6yzX"]),
+      expectedStudentsRoyaltyBasis: getNum(f["fldfgr13W1677d8q3"]),
+      studentsReported:             getNum(f["fld1GrC3L1P2bg0Ln"]),
+      lessonFeeKgs:                 getNum(f["fldjG72A7V62RPB9e"]),
+      annualLessonCount:            getNum(f["fldRRKaykqEQCOotl"]),
+      royaltyRatePct:               getNum(f["fldpVqQCyxjM3lDoy"]),
+      notes:                        getStr(f["fldfIvpsxZlcOAPXS"]),
+      buildOutProjectIds:           getArr(f["fldscs0gsnlmKRe5Q"]),
+      documentsIds:                 getArr(f["fldBxTXZJ3qhohzO1"]),
+      subFranchiseRoyaltiesIds:     getArr(f["fldlXP9y2prsgGqID"]),
+      setsIds:                      getArr(f["fldXC4fN4FiSmFsxK"]),
+      actualFixedRoyaltyAnnualKgs:  getNum(f["fldE4NfboA0xCXgnJ"]),  // formula
+      mfFeeShareToHqEur:            getNum(f["fldLhesvU6n9vtCL9"]),  // formula
+      inGracePeriod:                getStr(f["fld4WsId9rybFMXnU"]),  // formula
+    }),
+  },
+  {
+    airtableTableId: "tblx5V0x0s6kbr56l",
+    airtableTable: "36 Sub-Franchise Royalties / Роялти субфранчайзи",
+    prismaModel: "subFranchiseRoyalty",
+    mapFields: (id, f) => ({
+      id,
+      royaltyNo:            getStr(f["fld64NGZ78KyXqplO"]) || "Unnamed SubFranchiseRoyalty",
+      period:               getDate(f["fld7Pv17ijta1Yjkv"]),
+      franchiseeIds:        getArr(f["fldchsxtKEUrg60Bp"]),
+      monthlyRoyaltyDueKgs: getNum(f["fldCyof6PP304xcl7"]),
+      amountReceivedKgs:    getNum(f["flduaqSYY0ZrkVMN6"]),
+      status:               getStr(f["fldzppXXT9Wk0xSPk"]),
+      dueDate:              getDate(f["fldRkLsCCIpm52YMz"]),
+      receivedDate:         getDate(f["fldTmN6y8jVTCp8LF"]),
+      hqSharePct:           getNum(f["fldun6oJ8MwQ91dX8"]),
+      notes:                getStr(f["fld7aD2c90ZGHDzRQ"]),
+      setsIds:              getArr(f["fldlPGjcmC1ybgtxw"]),
+      balanceKgs:           getNum(f["fldpd2VqxDcsvixei"]),  // formula
+      hqShareKgs:           getNum(f["fld1Q5bVie7krlrEG"]),  // formula
+    }),
+  },
+  {
+    airtableTableId: "tbltNBkGhwTiItU6B",
+    airtableTable: "37 SETs / Самозанятые преподаватели",
+    prismaModel: "selfEmployedTeacher",
+    mapFields: (id, f) => ({
+      id,
+      setName:                  getStr(f["fldYUk6XgVmjl1uvM"]) || "Unnamed SelfEmployedTeacher",
+      phone:                    getStr(f["fldTaQWjGuIVeyXXa"]),
+      email:                    getStr(f["fld4OGF7gwHsFvhUO"]),
+      status:                   getStr(f["fldaz7VZIrWioat4A"]),
+      reportsToIds:             getArr(f["fldzQopiJPUzlAURg"]),
+      students:                 getNum(f["fldU61dlU5u1dWkD2"]),
+      royaltyRatePct:           getNum(f["fldKvYeaxeN9JCLZ4"]),
+      startDate:                getDate(f["fldZvKDcDITnObkBD"]),
+      notes:                    getStr(f["fldO5VT31d6CSywYh"]),
+      subFranchiseRoyaltiesIds: getArr(f["fldeapEgFxxJQJj8j"]),
+    }),
+  },
+  {
+    airtableTableId: "tblpepGaPbfVlBv74",
+    airtableTable: "38 Minimum Goals / Минимальные цели",
+    prismaModel: "minimumGoal",
+    mapFields: (id, f) => ({
+      id,
+      goalYear:          getStr(f["fldYpnEUjmowVHJoB"]) || "Unnamed MinimumGoal",
+      schoolYear:        getStr(f["fldh5XS5jbjlknOui"]),
+      targetStudents:    getNum(f["fldKwiTeHqOrcnwpT"]),
+      startDate:         getDate(f["fldo6uLFbbEb2j4RF"]),
+      endDate:           getDate(f["fldbaI3f0EPXhHhCd"]),
+      mfOwnedStudents:   getNum(f["fldFEUi4m3hRy1L5x"]),
+      lcf:               getNum(f["fldKofnyDx0Mz7xKN"]),
+      setStudents:       getNum(f["fld2MO7BHJwJZ51yd"]),
+      notes:             getStr(f["fldJuMgnBugPKzAXz"]),
+      totalAreaStudents: getNum(f["fldxT09L5HSOeJCT3"]),  // formula
+      gapToGoal:         getNum(f["fldXiNSWzs3SFbV9p"]),  // formula
+      pctOfGoal:         getNum(f["fldXfU0CPUXVMjlXw"]),  // formula
+      status:            getStr(f["fldmwlbVzkynyqVOG"]),  // formula
+    }),
+  },
+  {
+    airtableTableId: "tbleVIIZdAmIlFcZS",
+    airtableTable: "39 Franchise Obligations / Обязательства франшизы",
+    prismaModel: "franchiseObligation",
+    mapFields: (id, f) => ({
+      id,
+      obligation:  getStr(f["fldAtrbSX5jwIaiiV"]) || "Unnamed FranchiseObligation",
+      category:    getStr(f["fldvtxbqVmUxMCVoR"]),
+      mfaClause:   getStr(f["fldeY8IzBHdqS9AeL"]),
+      cadence:     getStr(f["fldPUsrFu7WsfofWG"]),
+      nextDueDate: getDate(f["fldMBiDFZNjcBPhKa"]),
+      amountEur:   getNum(f["fldUCzXFRcBLu4qA5"]),
+      penalty:     getStr(f["fldT4FKMIIOMHNIxv"]),
+      status:      getStr(f["fldVnGlS0KmnVNak6"]),
+      notes:       getStr(f["fldSqWzQqVGN9Gr5J"]),
+      daysToDue:   getNum(f["fldy72CE5dDtW5yJX"]),  // formula
     }),
   },
 ];

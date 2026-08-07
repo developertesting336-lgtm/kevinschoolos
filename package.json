@@ -11,6 +11,11 @@
     "build": "npx prisma generate && next build",
     "start": "next start -p 8002 -H 127.0.0.1",
     "lint": "eslint",
+    "test": "npm run test:static && npm run test:behaviour",
+    "test:static": "node --test tests/*.test.mjs",
+    "test:behaviour": "tsx --test tests/*.test.ts",
+    "schema:diff": "node scripts/schema-diff.mjs",
+    "schema:generate": "node scripts/generate-field-map.mjs",
     "format": "eslint --fix"
   },
   "dependencies": {

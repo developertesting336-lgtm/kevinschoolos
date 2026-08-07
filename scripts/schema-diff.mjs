@@ -4,6 +4,7 @@ import fs from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchBaseSchema, isReadOnlyField, generateSchemaHash } from "../lib/fetch-airtable-schema.mjs";
+import { resolveTier, resolvePrismaModel } from "../lib/table-registry.mjs";
 
 dotenv.config();
 
@@ -11,60 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const CONFIG_DIR = resolve(ROOT, "config");
 const BASELINE_PATH = resolve(CONFIG_DIR, "schema-baseline.json");
-
-// ---------------------------------------------------------------------------
-// Tier mapping (duplicated from scripts/generate-field-map.mjs to avoid run-time side effects)
-// ---------------------------------------------------------------------------
-const TIER_MAP = [
-  // T1 – Financial / HQ-only
-  { match: "Chart of Accounts", tier: "T1", tierName: "Financial" },
-  { match: "Journal Entries", tier: "T1", tierName: "Financial" },
-  { match: "Ledger Lines", tier: "T1", tierName: "Financial" },
-  { match: "Vendors", tier: "T1", tierName: "Financial" },
-  { match: "Expenses", tier: "T1", tierName: "Financial" },
-  { match: "Franchise Royalties", tier: "T1", tierName: "Financial" },
-  { match: "Teacher Pay", tier: "T1", tierName: "Financial" },
-  { match: "Teacher Hours", tier: "T1", tierName: "Financial" },
-
-  // T2 – PII / branch-admin
-  { match: "Users", tier: "T2", tierName: "PII" },
-  { match: "Parents", tier: "T2", tierName: "PII" },
-  { match: "Students", tier: "T2", tierName: "PII" },
-  { match: "Enrollments", tier: "T2", tierName: "PII" },
-  { match: "Invoices", tier: "T2", tierName: "PII" },
-  { match: "Payments", tier: "T2", tierName: "PII" },
-  { match: "Notifications Log", tier: "T2", tierName: "PII" },
-
-  // T3 – Operational
-  { match: "Terms", tier: "T3", tierName: "Operational" },
-  { match: "Rooms", tier: "T3", tierName: "Operational" },
-  { match: "Leads", tier: "T3", tierName: "Operational" },
-  { match: "Trials", tier: "T3", tierName: "Operational" },
-  { match: "Class Groups", tier: "T3", tierName: "Operational" },
-  { match: "Sessions", tier: "T3", tierName: "Operational" },
-  { match: "Attendance", tier: "T3", tierName: "Operational" },
-  { match: "Activities", tier: "T3", tierName: "Operational" },
-
-  // T4-RO – Analytics (Automation-Owned)
-  { match: "Channel Performance", tier: "T4-RO", tierName: "Analytics" },
-
-  // T4 – Reference / low-risk
-  { match: "Branches", tier: "T4", tierName: "Reference" },
-  { match: "Courses", tier: "T4", tierName: "Reference" },
-  { match: "Tuition Plans", tier: "T4", tierName: "Reference" },
-];
-
-/**
- * Resolve the tier for a table by matching its name against the TIER_MAP.
- */
-function resolveTier(tableName, tableId) {
-  for (const entry of TIER_MAP) {
-    if (tableName.includes(entry.match)) {
-      return { tier: entry.tier, tierName: entry.tierName };
-    }
-  }
-  throw new Error(`FATAL: Unmatched table name "${tableName}" (ID: ${tableId || "unknown"}) in TIER_MAP.`);
-}
+const RBAC_MATRIX_PATH = resolve(CONFIG_DIR, "rbac-matrix.json");
 
 /**
  * Map camelCase and raw types from Airtable API to polished display strings.
@@ -159,6 +107,20 @@ async function main() {
   const currentHash = generateSchemaHash(liveData.tables);
 
   const baselineTablesMap = new Map(baseline.tables.map((t) => [t.tableId, t]));
+
+  // Tier is now registry-driven and keyed by table ID, so it can no longer
+  // drift from Airtable. It CAN still drift from config/rbac-matrix.json, which
+  // is what actually gates access at runtime (lib/rbac.ts) — so that is the
+  // comparison worth making here.
+  const rbacTierByModel = new Map();
+  try {
+    const rbacMatrix = JSON.parse(fs.readFileSync(RBAC_MATRIX_PATH, "utf-8"));
+    for (const [tier, tables] of Object.entries(rbacMatrix.tiers || {})) {
+      for (const name of tables) rbacTierByModel.set(String(name).toLowerCase(), tier);
+    }
+  } catch {
+    console.error(`\u2717 Warning: could not read ${RBAC_MATRIX_PATH}; skipping tier cross-check.`);
+  }
   const liveTablesMap = new Map(liveData.tables.map((t) => [t.id, t]));
 
   const breakingIssues = [];
@@ -192,13 +154,14 @@ async function main() {
       hasTableWarning = true;
     }
 
-    // Table tier changed
-    const baseTier = resolveTier(baseTable.tableName, baseTable.tableId).tier;
-    const liveTier = resolveTier(liveTable.name, liveTable.id).tier;
-    if (baseTier !== liveTier) {
+    // Registry tier vs RBAC matrix tier
+    const registryTier = resolveTier(liveTable.id, liveTable.name).tier;
+    const prismaModel = resolvePrismaModel(liveTable.id);
+    const rbacTier = prismaModel ? rbacTierByModel.get(prismaModel.toLowerCase()) : undefined;
+    if (rbacTier && rbacTier !== registryTier) {
       breakingIssues.push({
         tableName: liveTable.name,
-        details: `Table tier changed\n\n${baseTier}\n↓\n\n${liveTier}`
+        details: `Tier mismatch: table-registry vs rbac-matrix\n\n${registryTier}\n↓\n\n${rbacTier}`
       });
       hasTableBreaking = true;
     }

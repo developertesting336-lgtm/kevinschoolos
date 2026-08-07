@@ -1,15 +1,16 @@
 {
   "allowRead": [
-    "/"
+    "/home/kevinschoolos"
   ],
   "allowWrite": [
-    "/"
+    "/home/kevinschoolos"
   ],
   "allowExecute": [
     "npm",
     "npx",
     "node",
     "git",
-    "next"
+    "next",
+    "curl"
   ]
 }

@@ -4,6 +4,12 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchBaseSchema, isReadOnlyField, generateSchemaHash } from "../lib/fetch-airtable-schema.mjs";
+import {
+  resolveTier,
+  resolveTableFlags,
+  resolvePrismaModel,
+  getRegistryEntry,
+} from "../lib/table-registry.mjs";
 
 dotenv.config();
 
@@ -15,85 +21,14 @@ const FIELD_MAP_PATH = resolve(CONFIG_DIR, "field-map.json");
 const BASELINE_PATH = resolve(CONFIG_DIR, "schema-baseline.json");
 
 // ---------------------------------------------------------------------------
-// Tier mapping
+// CLI flags
 // ---------------------------------------------------------------------------
-// Derived from Build Guide §2.4 (Table tiers) and config/rbac-matrix.json
-// Keyed by Airtable table NAME (case-insensitive substring match).
-// Names are stable identifiers for tier assignment; the output keys by ID.
-const TIER_MAP = [
-  // T1 – Financial / HQ-only
-  { match: "Chart of Accounts", tier: "T1", tierName: "Financial" },
-  { match: "Journal Entries", tier: "T1", tierName: "Financial" },
-  { match: "Ledger Lines", tier: "T1", tierName: "Financial" },
-  { match: "Vendors", tier: "T1", tierName: "Financial" },
-  { match: "Expenses", tier: "T1", tierName: "Financial" },
-  { match: "Franchise Royalties", tier: "T1", tierName: "Financial" },
-  { match: "Teacher Pay", tier: "T1", tierName: "Financial" },
-  { match: "Teacher Hours", tier: "T1", tierName: "Financial" },
-
-  // T2 – PII / branch-admin
-  { match: "Users", tier: "T2", tierName: "PII" },
-  { match: "Parents", tier: "T2", tierName: "PII" },
-  { match: "Students", tier: "T2", tierName: "PII" },
-  { match: "Enrollments", tier: "T2", tierName: "PII" },
-  { match: "Invoices", tier: "T2", tierName: "PII" },
-  { match: "Payments", tier: "T2", tierName: "PII" },
-  { match: "Notifications Log", tier: "T2", tierName: "PII" },
-
-  // T3 – Operational
-  { match: "Terms", tier: "T3", tierName: "Operational" },
-  { match: "Rooms", tier: "T3", tierName: "Operational" },
-  { match: "Leads", tier: "T3", tierName: "Operational" },
-  { match: "Trials", tier: "T3", tierName: "Operational" },
-  { match: "Class Groups", tier: "T3", tierName: "Operational" },
-  { match: "Sessions", tier: "T3", tierName: "Operational" },
-  { match: "Attendance", tier: "T3", tierName: "Operational" },
-  { match: "Activities", tier: "T3", tierName: "Operational" },
-
-  // T4-RO – Analytics (Automation-Owned)
-  { match: "Channel Performance", tier: "T4-RO", tierName: "Analytics" },
-
-  // T4 – Reference / low-risk
-  { match: "Branches", tier: "T4", tierName: "Reference" },
-  { match: "Courses", tier: "T4", tierName: "Reference" },
-  { match: "Tuition Plans", tier: "T4", tierName: "Reference" },
-];
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Table-level flags configuration map based on substring match.
- */
-const TABLE_FLAGS_MAP = [
-  { match: "Channel Performance", flags: { automationOwned: true, appWritable: false } },
-  { match: "Notifications Log", flags: { appendOnly: true } },
-];
-
-/**
- * Resolve table-level metadata flags by matching its name.
- */
-function resolveTableFlags(tableName) {
-  for (const entry of TABLE_FLAGS_MAP) {
-    if (tableName.includes(entry.match)) {
-      return entry.flags;
-    }
-  }
-  return {};
-}
-
-/**
- * Resolve the tier for a table by matching its name against the TIER_MAP.
- */
-function resolveTier(tableName, tableId) {
-  for (const entry of TIER_MAP) {
-    if (tableName.includes(entry.match)) {
-      return { tier: entry.tier, tierName: entry.tierName };
-    }
-  }
-  throw new Error(`FATAL: Unmatched table name "${tableName}" (ID: ${tableId || "unknown"}) in TIER_MAP.`);
-}
+const ARGS = process.argv.slice(2);
+const DRY_RUN = ARGS.includes("--dry-run") || ARGS.includes("--check");
+// Tables 28-39 carry proposed (unratified) tiers. Baking a proposed tier into
+// committed config is an Owner decision under gates #4/#5, so the generator
+// refuses unless this flag is passed explicitly.
+const ACCEPT_PROPOSED = ARGS.includes("--accept-proposed");
 
 /**
  * Build a deterministic, sorted copy of tables/fields from the raw API data.
@@ -104,8 +39,9 @@ function buildSortedFieldMap(tables) {
   for (const table of tables) {
     const tableId = table.id;
     const tableName = table.name;
-    const { tier, tierName } = resolveTier(tableName, tableId);
-    const tableFlags = resolveTableFlags(tableName);
+    const { tier, tierName } = resolveTier(tableId, tableName);
+    const tableFlags = resolveTableFlags(tableId);
+    const prismaModel = resolvePrismaModel(tableId);
     const tableDescription = table.description ?? null;
 
     const fields = {};
@@ -136,6 +72,7 @@ function buildSortedFieldMap(tables) {
     fieldMap[tableId] = {
       tableId,
       tableName,
+      prismaModel,
       tier,
       tierName,
       ...tableFlags,
@@ -383,8 +320,58 @@ async function main() {
   const baseline = buildSchemaBaseline(baseId, tables, schemaHash);
 
   // -----------------------------------------------------------------------
+  // Validate BEFORE writing.
+  //
+  // The previous ordering wrote both frozen config files first and validated
+  // afterwards, so a validation failure left modified config on disk.
+  // -----------------------------------------------------------------------
+  if (!validateFieldMap(sortedFieldMap, rawData)) {
+    console.error("\n✗ Field map validation failed. Nothing was written.");
+    process.exit(1);
+  }
+  console.error("✓ Field map validations passed.");
+
+  if (!validateBaseline(baseline)) {
+    console.error("\n✗ Schema baseline validation failed. Nothing was written.");
+    process.exit(1);
+  }
+  console.error("✓ Schema baseline validations passed.");
+
+  // -----------------------------------------------------------------------
+  // Gate #4/#5 guard: refuse to bake unratified tiers into committed config.
+  // -----------------------------------------------------------------------
+  const proposedLive = tables
+    .map((t) => getRegistryEntry(t.id))
+    .filter((e) => e?.proposed);
+
+  if (proposedLive.length > 0 && !ACCEPT_PROPOSED) {
+    console.error(
+      `\n✗ ${proposedLive.length} live table(s) have PROPOSED (unratified) tiers:`
+    );
+    for (const e of proposedLive) {
+      console.error(`    ${e.displayName} -> ${e.tier} ${e.tierName}`);
+    }
+    console.error(
+      "\n  Tier assignment drives redaction and role access, so it is an Owner\n" +
+        "  decision under gates #4/#5. Nothing was written.\n\n" +
+        "  Once the Owner has signed off, drop `proposed: true` in\n" +
+        "  lib/table-registry.mjs, or re-run with --accept-proposed.\n"
+    );
+    process.exit(1);
+  }
+
+  // -----------------------------------------------------------------------
   // Write both files
   // -----------------------------------------------------------------------
+  if (DRY_RUN) {
+    console.error("\n✓ --dry-run: validated, nothing written.");
+    console.error(`  Would write ${FIELD_MAP_PATH}`);
+    console.error(`    ${tables.length} table(s), ${countAllFields(sortedFieldMap)} field(s) total`);
+    console.error(`  Would write ${BASELINE_PATH}`);
+    console.error(`    ${baseline.totalTables} table(s), ${baseline.totalFields} field(s), hash=${baseline.schemaHash}\n`);
+    return;
+  }
+
   mkdirSync(CONFIG_DIR, { recursive: true });
   writeFileSync(FIELD_MAP_PATH, JSON.stringify(fieldMapOutput, null, 2), "utf-8");
   writeFileSync(BASELINE_PATH, JSON.stringify(baseline, null, 2), "utf-8");
@@ -393,25 +380,7 @@ async function main() {
   console.error(`  ${tables.length} table(s), ${countAllFields(sortedFieldMap)} field(s) total`);
 
   console.error(`\n✓ Wrote ${BASELINE_PATH}`);
-  console.error(`  ${baseline.totalTables} table(s), ${baseline.totalFields} field(s), hash=${baseline.schemaHash}`);
-
-  // -----------------------------------------------------------------------
-  // Validate field map
-  // -----------------------------------------------------------------------
-  if (!validateFieldMap(sortedFieldMap, rawData)) {
-    console.error("\n✗ Field map validation failed.");
-    process.exit(1);
-  }
-  console.error("✓ Field map validations passed.");
-
-  // -----------------------------------------------------------------------
-  // Validate baseline
-  // -----------------------------------------------------------------------
-  if (!validateBaseline(baseline)) {
-    console.error("\n✗ Schema baseline validation failed.");
-    process.exit(1);
-  }
-  console.error("✓ Schema baseline validations passed.\n");
+  console.error(`  ${baseline.totalTables} table(s), ${baseline.totalFields} field(s), hash=${baseline.schemaHash}\n`);
 }
 
 function countAllFields(fieldMap) {

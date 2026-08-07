@@ -1,13 +1,14 @@
 {
   "_meta": {
-    "generatedAt": "2026-07-16T08:27:43.628Z",
+    "generatedAt": "2026-08-06T23:15:37.942Z",
     "baseId": "appT1VyuwHzKGhOId",
-    "totalTables": 27
+    "totalTables": 39
   },
   "tables": {
     "tbl0A506K9OVCorYv": {
       "tableId": "tbl0A506K9OVCorYv",
       "tableName": "19 Ledger Lines / Проводки",
+      "prismaModel": "LedgerLine",
       "tier": "T1",
       "tierName": "Financial",
       "description": "Individual debit/credit legs of a Journal Entry. Each line hits one account. Signed Amount = Debit − Credit (formula). Σ Debit must equal Σ Credit within each Journal Entry.",
@@ -67,9 +68,92 @@
         }
       }
     },
+    "tbl1JpraNHlYrvYU0": {
+      "tableId": "tbl1JpraNHlYrvYU0",
+      "tableName": "34 Documents / Документы",
+      "prismaModel": "Document",
+      "tier": "T2",
+      "tierName": "PII",
+      "description": "Contract, agreement, certificate and license register with renewal/expiry dates. Covers LOI, MFA, future LCF/LSF agreements, the Kyrgyzstan certificate, leases and licenses. Source: LOI / MFA / DOCS folders; MFA §20.4 (LCF agreement renewal within 6 months).",
+      "fields": {
+        "fld0JUTH3vPU96j2w": {
+          "fieldId": "fld0JUTH3vPU96j2w",
+          "fieldName": "Days to Renewal / Дней до продления",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Days from today to Expiry/Renewal Date. Negative = overdue. Blank when no date set."
+        },
+        "fld1MaHn2Q18IYQmW": {
+          "fieldId": "fld1MaHn2Q18IYQmW",
+          "fieldName": "Type / Тип",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Certificate = Сертификат; Lease = Аренда; License = Лицензия; Insurance = Страховка; Other = Другое"
+        },
+        "fld6vt5wjYwqOb2ir": {
+          "fieldId": "fld6vt5wjYwqOb2ir",
+          "fieldName": "Expiry / Renewal Date / Дата окончания",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldJVPoiiaJ9zYoFO": {
+          "fieldId": "fldJVPoiiaJ9zYoFO",
+          "fieldName": "35 Sub-Franchisees (LCF/LSF) / Субфранчайзи",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblns9BnLFvsJrdOW"
+        },
+        "fldKS8rOWoyxxp6iO": {
+          "fieldId": "fldKS8rOWoyxxp6iO",
+          "fieldName": "Effective Date / Дата вступления",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldT8eX9TJvF0DGJQ": {
+          "fieldId": "fldT8eX9TJvF0DGJQ",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldUH05b6xUuPpgMS": {
+          "fieldId": "fldUH05b6xUuPpgMS",
+          "fieldName": "Document / Документ",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary."
+        },
+        "fldVV3L5iX4pYQEjn": {
+          "fieldId": "fldVV3L5iX4pYQEjn",
+          "fieldName": "Status / Статус",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Active = Действует; Expiring Soon = Скоро истекает; Expired = Истёк; Draft = Черновик; Superseded = Заменён"
+        },
+        "fldZtZylTOEDDn121": {
+          "fieldId": "fldZtZylTOEDDn121",
+          "fieldName": "File / Файл",
+          "type": "multipleAttachments",
+          "readOnly": false
+        },
+        "fldosENiG3kipLyfB": {
+          "fieldId": "fldosENiG3kipLyfB",
+          "fieldName": "Branch / Филиал",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
+        },
+        "fldv53DtsaF1yC7s7": {
+          "fieldId": "fldv53DtsaF1yC7s7",
+          "fieldName": "Party / Сторона",
+          "type": "singleLineText",
+          "readOnly": false
+        }
+      }
+    },
     "tbl2YiFYDq00gJIrF": {
       "tableId": "tbl2YiFYDq00gJIrF",
       "tableName": "22 Franchise Royalties / Роялти франшизы",
+      "prismaModel": "FranchiseRoyalty",
       "tier": "T1",
       "tierName": "Financial",
       "description": "Monthly Helen Doron HQ royalty + marketing fee accrual and the HQ report metrics. Accrual posts Dr Royalty Expense / Cr Royalty Payable; payment posts Dr Royalty Payable / Cr Bank.",
@@ -92,6 +176,13 @@
           "fieldName": "Royalty Amount (KGS) / Сумма роялти (сом)",
           "type": "formula",
           "readOnly": true
+        },
+        "fldEBJmNPvPRGsdIw": {
+          "fieldId": "fldEBJmNPvPRGsdIw",
+          "fieldName": "FX Rate (KGS per EUR) / Курс (сом за EUR)",
+          "type": "number",
+          "readOnly": false,
+          "description": "KGS per 1 EUR for this royalty period. Manual entry — rate is live/volatile and is never written from memory. Leave blank until you set it."
         },
         "fldGFKJtr8KtrD7OP": {
           "fieldId": "fldGFKJtr8KtrD7OP",
@@ -117,6 +208,13 @@
           "fieldName": "Notes / Заметки",
           "type": "multilineText",
           "readOnly": false
+        },
+        "fldUmEKHHxeKCKgzf": {
+          "fieldId": "fldUmEKHHxeKCKgzf",
+          "fieldName": "Total Due HQ (EUR) / Итого к оплате HQ (EUR)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Total Due HQ (KGS) ÷ FX Rate. Blank until FX Rate is entered. HQ-facing fees are EUR-denominated in the MFA."
         },
         "fldYq1yXbNxHE4ps4": {
           "fieldId": "fldYq1yXbNxHE4ps4",
@@ -176,6 +274,7 @@
     "tbl2utdNdP9usMXLf": {
       "tableId": "tbl2utdNdP9usMXLf",
       "tableName": "01 Branches / Филиалы",
+      "prismaModel": "Branch",
       "tier": "T4",
       "tierName": "Reference",
       "description": null,
@@ -200,6 +299,13 @@
           "type": "multipleRecordLinks",
           "readOnly": false,
           "linkedTableId": "tbl0A506K9OVCorYv"
+        },
+        "fld697jJsf0IjqXmg": {
+          "fieldId": "fld697jJsf0IjqXmg",
+          "fieldName": "34 Documents / Документы",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl1JpraNHlYrvYU0"
         },
         "fld6ccSBR16tGHDxK": {
           "fieldId": "fld6ccSBR16tGHDxK",
@@ -233,6 +339,13 @@
           "type": "multipleRecordLinks",
           "readOnly": false,
           "linkedTableId": "tblUE4gfr8en6lfUS"
+        },
+        "fldJk1iXRaHsm86El": {
+          "fieldId": "fldJk1iXRaHsm86El",
+          "fieldName": "31 Fixed Assets / Основные средства",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl5P27dUHrKWOMw2"
         },
         "fldJwVLFwIqvZnU7b": {
           "fieldId": "fldJwVLFwIqvZnU7b",
@@ -274,6 +387,13 @@
           "type": "singleLineText",
           "readOnly": false,
           "description": "Название филиала на русском"
+        },
+        "fldS83P29TmgKEyHS": {
+          "fieldId": "fldS83P29TmgKEyHS",
+          "fieldName": "33 Marketing Campaigns / Маркетинговые кампании",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblPSNnBHuyRj9C6N"
         },
         "fldT5JlLwUIMonS3W": {
           "fieldId": "fldT5JlLwUIMonS3W",
@@ -322,12 +442,33 @@
           "readOnly": false,
           "linkedTableId": "tblGVA0enM9oxS9C0"
         },
+        "fldk4KZO6sldUZ0Gn": {
+          "fieldId": "fldk4KZO6sldUZ0Gn",
+          "fieldName": "28 Backpack Inventory / Инвентарь рюкзаков",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblO38n2QCCEdey10"
+        },
+        "fldosZpLkodnBKl5P": {
+          "fieldId": "fldosZpLkodnBKl5P",
+          "fieldName": "29 TTCs / Курсы подготовки преподавателей",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblBbv8UPCF6TAYqy"
+        },
         "fldpWUoqTZGKcfZsY": {
           "fieldId": "fldpWUoqTZGKcfZsY",
           "fieldName": "Status / Статус",
           "type": "singleSelect",
           "readOnly": false,
           "description": "RU: Active = Активен; Planned = Планируется; Closed = Закрыт"
+        },
+        "fldqTJqyJyZioGRL3": {
+          "fieldId": "fldqTJqyJyZioGRL3",
+          "fieldName": "32 Build-Out Projects / Проекты открытия центров",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblqJGJRambPzTePj"
         },
         "fldstr7xhKppw0U7f": {
           "fieldId": "fldstr7xhKppw0U7f",
@@ -369,22 +510,149 @@
           "type": "multipleRecordLinks",
           "readOnly": false,
           "linkedTableId": "tblMsyDxS6ltliuU1"
+        },
+        "fldzbf7FuWiT5UyG8": {
+          "fieldId": "fldzbf7FuWiT5UyG8",
+          "fieldName": "30 Budget &amp; Targets / Бюджет и цели",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblRMtJRf9oYfWtqt"
+        }
+      }
+    },
+    "tbl5P27dUHrKWOMw2": {
+      "tableId": "tbl5P27dUHrKWOMw2",
+      "tableName": "31 Fixed Assets / Основные средства",
+      "prismaModel": "FixedAsset",
+      "tier": "T1",
+      "tierName": "Financial",
+      "description": "Fixed-asset register behind the Depreciation account in 17 Chart of Accounts. Tracks fit-out, furniture, IT and teaching equipment per LC. Source: CONSTRUCTIONS folder procurement lists.",
+      "fields": {
+        "fld2P1d0E7Kt9My8L": {
+          "fieldId": "fld2P1d0E7Kt9My8L",
+          "fieldName": "Useful Life (years) / Срок службы (лет)",
+          "type": "number",
+          "readOnly": false
+        },
+        "fld3cWaXmN6XuezMQ": {
+          "fieldId": "fld3cWaXmN6XuezMQ",
+          "fieldName": "Acquisition Date / Дата приобретения",
+          "type": "date",
+          "readOnly": false
+        },
+        "fld41DEO1wCOv2Tdx": {
+          "fieldId": "fld41DEO1wCOv2Tdx",
+          "fieldName": "Cost (KGS) / Стоимость (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "fldB645tnnRW78pKH": {
+          "fieldId": "fldB645tnnRW78pKH",
+          "fieldName": "Category / Категория",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Furniture = Мебель; IT Equipment = ИТ-оборудование; Teaching Materials = Учебные материалы; Fit-out = Ремонт; Vehicle = Транспорт; Other = Другое"
+        },
+        "fldGE11vfx7ddT3IU": {
+          "fieldId": "fldGE11vfx7ddT3IU",
+          "fieldName": "Asset / Актив",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary."
+        },
+        "fldLSMRO4GZRHSUqP": {
+          "fieldId": "fldLSMRO4GZRHSUqP",
+          "fieldName": "Build-Out Project / Проект открытия",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblqJGJRambPzTePj",
+          "description": "The build-out project this asset was purchased for."
+        },
+        "fldSxTpgHZYQRiU4r": {
+          "fieldId": "fldSxTpgHZYQRiU4r",
+          "fieldName": "Annual Depreciation (KGS) / Годовая амортизация (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Straight-line: Cost / Useful Life. Blank when Useful Life is 0/blank."
+        },
+        "fldeNb0slXS6tac2o": {
+          "fieldId": "fldeNb0slXS6tac2o",
+          "fieldName": "Book Value (KGS) / Балансовая стоимость (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Cost − Accumulated Depreciation."
+        },
+        "fldj1tSnsxRqxCLXe": {
+          "fieldId": "fldj1tSnsxRqxCLXe",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldjOQcMr9BlZbfzu": {
+          "fieldId": "fldjOQcMr9BlZbfzu",
+          "fieldName": "Branch / Филиал",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
+        },
+        "fldkuwDLD1ITmzmgK": {
+          "fieldId": "fldkuwDLD1ITmzmgK",
+          "fieldName": "Accumulated Depreciation (KGS) / Накопленная амортизация (сом)",
+          "type": "currency",
+          "readOnly": false,
+          "description": "Manual entry / posted at monthly or annual close."
+        },
+        "fldlT5JntDYj1HpLE": {
+          "fieldId": "fldlT5JntDYj1HpLE",
+          "fieldName": "Vendor / Поставщик",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblAu08dz4NZJ5HDs"
+        },
+        "fldmOrpvyKIUqXXXC": {
+          "fieldId": "fldmOrpvyKIUqXXXC",
+          "fieldName": "Status / Статус",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: In Use = В эксплуатации; In Storage = На складе; Disposed = Списан"
         }
       }
     },
     "tbl9Ddw4uRQ3i6e1B": {
       "tableId": "tbl9Ddw4uRQ3i6e1B",
       "tableName": "10 Students / Ученики",
+      "prismaModel": "Student",
       "tier": "T2",
       "tierName": "PII",
       "description": null,
       "fields": {
+        "fld1mmys4N9MGjsEf": {
+          "fieldId": "fld1mmys4N9MGjsEf",
+          "fieldName": "Reason for Leaving / Причина ухода",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "Churn reason, captured at withdrawal. RU: Relocation = Переезд; Financial Reasons = Финансовые причины; Teaching Method Not Suitable = Методика не подошла; Lack of Time = Нет времени; Other = Другое. Student-side churn — distinct from 07 Leads Lost Reason, which is pre-enrollment."
+        },
         "fld5mAXd41sVpQzlp": {
           "fieldId": "fld5mAXd41sVpQzlp",
           "fieldName": "Attendance",
           "type": "multipleRecordLinks",
           "readOnly": false,
           "linkedTableId": "tblbOAIuMZHgtsjEP"
+        },
+        "fldFJtT0mMHcQuEC4": {
+          "fieldId": "fldFJtT0mMHcQuEC4",
+          "fieldName": "Pause Reason / Причина паузы",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "Why a student is paused. Populate when Status = Paused. Separates recoverable breaks from at-risk holds without expanding the Status state machine. RU: Holiday = Каникулы; Payment Hold = Задержка оплаты; Medical = Медицинская причина; Other = Другое."
+        },
+        "fldJ9WPx3YGLaZhEU": {
+          "fieldId": "fldJ9WPx3YGLaZhEU",
+          "fieldName": "Withdrawal Date / Дата отчисления",
+          "type": "date",
+          "readOnly": false,
+          "description": "Date the student was withdrawn. Populate when Status = Withdrawn."
         },
         "fldTeS3Yg44gCGB90": {
           "fieldId": "fldTeS3Yg44gCGB90",
@@ -406,6 +674,20 @@
           "type": "singleSelect",
           "readOnly": false,
           "description": "RU: Lead = Лид; Trial = Пробный; Active = Учится; Paused = Пауза; Graduated = Выпустился; Withdrawn = Отчислен"
+        },
+        "fldZCMbjKfOHBhPa9": {
+          "fieldId": "fldZCMbjKfOHBhPa9",
+          "fieldName": "First Enroll Date / Дата первого зачисления",
+          "type": "rollup",
+          "readOnly": true,
+          "description": "Phase 0 / C2 helper. Earliest Enroll Date across all of this student's enrollments. Feeds Cohort Month. Not for direct reporting — use Cohort Month."
+        },
+        "fldaYH29vzzSvYi8D": {
+          "fieldId": "fldaYH29vzzSvYi8D",
+          "fieldName": "Age at Withdrawal / Возраст при отчислении",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Phase 0 / C3. Age in years at the point of withdrawal. Blank unless BOTH Date of Birth and Withdrawal Date are present — so it will read blank across the historical backlog until A1 capture and B2 backfill land. That blankness is the honest signal, not a bug. Answers the question the exam-track proposal rests on: does churn spike at a specific age?"
         },
         "flddPunThQwHvRVkF": {
           "fieldId": "flddPunThQwHvRVkF",
@@ -465,12 +747,20 @@
           "type": "multipleRecordLinks",
           "readOnly": false,
           "linkedTableId": "tblfvl5TjmWtr24Yp"
+        },
+        "fldzpHQOs0EyG2uuO": {
+          "fieldId": "fldzpHQOs0EyG2uuO",
+          "fieldName": "Cohort Month / Месяц когорты",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Phase 0 / C2. YYYY-MM of the student's first ever enrollment. Groups students into intake cohorts so retention can be measured as a curve rather than a single number. Blank-safe."
         }
       }
     },
     "tblAu08dz4NZJ5HDs": {
       "tableId": "tblAu08dz4NZJ5HDs",
       "tableName": "20 Vendors / Поставщики",
+      "prismaModel": "Vendor",
       "tier": "T1",
       "tierName": "Financial",
       "description": "Suppliers and payees: landlord, utilities, materials suppliers, Helen Doron HQ, tax office.",
@@ -514,6 +804,13 @@
           "readOnly": false,
           "description": "Название поставщика на русском"
         },
+        "fldhZBJYSnjsT0qeB": {
+          "fieldId": "fldhZBJYSnjsT0qeB",
+          "fieldName": "31 Fixed Assets / Основные средства",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl5P27dUHrKWOMw2"
+        },
         "fldrUAaCEBNxGMyx5": {
           "fieldId": "fldrUAaCEBNxGMyx5",
           "fieldName": "Vendor Name / Поставщик",
@@ -536,9 +833,117 @@
         }
       }
     },
+    "tblBbv8UPCF6TAYqy": {
+      "tableId": "tblBbv8UPCF6TAYqy",
+      "tableName": "29 TTCs / Курсы подготовки преподавателей",
+      "prismaModel": "Ttc",
+      "tier": "T3",
+      "tierName": "Operational",
+      "description": "Teacher Training Courses run by the MF. Revenue stream (participants × fee) and the record of which teachers were trained/certified on which programme. Feeds teacher qualification fields on 02 Users. Source: EI&E Simulator 'MF Business' TTC block; MFA §4.7.1 (all age groups, qualified teachers).",
+      "fields": {
+        "fld1xWv24l4lPqcGJ": {
+          "fieldId": "fld1xWv24l4lPqcGJ",
+          "fieldName": "Materials Cost (KGS) / Стоимость материалов (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "fld9Z88uGQ4GrOHm7": {
+          "fieldId": "fld9Z88uGQ4GrOHm7",
+          "fieldName": "Teachers Trained / Обученные преподаватели",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblUkEhqFJBFTvRN5"
+        },
+        "fldARO0bEv6fhx2IZ": {
+          "fieldId": "fldARO0bEv6fhx2IZ",
+          "fieldName": "End Date / Дата окончания",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldBCHqqw3yICMtHs": {
+          "fieldId": "fldBCHqqw3yICMtHs",
+          "fieldName": "Start Date / Дата начала",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldE5jMOGEydLRfch": {
+          "fieldId": "fldE5jMOGEydLRfch",
+          "fieldName": "Participants / Участников",
+          "type": "number",
+          "readOnly": false
+        },
+        "fldHkbOnXiycnrUpX": {
+          "fieldId": "fldHkbOnXiycnrUpX",
+          "fieldName": "Net Revenue (KGS) / Чистая выручка (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "(Participants × Fee) − Materials Cost."
+        },
+        "fldNijmSlTcK6JVjV": {
+          "fieldId": "fldNijmSlTcK6JVjV",
+          "fieldName": "Status / Статус",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Planned = Запланирован; Running = Идёт; Completed = Завершён; Cancelled = Отменён"
+        },
+        "fldOqNr6Mo4SkyiQZ": {
+          "fieldId": "fldOqNr6Mo4SkyiQZ",
+          "fieldName": "Programme / Программа",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: HDE Early English = Английский для детей; HDE Teen English = Английский для подростков; Holiday Course = Каникулярный курс; Playgroup = Плейгруп; Other = Другое"
+        },
+        "fldX07yAv1ASg4jgZ": {
+          "fieldId": "fldX07yAv1ASg4jgZ",
+          "fieldName": "Total Revenue (KGS) / Выручка (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Participants × Fee per Participant. Blank-safe via multiplication."
+        },
+        "fldaAIl60DkkTh8tE": {
+          "fieldId": "fldaAIl60DkkTh8tE",
+          "fieldName": "Branch / Филиал",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
+        },
+        "fldat06pEmLbXXX77": {
+          "fieldId": "fldat06pEmLbXXX77",
+          "fieldName": "Location / Место",
+          "type": "singleLineText",
+          "readOnly": false
+        },
+        "flde1b7oQixFbjHXz": {
+          "fieldId": "flde1b7oQixFbjHXz",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldm2P1bn0q6DUzs7": {
+          "fieldId": "fldm2P1bn0q6DUzs7",
+          "fieldName": "Fee per Participant (KGS) / Стоимость за участника (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "fldnYxluPJk4ZcpnB": {
+          "fieldId": "fldnYxluPJk4ZcpnB",
+          "fieldName": "TTC ID / ID курса",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary. e.g. TTC-2026-01"
+        },
+        "fldwdkSifeVDlzwew": {
+          "fieldId": "fldwdkSifeVDlzwew",
+          "fieldName": "Trainer / Тренер",
+          "type": "singleLineText",
+          "readOnly": false
+        }
+      }
+    },
     "tblGVA0enM9oxS9C0": {
       "tableId": "tblGVA0enM9oxS9C0",
       "tableName": "23 Teacher Pay / Оплата преподавателям",
+      "prismaModel": "TeacherPay",
       "tier": "T1",
       "tierName": "Financial",
       "description": "One pay run per teacher per period. Posting creates a Journal Entry: Dr Salaries Expense / Cr Cash or Bank. Computed Pay = Hours × Rate (formula); Gross Pay can be overridden for salaried staff.",
@@ -648,6 +1053,7 @@
     "tblItZ3B7d4YRO9ih": {
       "tableId": "tblItZ3B7d4YRO9ih",
       "tableName": "07 Leads / Лиды",
+      "prismaModel": "Lead",
       "tier": "T3",
       "tierName": "Operational",
       "description": null,
@@ -658,6 +1064,13 @@
           "type": "singleSelect",
           "readOnly": false,
           "description": "RU: Price = Цена; Schedule = Расписание; Location = Локация; Went Elsewhere = Ушли к другим; No Response = Нет ответа; Other = Другое"
+        },
+        "fld0XM2wfroNux6qt": {
+          "fieldId": "fld0XM2wfroNux6qt",
+          "fieldName": "Referred By / Кто порекомендовал",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Name of the person who referred this lead. Free text so it covers non-customer referrers (teachers, friends, former parents). Use alongside Channel = Referral."
         },
         "fldCmaAEjCR6Q2wvH": {
           "fieldId": "fldCmaAEjCR6Q2wvH",
@@ -778,12 +1191,20 @@
           "type": "multipleRecordLinks",
           "readOnly": false,
           "linkedTableId": "tbl2utdNdP9usMXLf"
+        },
+        "fldx4CMfZ2WbIsZsi": {
+          "fieldId": "fldx4CMfZ2WbIsZsi",
+          "fieldName": "33 Marketing Campaigns / Маркетинговые кампании",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblPSNnBHuyRj9C6N"
         }
       }
     },
     "tblJQ9zndF47zIBVg": {
       "tableId": "tblJQ9zndF47zIBVg",
       "tableName": "26 Channel Performance / Эффективность каналов",
+      "prismaModel": "ChannelPerformance",
       "tier": "T4-RO",
       "tierName": "Analytics",
       "automationOwned": true,
@@ -909,6 +1330,7 @@
     "tblLkuBm7zVJKpzzu": {
       "tableId": "tblLkuBm7zVJKpzzu",
       "tableName": "17 Chart of Accounts / План счетов",
+      "prismaModel": "Account",
       "tier": "T1",
       "tierName": "Financial",
       "description": "Double-entry chart of accounts for Helen Doron Kyrgyzstan. One row per ledger account. Balance = rollup of Ledger Lines (Debit − Credit), added in the UI.",
@@ -973,6 +1395,13 @@
           "readOnly": false,
           "description": "RU: Asset = Актив; Liability = Обязательство; Equity = Капитал; Income = Доход; Expense = Расход"
         },
+        "fldzWQA33bCm31avg": {
+          "fieldId": "fldzWQA33bCm31avg",
+          "fieldName": "Balance (KGS) / Баланс (сом)",
+          "type": "rollup",
+          "readOnly": true,
+          "description": "Account balance = SUM of linked Ledger Lines' signed amount (Debit − Credit). Prerequisite for the P&L / Balance Sheet interface pages."
+        },
         "fldzaMxKxPt9rmkFi": {
           "fieldId": "fldzaMxKxPt9rmkFi",
           "fieldName": "Account Name / Название счёта",
@@ -991,6 +1420,7 @@
     "tblMsyDxS6ltliuU1": {
       "tableId": "tblMsyDxS6ltliuU1",
       "tableName": "27 Notifications Log / Журнал уведомлений",
+      "prismaModel": "NotificationLog",
       "tier": "T2",
       "tierName": "PII",
       "appendOnly": true,
@@ -1095,9 +1525,187 @@
         }
       }
     },
+    "tblO38n2QCCEdey10": {
+      "tableId": "tblO38n2QCCEdey10",
+      "tableName": "28 Backpack Inventory / Инвентарь рюкзаков",
+      "prismaModel": "BackpackInventory",
+      "tier": "T4",
+      "tierName": "Reference",
+      "description": "Track backpack inventory, suppliers, costs, and sales by educational level.",
+      "fields": {
+        "fld8aVSU2lg5WzqHR": {
+          "fieldId": "fld8aVSU2lg5WzqHR",
+          "fieldName": "Sold / Продано",
+          "type": "number",
+          "readOnly": false
+        },
+        "fldBfxbNuTe2xIvFD": {
+          "fieldId": "fldBfxbNuTe2xIvFD",
+          "fieldName": "Date Received / Дата получения",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldD6Gs0uL2FsqrtP": {
+          "fieldId": "fldD6Gs0uL2FsqrtP",
+          "fieldName": "Net Profit per Backpack (KGS) / Чистая прибыль (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Selling Price − Purchase Cost − Related Services Royalty. True per-unit margin. Deliberately conservative: subtracts the full 8% royalty even though only ~4% may actually remit to HD on MF-owned branch sales (MFA Addendum 9 §3). Understates profit rather than overstating it — the safe direction for a pricing decision. Revise to 4% only if counsel confirms the 50% split applies. Blank-safe."
+        },
+        "fldHfOvTMq5n5FXxk": {
+          "fieldId": "fldHfOvTMq5n5FXxk",
+          "fieldName": "Branch / Филиал",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf",
+          "description": "Branch holding this stock. Grain is Level × Branch — one row per level per branch, not one row per level. Required for RBAC branch-scoping; an unscoped row is visible to every role."
+        },
+        "fldW2aLYeRFRSTvFP": {
+          "fieldId": "fldW2aLYeRFRSTvFP",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldhpOnpoEnXXN8RL": {
+          "fieldId": "fldhpOnpoEnXXN8RL",
+          "fieldName": "Total Backpacks / Всего рюкзаков",
+          "type": "number",
+          "readOnly": false
+        },
+        "fldjumjFFrvc0Ze9b": {
+          "fieldId": "fldjumjFFrvc0Ze9b",
+          "fieldName": "Gross Profit per Backpack (KGS) / Валовая прибыль (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Selling Price \\u2212 Purchase Cost, BEFORE Related Services Royalty. This is gross margin, not take-home \\u2014 see Net Profit per Backpack for the figure after royalty. Blank-safe: returns blank if either input is empty."
+        },
+        "fldktMnyEsVaF03ii": {
+          "fieldId": "fldktMnyEsVaF03ii",
+          "fieldName": "Selling Price (KGS) / Цена продажи (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "fldmPwxp41lxT1lc2": {
+          "fieldId": "fldmPwxp41lxT1lc2",
+          "fieldName": "Related Services Royalty 8% (KGS) / Роялти 8% (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "8% of Selling Price. Source: MFA Addendum 9 §3(i) — Related Services Royalties at a flat rate of 8% of total Related Services fee income, no deduction for expenses, commissions or charges. Merchandise sales are Related Services per the MFA Definitions. EXCLUDES VAT (addendum says 8% + VAT if applicable). NOTE: for MF-owned branches only 50% of this remits to HD (≈ 4% of selling price); the full 8% is used here as the conservative figure pending counsel review — see Net Profit per Backpack."
+        },
+        "fldtouN3wXqMeVs9V": {
+          "fieldId": "fldtouN3wXqMeVs9V",
+          "fieldName": "Purchase Cost (KGS) / Себестоимость (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "fldtuQS6u6Tri48ve": {
+          "fieldId": "fldtuQS6u6Tri48ve",
+          "fieldName": "Supplier / Поставщик",
+          "type": "singleLineText",
+          "readOnly": false
+        },
+        "fldwaW8Hsu9r4soBd": {
+          "fieldId": "fldwaW8Hsu9r4soBd",
+          "fieldName": "Remaining / Остаток",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Total Backpacks − Sold. Blank-safe: returns blank when Total is empty, so an unfilled row shows blank rather than a phantom negative count."
+        },
+        "fldx5KbfjYmIF1AiN": {
+          "fieldId": "fldx5KbfjYmIF1AiN",
+          "fieldName": "Level Name / Уровень",
+          "type": "singleLineText",
+          "readOnly": false
+        }
+      }
+    },
+    "tblPSNnBHuyRj9C6N": {
+      "tableId": "tblPSNnBHuyRj9C6N",
+      "tableName": "33 Marketing Campaigns / Маркетинговые кампании",
+      "prismaModel": "MarketingCampaign",
+      "tier": "T3",
+      "tierName": "Operational",
+      "description": "Marketing campaigns with spend, linked to the leads they generated, to compute cost-per-lead / CAC. Complements 26 Channel Performance (which holds funnel counts but no spend). Source: SALES & MARKETING folder + KZ marketing timeline.",
+      "fields": {
+        "fld2EoNKaZnxcqqfD": {
+          "fieldId": "fld2EoNKaZnxcqqfD",
+          "fieldName": "Channel / Канал",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "Mirrors 07 Leads Channel. RU: Local Ad = Местная реклама; Referral = Рекомендация; Website = Сайт; Event = Мероприятие; Other = Другое"
+        },
+        "fldDdnPVgYNyAg4dP": {
+          "fieldId": "fldDdnPVgYNyAg4dP",
+          "fieldName": "Cost per Lead (KGS) / Стоимость лида (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Spend / Leads Generated (CAC at lead stage). Blank when no leads linked yet."
+        },
+        "fldIkbgSd3ez4vu3e": {
+          "fieldId": "fldIkbgSd3ez4vu3e",
+          "fieldName": "Spend (KGS) / Затраты (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "fldbazbAhOEp2NCwz": {
+          "fieldId": "fldbazbAhOEp2NCwz",
+          "fieldName": "Objective / Цель",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldgvaZu402noU8BZ": {
+          "fieldId": "fldgvaZu402noU8BZ",
+          "fieldName": "Branch / Филиал",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
+        },
+        "fldhkqNAhj0GbwA1y": {
+          "fieldId": "fldhkqNAhj0GbwA1y",
+          "fieldName": "Leads Generated / Привлечено лидов",
+          "type": "count",
+          "readOnly": true,
+          "description": "Number of linked Leads."
+        },
+        "fldkCgK0Pop8zOli9": {
+          "fieldId": "fldkCgK0Pop8zOli9",
+          "fieldName": "Campaign / Кампания",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary."
+        },
+        "fldp4LpOLasnalJJl": {
+          "fieldId": "fldp4LpOLasnalJJl",
+          "fieldName": "Start Date / Дата начала",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldqHUOKuVJvGgr64": {
+          "fieldId": "fldqHUOKuVJvGgr64",
+          "fieldName": "End Date / Дата окончания",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldtHMk8UylxoQm8j": {
+          "fieldId": "fldtHMk8UylxoQm8j",
+          "fieldName": "Status / Статус",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Planned = Запланирована; Active = Активна; Completed = Завершена; Cancelled = Отменена"
+        },
+        "fldxz1w8btL8MFrTp": {
+          "fieldId": "fldxz1w8btL8MFrTp",
+          "fieldName": "Leads / Лиды",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblItZ3B7d4YRO9ih"
+        }
+      }
+    },
     "tblRJNw4S6o1WPjBI": {
       "tableId": "tblRJNw4S6o1WPjBI",
       "tableName": "09 Parents / Родители",
+      "prismaModel": "Parent",
       "tier": "T2",
       "tierName": "PII",
       "description": null,
@@ -1203,9 +1811,87 @@
         }
       }
     },
+    "tblRMtJRf9oYfWtqt": {
+      "tableId": "tblRMtJRf9oYfWtqt",
+      "tableName": "30 Budget &amp; Targets / Бюджет и цели",
+      "prismaModel": "BudgetTarget",
+      "tier": "T1",
+      "tierName": "Financial",
+      "description": "Monthly budget/target vs actual by category, mirroring the Chart of Accounts sub-types. Feeds variance analysis. Targets are entered by the Owner (sourced from BREAK-EVEN ANALYSIS.xlsx and the EI&E Simulator); actuals entered at monthly close or rolled from the ledger. No figures pre-filled.",
+      "fields": {
+        "fldAfOXzE4oPGKOMD": {
+          "fieldId": "fldAfOXzE4oPGKOMD",
+          "fieldName": "Line / Строка",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary. e.g. 2026-07 · Tuition Income"
+        },
+        "fldIJLbtAN5Y64Sns": {
+          "fieldId": "fldIJLbtAN5Y64Sns",
+          "fieldName": "Branch / Филиал",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
+        },
+        "fldMmstdSVkwhkwby": {
+          "fieldId": "fldMmstdSVkwhkwby",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldSBljGfPZDqWZol": {
+          "fieldId": "fldSBljGfPZDqWZol",
+          "fieldName": "Period / Период",
+          "type": "date",
+          "readOnly": false,
+          "description": "First day of the budget month."
+        },
+        "fldVkjfw1AblBeYsb": {
+          "fieldId": "fldVkjfw1AblBeYsb",
+          "fieldName": "Category / Категория",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "Mirrors 17 Chart of Accounts sub-types. RU: Tuition Income = Доход от обучения; Salaries = Зарплаты; Rent = Аренда; Utilities = Коммунальные; Materials = Материалы; Marketing = Маркетинг; Franchise Royalty = Роялти"
+        },
+        "flde3bCL9gvxEz5oE": {
+          "fieldId": "flde3bCL9gvxEz5oE",
+          "fieldName": "Variance % / Отклонение %",
+          "type": "formula",
+          "readOnly": true,
+          "description": "(Actual − Target) / Target, in % points. Blank when Target is 0/blank."
+        },
+        "fldf0Pqo7b5Jhhp1d": {
+          "fieldId": "fldf0Pqo7b5Jhhp1d",
+          "fieldName": "Type / Тип",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Income = Доход; Expense = Расход"
+        },
+        "fldkH0BkC7SqqAwbk": {
+          "fieldId": "fldkH0BkC7SqqAwbk",
+          "fieldName": "Variance (KGS) / Отклонение (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Actual − Target. Positive = over budget on income (good) or over budget on expense (bad); read with Type."
+        },
+        "fldt9G33hSN6qDRco": {
+          "fieldId": "fldt9G33hSN6qDRco",
+          "fieldName": "Actual Amount (KGS) / Факт (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "flduL47ASUjGOuRgA": {
+          "fieldId": "flduL47ASUjGOuRgA",
+          "fieldName": "Target Amount (KGS) / План (сом)",
+          "type": "currency",
+          "readOnly": false
+        }
+      }
+    },
     "tblRf3mdeZmzp2mnf": {
       "tableId": "tblRf3mdeZmzp2mnf",
       "tableName": "18 Journal Entries / Журнальные записи",
+      "prismaModel": "JournalEntry",
       "tier": "T1",
       "tierName": "Financial",
       "description": "Double-entry transaction header. Each entry has 2+ Ledger Lines whose debits must equal credits. Source records where the posting came from. Balance check (Σ Debit = Σ Credit) is a rollup added in the UI.",
@@ -1296,6 +1982,7 @@
     "tblTB6N6jNqSFvEER": {
       "tableId": "tblTB6N6jNqSFvEER",
       "tableName": "15 Invoices / Счета",
+      "prismaModel": "Invoice",
       "tier": "T2",
       "tierName": "PII",
       "description": null,
@@ -1347,6 +2034,13 @@
           "type": "currency",
           "readOnly": false
         },
+        "fldY6vKlBdfd4oZ8q": {
+          "fieldId": "fldY6vKlBdfd4oZ8q",
+          "fieldName": "Amount Paid (KGS) / Оплачено (сом)",
+          "type": "rollup",
+          "readOnly": true,
+          "description": "SUM of linked Payments. Prerequisite for the Billing & Aging page and the Balance formula."
+        },
         "fldZ2vfOggiAbm0fC": {
           "fieldId": "fldZ2vfOggiAbm0fC",
           "fieldName": "Issue Date / Дата выставления",
@@ -1379,12 +2073,20 @@
           "type": "singleSelect",
           "readOnly": false,
           "description": "RU: Draft = Черновик; Sent = Отправлен; Partially Paid = Частично оплачен; Paid = Оплачен; Overdue = Просрочен; Void = Аннулирован"
+        },
+        "fldxRzzNfggP9ezbT": {
+          "fieldId": "fldxRzzNfggP9ezbT",
+          "fieldName": "Balance (KGS) / Остаток (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Amount − Amount Paid. Drives the 'Unpaid' / aging view."
         }
       }
     },
     "tblUE4gfr8en6lfUS": {
       "tableId": "tblUE4gfr8en6lfUS",
       "tableName": "13 Sessions / Занятия",
+      "prismaModel": "Session",
       "tier": "T3",
       "tierName": "Operational",
       "description": null,
@@ -1448,10 +2150,25 @@
     "tblUkEhqFJBFTvRN5": {
       "tableId": "tblUkEhqFJBFTvRN5",
       "tableName": "02 Users / Сотрудники",
+      "prismaModel": "User",
       "tier": "T2",
       "tierName": "PII",
       "description": null,
       "fields": {
+        "fld3oHpTSq7X00jIB": {
+          "fieldId": "fld3oHpTSq7X00jIB",
+          "fieldName": "TTC Completed Date / Дата прохождения TTC",
+          "type": "date",
+          "readOnly": false,
+          "description": "Date this teacher completed their most recent Teacher Training Course."
+        },
+        "fld5fsjtkR1E2BcHc": {
+          "fieldId": "fld5fsjtkR1E2BcHc",
+          "fieldName": "Qualification Status / Статус квалификации",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Active = Действует; Expiring = Истекает; Expired = Истёк; Pending = Ожидает"
+        },
         "fld6cRQ0hWQ7eoJxl": {
           "fieldId": "fld6cRQ0hWQ7eoJxl",
           "fieldName": "Teacher Hours",
@@ -1479,6 +2196,13 @@
           "type": "singleLineText",
           "readOnly": false
         },
+        "fldLPVzms9txNdTpX": {
+          "fieldId": "fldLPVzms9txNdTpX",
+          "fieldName": "Teacher Level / Уровень преподавателя",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Trainee = Стажёр; Certified = Сертифицирован; Senior = Старший; Trainer = Тренер"
+        },
         "fldO0dXiGejfosngj": {
           "fieldId": "fldO0dXiGejfosngj",
           "fieldName": "25 Activities / Действия",
@@ -1492,6 +2216,20 @@
           "type": "singleSelect",
           "readOnly": false,
           "description": "RU: Russian = Русский; English = Английский"
+        },
+        "fldVuWgqDXynqLYJc": {
+          "fieldId": "fldVuWgqDXynqLYJc",
+          "fieldName": "29 TTCs / Курсы подготовки преподавателей",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblBbv8UPCF6TAYqy"
+        },
+        "fldk7VkXF4NEE5Zn1": {
+          "fieldId": "fldk7VkXF4NEE5Zn1",
+          "fieldName": "Programmes Certified / Сертифицированные программы",
+          "type": "multipleSelects",
+          "readOnly": false,
+          "description": "Programmes this teacher is TTC-certified to teach. MFA §4.7.1 requires qualified teachers across all age groups."
         },
         "fldoxjXB6LlfBLbAA": {
           "fieldId": "fldoxjXB6LlfBLbAA",
@@ -1552,6 +2290,7 @@
     "tblVA5O7fnBx5cAnJ": {
       "tableId": "tblVA5O7fnBx5cAnJ",
       "tableName": "12 Enrollments / Зачисления",
+      "prismaModel": "Enrollment",
       "tier": "T2",
       "tierName": "PII",
       "description": null,
@@ -1624,6 +2363,13 @@
           "readOnly": false,
           "description": "Onboarding lifecycle, independent of Enrollment Status (Build 11). RU: Pending = Ожидает; In Progress = В процессе; Complete = Завершено."
         },
+        "fldV6NE7X3PWFU0tR": {
+          "fieldId": "fldV6NE7X3PWFU0tR",
+          "fieldName": "Tenure (months) / Длительность (мес.)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Phase 0 / C1. Months from Enroll Date to End Date, or to today if the enrollment is still open. Blank-safe: returns blank when Enroll Date is empty rather than a phantom value. Core retention metric — feeds the cohort curve."
+        },
         "fldV9CDG6hTBsoPyP": {
           "fieldId": "fldV9CDG6hTBsoPyP",
           "fieldName": "Student",
@@ -1687,12 +2433,26 @@
           "readOnly": false,
           "linkedTableId": "tblTB6N6jNqSFvEER"
         },
+        "fldj4rnd6RcQrZEWf": {
+          "fieldId": "fldj4rnd6RcQrZEWf",
+          "fieldName": "Next Payment Date / Дата следующего платежа",
+          "type": "date",
+          "readOnly": false,
+          "description": "Next tuition payment due date at the enrollment level. Distinct from 15 Invoices Due Date, which is per-invoice; this is the forward-looking schedule anchor for payment reminders."
+        },
         "fldm9VVVEVGgSsBOM": {
           "fieldId": "fldm9VVVEVGgSsBOM",
           "fieldName": "27 Notifications Log / Журнал уведомлений",
           "type": "multipleRecordLinks",
           "readOnly": false,
           "linkedTableId": "tblMsyDxS6ltliuU1"
+        },
+        "fldsTa7YnJYNyUOEt": {
+          "fieldId": "fldsTa7YnJYNyUOEt",
+          "fieldName": "End Date / Дата окончания",
+          "type": "date",
+          "readOnly": false,
+          "description": "Phase 0 / A4. Date the enrollment ended, whether Completed (finished the level) or Withdrawn (stopped). Populate whenever Status moves off Active. Required input for Tenure (months). Distinct from 10 Students Withdrawal Date, which is student-level; this is per-enrollment."
         },
         "fldtgJU9259Sf78x9": {
           "fieldId": "fldtgJU9259Sf78x9",
@@ -1720,6 +2480,7 @@
     "tblVSaneGtUOq5Xzr": {
       "tableId": "tblVSaneGtUOq5Xzr",
       "tableName": "05 Terms / Учебные периоды",
+      "prismaModel": "Term",
       "tier": "T3",
       "tierName": "Operational",
       "description": null,
@@ -1768,6 +2529,7 @@
     "tblZPcDPnzTxp0sol": {
       "tableId": "tblZPcDPnzTxp0sol",
       "tableName": "21 Expenses / Расходы",
+      "prismaModel": "Expense",
       "tier": "T1",
       "tierName": "Financial",
       "description": "Operating expenses and bills. Posting an expense creates a Journal Entry: Dr expense account / Cr Cash, Bank, or Accounts Payable.",
@@ -1849,6 +2611,7 @@
     "tblbGzoGxZVLRPB7k": {
       "tableId": "tblbGzoGxZVLRPB7k",
       "tableName": "25 Activities / Действия",
+      "prismaModel": "Activity",
       "tier": "T3",
       "tierName": "Operational",
       "description": "One row per lead touch (call, WhatsApp, email, etc.). CRM activity log feeding stale-lead flagging on 07 Leads.",
@@ -1915,6 +2678,7 @@
     "tblbOAIuMZHgtsjEP": {
       "tableId": "tblbOAIuMZHgtsjEP",
       "tableName": "14 Attendance / Посещаемость",
+      "prismaModel": "Attendance",
       "tier": "T3",
       "tierName": "Operational",
       "description": null,
@@ -1951,6 +2715,7 @@
     "tblcOJdLkCBXXJ3AL": {
       "tableId": "tblcOJdLkCBXXJ3AL",
       "tableName": "24 Teacher Hours / Часы преподавателей",
+      "prismaModel": "TeacherHours",
       "tier": "T1",
       "tierName": "Financial",
       "description": "Timesheet entries: hours a teacher worked, optionally tied to a Session. Rolled up into a Teacher Pay run for the period.",
@@ -2020,10 +2785,39 @@
     "tbldiIHLyH7bup2XG": {
       "tableId": "tbldiIHLyH7bup2XG",
       "tableName": "04 Tuition Plans / Тарифные планы",
+      "prismaModel": "TuitionPlan",
       "tier": "T4",
       "tierName": "Reference",
       "description": null,
       "fields": {
+        "fld5Lop5tmv9f6JC8": {
+          "fieldId": "fld5Lop5tmv9f6JC8",
+          "fieldName": "Discount Value / Размер скидки",
+          "type": "number",
+          "readOnly": false,
+          "description": "Magnitude of the discount. Read together with Discount Type: 10 + Percent = 10% off; 500 + Fixed = 500 KGS off. Never interpret this number without checking Discount Type."
+        },
+        "fld8euHTkCd4gutyg": {
+          "fieldId": "fld8euHTkCd4gutyg",
+          "fieldName": "Discount Type / Тип скидки",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "How Discount Value is interpreted. RU: Percent = Процент; Fixed = Фиксированная сумма. Required whenever Discount is checked — a value without a type is ambiguous."
+        },
+        "fldEEn1ydkLEWDDfn": {
+          "fieldId": "fldEEn1ydkLEWDDfn",
+          "fieldName": "Discount / Скидка",
+          "type": "checkbox",
+          "readOnly": false,
+          "description": "This plan carries a discount off the standard rate. Plan-level: create a separate discounted plan record rather than discounting an individual student."
+        },
+        "fldEc5zcubOQAN5yz": {
+          "fieldId": "fldEc5zcubOQAN5yz",
+          "fieldName": "Discount Reason / Причина скидки",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "Why this plan is discounted. RU: Sibling = Брат/сестра; Referral = Рекомендация; Early Payment = Ранняя оплата; Financial Hardship = Финансовые трудности; Promotion = Акция; Staff = Сотрудник; Other = Другое."
+        },
         "fldJah9AdenE3lzDY": {
           "fieldId": "fldJah9AdenE3lzDY",
           "fieldName": "Name (Kyrgyz) / Аталышы",
@@ -2063,6 +2857,13 @@
           "type": "singleLineText",
           "readOnly": false
         },
+        "fldhBe0Mg9IPel7AZ": {
+          "fieldId": "fldhBe0Mg9IPel7AZ",
+          "fieldName": "Net Amount (KGS) / Итого к оплате (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Actual charged price after discount. Percent → Amount × (1 − Value/100); Fixed → Amount − Value; no discount → Amount. Falls back to full Amount if Discount is checked but Type or Value is blank — fails toward never undercharging, so an incomplete discount config is silent. ROYALTY NOTE: this field does NOT feed royalty. Per MFA §Definitions, LCF/LSF royalty is an Actual Fixed Royalty computed pre-signature from agreed Lesson Fees × Annual Lesson Count × Royalty Rate, expressly not from actual fees paid or lessons delivered, and payable regardless of actual student numbers. MF-owned LC royalty is the fixed annual schedule in Addendum 9 Table 2, which already carries a separate Discount for Royalty headcount allowance. A student-level discount therefore does not reduce the royalty base. 22 Franchise Royalties → Revenue Base remains manual entry."
+        },
         "fldzJoaYdz7VwF6r2": {
           "fieldId": "fldzJoaYdz7VwF6r2",
           "fieldName": "Billing Period / Период оплаты",
@@ -2079,9 +2880,86 @@
         }
       }
     },
+    "tbleVIIZdAmIlFcZS": {
+      "tableId": "tbleVIIZdAmIlFcZS",
+      "tableName": "39 Franchise Obligations / Обязательства франшизы",
+      "prismaModel": "FranchiseObligation",
+      "tier": "T1",
+      "tierName": "Financial",
+      "description": "MFA obligation & key-date calendar (reporting, fees, advertising, meetings, branding). Several are fundamental-breach or penalty-bearing. Clauses/penalties sourced from the signed MFA; fee amounts left blank pending confirmation against the current Guidelines / MF Portal (some are index-linked or conditional). Source: MFA §7, §8, §16.",
+      "fields": {
+        "fldAtrbSX5jwIaiiV": {
+          "fieldId": "fldAtrbSX5jwIaiiV",
+          "fieldName": "Obligation / Обязательство",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary."
+        },
+        "fldMBiDFZNjcBPhKa": {
+          "fieldId": "fldMBiDFZNjcBPhKa",
+          "fieldName": "Next Due Date / Следующий срок",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldPUsrFu7WsfofWG": {
+          "fieldId": "fldPUsrFu7WsfofWG",
+          "fieldName": "Cadence / Периодичность",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Monthly = Ежемесячно; Quarterly = Ежеквартально; Annual = Ежегодно; One-time = Разово; Ongoing = Постоянно; Conditional = Условно"
+        },
+        "fldSqWzQqVGN9Gr5J": {
+          "fieldId": "fldSqWzQqVGN9Gr5J",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldT4FKMIIOMHNIxv": {
+          "fieldId": "fldT4FKMIIOMHNIxv",
+          "fieldName": "Penalty / Штраф",
+          "type": "singleLineText",
+          "readOnly": false
+        },
+        "fldUCzXFRcBLu4qA5": {
+          "fieldId": "fldUCzXFRcBLu4qA5",
+          "fieldName": "Amount (EUR) / Сумма (EUR)",
+          "type": "currency",
+          "readOnly": false,
+          "description": "Fee amount where fixed. Blank where index-linked/conditional — confirm against current MF Portal."
+        },
+        "fldVnGlS0KmnVNak6": {
+          "fieldId": "fldVnGlS0KmnVNak6",
+          "fieldName": "Status / Статус",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Upcoming = Предстоит; Due Soon = Скоро; Overdue = Просрочено; Done = Выполнено; N/A = Не применимо"
+        },
+        "fldeY8IzBHdqS9AeL": {
+          "fieldId": "fldeY8IzBHdqS9AeL",
+          "fieldName": "MFA Clause / Пункт MFA",
+          "type": "singleLineText",
+          "readOnly": false
+        },
+        "fldvtxbqVmUxMCVoR": {
+          "fieldId": "fldvtxbqVmUxMCVoR",
+          "fieldName": "Category / Категория",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Reporting = Отчётность; Fee = Платёж; Advertising = Реклама; Meeting = Встреча; Training = Обучение; Branding = Брендинг; Goals = Цели; Other = Другое"
+        },
+        "fldy72CE5dDtW5yJX": {
+          "fieldId": "fldy72CE5dDtW5yJX",
+          "fieldName": "Days to Due / Дней до срока",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Days from today to Next Due Date. Negative = overdue."
+        }
+      }
+    },
     "tblfvl5TjmWtr24Yp": {
       "tableId": "tblfvl5TjmWtr24Yp",
       "tableName": "08 Trials / Пробные уроки",
+      "prismaModel": "Trial",
       "tier": "T3",
       "tierName": "Operational",
       "description": null,
@@ -2203,6 +3081,7 @@
     "tblgvltY5JtmMZs1q": {
       "tableId": "tblgvltY5JtmMZs1q",
       "tableName": "03 Courses / Курсы",
+      "prismaModel": "Course",
       "tier": "T4",
       "tierName": "Reference",
       "description": null,
@@ -2282,6 +3161,7 @@
     "tbliFcGpMbqnMaD9S": {
       "tableId": "tbliFcGpMbqnMaD9S",
       "tableName": "16 Payments / Платежи",
+      "prismaModel": "Payment",
       "tier": "T2",
       "tierName": "PII",
       "description": null,
@@ -2362,9 +3242,186 @@
         }
       }
     },
+    "tblns9BnLFvsJrdOW": {
+      "tableId": "tblns9BnLFvsJrdOW",
+      "tableName": "35 Sub-Franchisees (LCF/LSF) / Субфранчайзи",
+      "prismaModel": "SubFranchisee",
+      "tier": "T2",
+      "tierName": "PII",
+      "description": "The MF's sub-franchisee network: Learning Centre Franchisees (LCF), mini-LCFs and Learning Studio Franchisees (LSF) licensed across the Bishkek & Chuy territory. Source of the MF's inbound royalty revenue and of the minimum-goal students (MFA §3.14). Rates/fees are inputs entered from the rate source — none pre-filled. Source: MFA Definitions, §4.6 (territory density), §4.11 (25% of LCF fee to HQ).",
+      "fields": {
+        "fld1GrC3L1P2bg0Ln": {
+          "fieldId": "fld1GrC3L1P2bg0Ln",
+          "fieldName": "Students Reported / Учеников в отчёте",
+          "type": "number",
+          "readOnly": false,
+          "description": "Headcount reported for minimum-goal purposes (MFA §3.14)."
+        },
+        "fld3IOK2RksquIWPh": {
+          "fieldId": "fld3IOK2RksquIWPh",
+          "fieldName": "Population Served / Население района",
+          "type": "number",
+          "readOnly": false
+        },
+        "fld4WsId9rybFMXnU": {
+          "fieldId": "fld4WsId9rybFMXnU",
+          "fieldName": "In Grace Period? / В льготном периоде?",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Yes while Grace Period End is in the future — royalty is waived. MFA New LCF/LSF grace period."
+        },
+        "fldAf8wtYhOvB5kD8": {
+          "fieldId": "fldAf8wtYhOvB5kD8",
+          "fieldName": "Open Date / Дата открытия",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldBxTXZJ3qhohzO1": {
+          "fieldId": "fldBxTXZJ3qhohzO1",
+          "fieldName": "Documents / Документы",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl1JpraNHlYrvYU0"
+        },
+        "fldE4NfboA0xCXgnJ": {
+          "fieldId": "fldE4NfboA0xCXgnJ",
+          "fieldName": "Actual Fixed Royalty (Annual, KGS) / Годовое фикс. роялти (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Expected Students × Lesson Fee × Annual Lesson Count × Royalty Rate. Per MFA this is a FIXED royalty payable regardless of how many students are actually taught. Blank until the rate inputs are entered."
+        },
+        "fldFMSZkmBA4sMUXk": {
+          "fieldId": "fldFMSZkmBA4sMUXk",
+          "fieldName": "Sub-Area / Район",
+          "type": "singleLineText",
+          "readOnly": false
+        },
+        "fldFOLmmfRN4nvWoB": {
+          "fieldId": "fldFOLmmfRN4nvWoB",
+          "fieldName": "Type / Тип",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: LCF (Standard) = Стандартный центр (50-100тыс. жит.); Mini-LCF = Мини-центр (26-50тыс.); LSF = Студия"
+        },
+        "fldHtqBTlorpoZUWX": {
+          "fieldId": "fldHtqBTlorpoZUWX",
+          "fieldName": "Franchisee Name / Название франчайзи",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary."
+        },
+        "fldIDGondp9YdBHfK": {
+          "fieldId": "fldIDGondp9YdBHfK",
+          "fieldName": "Agreement Signed Date / Дата подписания",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldLhesvU6n9vtCL9": {
+          "fieldId": "fldLhesvU6n9vtCL9",
+          "fieldName": "MF Fee Share to HQ (EUR) / Доля взноса HQ (EUR)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "25% of the Franchise Fee, transferred to the Franchisor per MFA §4.11. Blank until Franchise Fee entered."
+        },
+        "fldRRKaykqEQCOotl": {
+          "fieldId": "fldRRKaykqEQCOotl",
+          "fieldName": "Annual Lesson Count / Уроков в год",
+          "type": "number",
+          "readOnly": false
+        },
+        "fldXC4fN4FiSmFsxK": {
+          "fieldId": "fldXC4fN4FiSmFsxK",
+          "fieldName": "37 SETs / Самозанятые преподаватели",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbltNBkGhwTiItU6B"
+        },
+        "fldeAMr13XqAE6yzX": {
+          "fieldId": "fldeAMr13XqAE6yzX",
+          "fieldName": "Franchise Fee (EUR) / Франшизный взнос (EUR)",
+          "type": "currency",
+          "readOnly": false,
+          "description": "Fee the MF charges this franchisee. Enter from the rate source — not pre-filled."
+        },
+        "fldfIvpsxZlcOAPXS": {
+          "fieldId": "fldfIvpsxZlcOAPXS",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldfgr13W1677d8q3": {
+          "fieldId": "fldfgr13W1677d8q3",
+          "fieldName": "Expected Students (Royalty Basis) / Ожидаемых учеников",
+          "type": "number",
+          "readOnly": false,
+          "description": "Agreed expected student count for the Actual Fixed Royalty (MFA: royalty is fixed on this, not on actual students taught)."
+        },
+        "fldggf1KurmdeFH6H": {
+          "fieldId": "fldggf1KurmdeFH6H",
+          "fieldName": "Phone / Телефон",
+          "type": "phoneNumber",
+          "readOnly": false
+        },
+        "fldjG72A7V62RPB9e": {
+          "fieldId": "fldjG72A7V62RPB9e",
+          "fieldName": "Lesson Fee (KGS) / Стоимость урока (сом)",
+          "type": "currency",
+          "readOnly": false,
+          "description": "Agreed lesson fee. Enter from the rate source — not pre-filled."
+        },
+        "fldlXP9y2prsgGqID": {
+          "fieldId": "fldlXP9y2prsgGqID",
+          "fieldName": "36 Sub-Franchise Royalties / Роялти субфранчайзи",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblx5V0x0s6kbr56l"
+        },
+        "fldpVqQCyxjM3lDoy": {
+          "fieldId": "fldpVqQCyxjM3lDoy",
+          "fieldName": "Royalty Rate % / Ставка роялти %",
+          "type": "percent",
+          "readOnly": false,
+          "description": "LCF/LSF Royalty Rate. Enter from the rate source — not pre-filled."
+        },
+        "fldqlcfdGkQg0jjag": {
+          "fieldId": "fldqlcfdGkQg0jjag",
+          "fieldName": "Email / Эл. почта",
+          "type": "email",
+          "readOnly": false
+        },
+        "fldr7MzbE89PI2EUv": {
+          "fieldId": "fldr7MzbE89PI2EUv",
+          "fieldName": "Contact Name / Контактное лицо",
+          "type": "singleLineText",
+          "readOnly": false
+        },
+        "fldscs0gsnlmKRe5Q": {
+          "fieldId": "fldscs0gsnlmKRe5Q",
+          "fieldName": "Build-Out Project / Проект открытия",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblqJGJRambPzTePj"
+        },
+        "fldvQOQUNeXqHgw0b": {
+          "fieldId": "fldvQOQUNeXqHgw0b",
+          "fieldName": "Grace Period End / Конец льготного периода",
+          "type": "date",
+          "readOnly": false,
+          "description": "MFA New LCF/LSF royalty grace period end. Royalty waived until this date."
+        },
+        "fldyZS8xNhrfTf6bJ": {
+          "fieldId": "fldyZS8xNhrfTf6bJ",
+          "fieldName": "Status / Статус",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Prospect = Потенциальный; Application = Заявка; Signed = Подписан; Open = Открыт; Grace Period = Льготный период; Active = Активен; Terminated = Расторгнут"
+        }
+      }
+    },
     "tblpUJni7tMvO2QBs": {
       "tableId": "tblpUJni7tMvO2QBs",
       "tableName": "11 Class Groups / Группы",
+      "prismaModel": "ClassGroup",
       "tier": "T3",
       "tierName": "Operational",
       "description": null,
@@ -2422,6 +3479,13 @@
           "readOnly": false,
           "linkedTableId": "tblgvltY5JtmMZs1q"
         },
+        "fldPJpcz3xsIYc4IK": {
+          "fieldId": "fldPJpcz3xsIYc4IK",
+          "fieldName": "Utilisation % / Заполненность %",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Enrolled Count / Capacity, in % points (0-100). Blank when Capacity is 0/blank. Seat utilisation lever for the minimum-goal ramp."
+        },
         "fldPvtA1ugZitmSkT": {
           "fieldId": "fldPvtA1ugZitmSkT",
           "fieldName": "Teacher",
@@ -2443,6 +3507,13 @@
           "readOnly": false,
           "linkedTableId": "tblunCF2EX30onveH"
         },
+        "fldrPYdkK20io4VVo": {
+          "fieldId": "fldrPYdkK20io4VVo",
+          "fieldName": "Enrolled Count / Зачислено",
+          "type": "count",
+          "readOnly": true,
+          "description": "Number of linked Enrollments. Pairs with Capacity for utilisation."
+        },
         "fldzQWsTvAK9VkcxC": {
           "fieldId": "fldzQWsTvAK9VkcxC",
           "fieldName": "Branch",
@@ -2459,9 +3530,277 @@
         }
       }
     },
+    "tblpepGaPbfVlBv74": {
+      "tableId": "tblpepGaPbfVlBv74",
+      "tableName": "38 Minimum Goals / Минимальные цели",
+      "prismaModel": "MinimumGoal",
+      "tier": "T3",
+      "tierName": "Operational",
+      "description": "MFA §3.14 minimum-goal tracker. One row per goal year. Target students count MF-owned LC + LCF/LSF + SET students (1x weekly). The single metric the whole agreement is measured on. Targets seeded from the signed MFA §3.14; actual counts are entered at reporting time.",
+      "fields": {
+        "fld2MO7BHJwJZ51yd": {
+          "fieldId": "fld2MO7BHJwJZ51yd",
+          "fieldName": "SET Students / Учеников SET",
+          "type": "number",
+          "readOnly": false
+        },
+        "fldFEUi4m3hRy1L5x": {
+          "fieldId": "fldFEUi4m3hRy1L5x",
+          "fieldName": "MF-owned Students / Учеников собств. центра",
+          "type": "number",
+          "readOnly": false
+        },
+        "fldJuMgnBugPKzAXz": {
+          "fieldId": "fldJuMgnBugPKzAXz",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldKofnyDx0Mz7xKN": {
+          "fieldId": "fldKofnyDx0Mz7xKN",
+          "fieldName": "LCF/LSF Students / Учеников франчайзи",
+          "type": "number",
+          "readOnly": false
+        },
+        "fldKwiTeHqOrcnwpT": {
+          "fieldId": "fldKwiTeHqOrcnwpT",
+          "fieldName": "Target Students / Цель (учеников)",
+          "type": "number",
+          "readOnly": false,
+          "description": "MFA §3.14 minimum, area-wide (incl. LCF/LSF + SET students)."
+        },
+        "fldXfU0CPUXVMjlXw": {
+          "fieldId": "fldXfU0CPUXVMjlXw",
+          "fieldName": "% of Goal / % цели",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Total Area Students / Target, in % points. Blank when Target is 0."
+        },
+        "fldXiNSWzs3SFbV9p": {
+          "fieldId": "fldXiNSWzs3SFbV9p",
+          "fieldName": "Gap to Goal / Разрыв до цели",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Total Area Students − Target. Negative = behind the minimum goal."
+        },
+        "fldYpnEUjmowVHJoB": {
+          "fieldId": "fldYpnEUjmowVHJoB",
+          "fieldName": "Goal Year / Год цели",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary. e.g. Year 3 (2026-27)"
+        },
+        "fldbaI3f0EPXhHhCd": {
+          "fieldId": "fldbaI3f0EPXhHhCd",
+          "fieldName": "End Date / Конец",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldh5XS5jbjlknOui": {
+          "fieldId": "fldh5XS5jbjlknOui",
+          "fieldName": "School Year / Учебный год",
+          "type": "singleLineText",
+          "readOnly": false
+        },
+        "fldmwlbVzkynyqVOG": {
+          "fieldId": "fldmwlbVzkynyqVOG",
+          "fieldName": "Status / Статус",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Met when Total Area Students ≥ Target, else Behind."
+        },
+        "fldo6uLFbbEb2j4RF": {
+          "fieldId": "fldo6uLFbbEb2j4RF",
+          "fieldName": "Start Date / Начало",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldxT09L5HSOeJCT3": {
+          "fieldId": "fldxT09L5HSOeJCT3",
+          "fieldName": "Total Area Students / Всего учеников",
+          "type": "formula",
+          "readOnly": true,
+          "description": "MF-owned + LCF/LSF + SET students. The MFA §3.14 measure."
+        }
+      }
+    },
+    "tblqJGJRambPzTePj": {
+      "tableId": "tblqJGJRambPzTePj",
+      "tableName": "32 Build-Out Projects / Проекты открытия центров",
+      "prismaModel": "BuildOutProject",
+      "tier": "T1",
+      "tierName": "Financial",
+      "description": "Per-location opening/fit-out project tracker (MF-owned LC, LCF, LSF, branch, or office). Turns the population-based territory build-out into trackable projects. Source: MFA §4.2/4.5/4.6 opening obligations; CONSTRUCTIONS folder.",
+      "fields": {
+        "fld6gnBF7JNnrZP7M": {
+          "fieldId": "fld6gnBF7JNnrZP7M",
+          "fieldName": "Branch / Филиал",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl2utdNdP9usMXLf"
+        },
+        "fldHLfFokfWDUiCXl": {
+          "fieldId": "fldHLfFokfWDUiCXl",
+          "fieldName": "35 Sub-Franchisees (LCF/LSF) / Субфранчайзи",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblns9BnLFvsJrdOW"
+        },
+        "fldM6EW8YlQcWV2dn": {
+          "fieldId": "fldM6EW8YlQcWV2dn",
+          "fieldName": "Status / Статус",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Planning = Планирование; Site Search = Поиск помещения; Fit-out = Ремонт; Branding = Брендинг; Ready = Готов; Open = Открыт; On Hold = Пауза"
+        },
+        "fldNz804wF8IWUUkh": {
+          "fieldId": "fldNz804wF8IWUUkh",
+          "fieldName": "31 Fixed Assets / Основные средства",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbl5P27dUHrKWOMw2"
+        },
+        "fldVtlpRGMhIoFZM3": {
+          "fieldId": "fldVtlpRGMhIoFZM3",
+          "fieldName": "Sub-Area / Район",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Population sub-area (MFA: ~1 LC per 50,000-100,000 inhabitants)."
+        },
+        "fldc4Vfe0oWjFrsnz": {
+          "fieldId": "fldc4Vfe0oWjFrsnz",
+          "fieldName": "Budget (KGS) / Бюджет (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "fldfpxbHAcxDxIW5R": {
+          "fieldId": "fldfpxbHAcxDxIW5R",
+          "fieldName": "Type / Тип",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: MF-owned LC = Собственный центр MF; LCF = Франчайзи-центр; LSF = Франчайзи-студия; Branch = Филиал; Office = Офис"
+        },
+        "fldiSdxGbTcfRPHB4": {
+          "fieldId": "fldiSdxGbTcfRPHB4",
+          "fieldName": "Actual Spend (KGS) / Фактические затраты (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "fldmbtA39UbwIMlAI": {
+          "fieldId": "fldmbtA39UbwIMlAI",
+          "fieldName": "Variance (KGS) / Отклонение (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Budget − Actual Spend. Positive = under budget."
+        },
+        "fldo0VcPaOOCn1rn4": {
+          "fieldId": "fldo0VcPaOOCn1rn4",
+          "fieldName": "Actual Open Date / Фактическая дата открытия",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldpGCqvVv3uO8fPi": {
+          "fieldId": "fldpGCqvVv3uO8fPi",
+          "fieldName": "Project / Проект",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary."
+        },
+        "fldqHZHHyayUCKvue": {
+          "fieldId": "fldqHZHHyayUCKvue",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldwfnxzjaXwvnOeb": {
+          "fieldId": "fldwfnxzjaXwvnOeb",
+          "fieldName": "Target Open Date / Плановая дата открытия",
+          "type": "date",
+          "readOnly": false
+        }
+      }
+    },
+    "tbltNBkGhwTiItU6B": {
+      "tableId": "tbltNBkGhwTiItU6B",
+      "tableName": "37 SETs / Самозанятые преподаватели",
+      "prismaModel": "SelfEmployedTeacher",
+      "tier": "T2",
+      "tierName": "PII",
+      "description": "Self-Employed Teachers of HDE. A SET reports and pays royalties to an LCF/LSF or the MF; their students count toward the MFA §3.14 minimum goals. Independent contractors, not part of the LCF/LSF pedagogic staff. Source: MFA Definitions (SET).",
+      "fields": {
+        "fld4OGF7gwHsFvhUO": {
+          "fieldId": "fld4OGF7gwHsFvhUO",
+          "fieldName": "Email / Эл. почта",
+          "type": "email",
+          "readOnly": false
+        },
+        "fldKvYeaxeN9JCLZ4": {
+          "fieldId": "fldKvYeaxeN9JCLZ4",
+          "fieldName": "Royalty Rate % / Ставка роялти %",
+          "type": "percent",
+          "readOnly": false,
+          "description": "Enter from the rate source — not pre-filled."
+        },
+        "fldO5VT31d6CSywYh": {
+          "fieldId": "fldO5VT31d6CSywYh",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldTaQWjGuIVeyXXa": {
+          "fieldId": "fldTaQWjGuIVeyXXa",
+          "fieldName": "Phone / Телефон",
+          "type": "phoneNumber",
+          "readOnly": false
+        },
+        "fldU61dlU5u1dWkD2": {
+          "fieldId": "fldU61dlU5u1dWkD2",
+          "fieldName": "Students / Учеников",
+          "type": "number",
+          "readOnly": false,
+          "description": "Headcount — counts toward minimum goals (MFA §3.14)."
+        },
+        "fldYUk6XgVmjl1uvM": {
+          "fieldId": "fldYUk6XgVmjl1uvM",
+          "fieldName": "SET Name / ФИО",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary."
+        },
+        "fldZvKDcDITnObkBD": {
+          "fieldId": "fldZvKDcDITnObkBD",
+          "fieldName": "Start Date / Дата начала",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldaz7VZIrWioat4A": {
+          "fieldId": "fldaz7VZIrWioat4A",
+          "fieldName": "Status / Статус",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Prospect = Потенциальный; Active = Активен; Inactive = Неактивен"
+        },
+        "fldeapEgFxxJQJj8j": {
+          "fieldId": "fldeapEgFxxJQJj8j",
+          "fieldName": "Sub-Franchise Royalties / Роялти",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblx5V0x0s6kbr56l"
+        },
+        "fldzQopiJPUzlAURg": {
+          "fieldId": "fldzQopiJPUzlAURg",
+          "fieldName": "Reports To / Относится к",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblns9BnLFvsJrdOW",
+          "description": "The LCF/LSF (or MF) this SET reports and pays royalties to."
+        }
+      }
+    },
     "tblunCF2EX30onveH": {
       "tableId": "tblunCF2EX30onveH",
       "tableName": "06 Rooms / Кабинеты",
+      "prismaModel": "Room",
       "tier": "T3",
       "tierName": "Operational",
       "description": null,
@@ -2498,6 +3837,103 @@
           "type": "multipleRecordLinks",
           "readOnly": false,
           "linkedTableId": "tbl2utdNdP9usMXLf"
+        }
+      }
+    },
+    "tblx5V0x0s6kbr56l": {
+      "tableId": "tblx5V0x0s6kbr56l",
+      "tableName": "36 Sub-Franchise Royalties / Роялти субфранчайзи",
+      "prismaModel": "SubFranchiseRoyalty",
+      "tier": "T1",
+      "tierName": "Financial",
+      "description": "Inbound royalties the MF collects from LCF/LSF/SET (LCF→MF), by month. Distinct from 22 Franchise Royalties, which is the MF's onward payment to HQ. A share of what is collected here is remitted onward to HQ (rate per MFA — confirm with counsel; left as an input). Source: MFA Definitions (Actual Calculated Annual Royalty Amount).",
+      "fields": {
+        "fld1Q5bVie7krlrEG": {
+          "fieldId": "fld1Q5bVie7krlrEG",
+          "fieldName": "HQ Share (KGS) / Доля HQ (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Amount Received × HQ Share %. The portion remitted onward to HQ. Blank until HQ Share % entered."
+        },
+        "fld64NGZ78KyXqplO": {
+          "fieldId": "fld64NGZ78KyXqplO",
+          "fieldName": "Royalty No / Номер роялти",
+          "type": "singleLineText",
+          "readOnly": false,
+          "description": "Primary. e.g. SFR-2026-07-<franchisee>"
+        },
+        "fld7Pv17ijta1Yjkv": {
+          "fieldId": "fld7Pv17ijta1Yjkv",
+          "fieldName": "Period / Период",
+          "type": "date",
+          "readOnly": false,
+          "description": "First day of the royalty month."
+        },
+        "fld7aD2c90ZGHDzRQ": {
+          "fieldId": "fld7aD2c90ZGHDzRQ",
+          "fieldName": "Notes / Заметки",
+          "type": "multilineText",
+          "readOnly": false
+        },
+        "fldCyof6PP304xcl7": {
+          "fieldId": "fldCyof6PP304xcl7",
+          "fieldName": "Monthly Royalty Due (KGS) / Роялти к получению (сом)",
+          "type": "currency",
+          "readOnly": false,
+          "description": "Amount due this month (Actual Calculated Annual Royalty ÷ 12, or as agreed). Due regardless of actual students taught (MFA)."
+        },
+        "fldRkLsCCIpm52YMz": {
+          "fieldId": "fldRkLsCCIpm52YMz",
+          "fieldName": "Due Date / Срок оплаты",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldTmN6y8jVTCp8LF": {
+          "fieldId": "fldTmN6y8jVTCp8LF",
+          "fieldName": "Received Date / Дата получения",
+          "type": "date",
+          "readOnly": false
+        },
+        "fldchsxtKEUrg60Bp": {
+          "fieldId": "fldchsxtKEUrg60Bp",
+          "fieldName": "Franchisee / Франчайзи",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tblns9BnLFvsJrdOW"
+        },
+        "fldlPGjcmC1ybgtxw": {
+          "fieldId": "fldlPGjcmC1ybgtxw",
+          "fieldName": "37 SETs / Самозанятые преподаватели",
+          "type": "multipleRecordLinks",
+          "readOnly": false,
+          "linkedTableId": "tbltNBkGhwTiItU6B"
+        },
+        "fldpd2VqxDcsvixei": {
+          "fieldId": "fldpd2VqxDcsvixei",
+          "fieldName": "Balance (KGS) / Остаток (сом)",
+          "type": "formula",
+          "readOnly": true,
+          "description": "Monthly Royalty Due − Amount Received."
+        },
+        "flduaqSYY0ZrkVMN6": {
+          "fieldId": "flduaqSYY0ZrkVMN6",
+          "fieldName": "Amount Received (KGS) / Получено (сом)",
+          "type": "currency",
+          "readOnly": false
+        },
+        "fldun6oJ8MwQ91dX8": {
+          "fieldId": "fldun6oJ8MwQ91dX8",
+          "fieldName": "HQ Share % / Доля HQ %",
+          "type": "percent",
+          "readOnly": false,
+          "description": "Share of this royalty remitted onward to HQ. Enter per MFA / counsel — not pre-filled."
+        },
+        "fldzppXXT9Wk0xSPk": {
+          "fieldId": "fldzppXXT9Wk0xSPk",
+          "fieldName": "Status / Статус",
+          "type": "singleSelect",
+          "readOnly": false,
+          "description": "RU: Due = К оплате; Received = Получено; Overdue = Просрочено; Waived (Grace) = Льгота"
         }
       }
     }

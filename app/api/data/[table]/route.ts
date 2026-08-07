@@ -34,6 +34,19 @@ const modelMapping: { [key: string]: string } = {
   activity: "activity",
   channelperformance: "channelPerformance",
   notificationlog: "notificationLog",
+  // Tables 28–39, adopted 2026-08-06
+  backpackinventory: "backpackInventory",
+  ttc: "ttc",
+  budgettarget: "budgetTarget",
+  fixedasset: "fixedAsset",
+  buildoutproject: "buildOutProject",
+  marketingcampaign: "marketingCampaign",
+  document: "document",
+  subfranchisee: "subFranchisee",
+  subfranchiseroyalty: "subFranchiseRoyalty",
+  selfemployedteacher: "selfEmployedTeacher",
+  minimumgoal: "minimumGoal",
+  franchiseobligation: "franchiseObligation",
 };
 
 const searchableFields: Record<string, string[]> = {
@@ -64,6 +77,21 @@ const searchableFields: Record<string, string[]> = {
   activity: ["activityId", "notes"],
   channelPerformance: ["channel", "month"],
   notificationLog: ["notificationId", "message"],
+  // Tables 28–39, adopted 2026-08-06. Contact fields on the three T2 tables are
+  // deliberately excluded — they are redacted for every role except owner
+  // (lib/rbac.ts §5–7), so searching them would leak the redacted values.
+  backpackInventory: ["levelName", "supplier"],
+  ttc: ["ttcId", "programme", "location", "trainer"],
+  budgetTarget: ["line", "type", "category"],
+  fixedAsset: ["asset", "category", "status"],
+  buildOutProject: ["project", "subArea", "status"],
+  marketingCampaign: ["campaign", "channel", "objective"],
+  document: ["document", "type"],
+  subFranchisee: ["franchiseeName", "type", "subArea"],
+  subFranchiseRoyalty: ["royaltyNo", "status"],
+  selfEmployedTeacher: ["setName", "status"],
+  minimumGoal: ["goalYear", "schoolYear"],
+  franchiseObligation: ["obligation", "status"],
 };
 
 const defaultSorts: Record<string, Record<string, string>> = {
@@ -675,8 +703,10 @@ export async function GET(
     >;
 
     // Define sensitive tables for action classification
-    const T1_TABLES = ["Account", "JournalEntry", "LedgerLine", "Vendor", "Expense", "FranchiseRoyalty", "TeacherPay", "TeacherHours"];
-    const T2_TABLES = ["User", "Parent", "Student", "Enrollment", "Invoice", "Payment", "NotificationLog"];
+    const T1_TABLES = ["Account", "JournalEntry", "LedgerLine", "Vendor", "Expense", "FranchiseRoyalty", "TeacherPay", "TeacherHours",
+      "BudgetTarget", "FixedAsset", "BuildOutProject", "SubFranchiseRoyalty", "FranchiseObligation"];
+    const T2_TABLES = ["User", "Parent", "Student", "Enrollment", "Invoice", "Payment", "NotificationLog",
+      "Document", "SubFranchisee", "SelfEmployedTeacher"];
     const isSensitive = T1_TABLES.includes(prismaModelName) || T2_TABLES.includes(prismaModelName);
     const action = isSensitive ? "SENSITIVE_ACCESS" : "VIEW";
 

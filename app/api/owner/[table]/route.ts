@@ -23,9 +23,18 @@ const SENSITIVE_TABLES = [
   "Enrollment",
   "Invoice",
   "Payment",
+  // Tables 28–39 (adopted 2026-08-06): T1 financial and T2 personal-data tables.
+  "BudgetTarget",
+  "FixedAsset",
+  "BuildOutProject",
+  "SubFranchiseRoyalty",
+  "FranchiseObligation",
+  "Document",
+  "SubFranchisee",
+  "SelfEmployedTeacher",
 ];
 
-import { checkRBAC, getScopingFilter, normalizeRole } from "@/lib/rbac";
+import { checkRBAC, getScopingFilter, normalizeRole, applyRedactions } from "@/lib/rbac";
 
 export async function GET(
   request: NextRequest,
@@ -326,10 +335,23 @@ export async function GET(
       details: `Owner accessed sensitive table ${prismaModelName} (page ${page}, limit ${limit}, search "${search}").`,
     }, request);
 
+    // Field-level redaction.
+    //
+    // This route previously relied solely on which columns appear in
+    // ownerTablesConfig, but that list is global and cannot vary by role — so
+    // every role admitted by checkRBAC saw every configured column. That let
+    // `finance` read Student dateOfBirth / medicalNotes and `teacher` read
+    // Parent contact details, both of which CLAUDE.md §6 forbids.
+    //
+    // Columns stay in ownerTablesConfig so `owner` still sees them; this
+    // role-aware pass strips what each role must not see, matching how
+    // app/api/data/[table]/route.ts already behaves.
+    const redacted = applyRedactions(userRole, prismaModelName, records, false);
+
     const lookups = await resolveOwnerTableLookups(records);
 
     return NextResponse.json({
-      data: records,
+      data: redacted,
       pagination: {
         total,
         page,

@@ -84,11 +84,23 @@ Roles (from `config/rbac-matrix.json` — that file is the machine-readable sour
 Tier-to-table mapping (authoritative in `config/rbac-matrix.json`):
 
 - **T1 – Financial/HQ**: Account, JournalEntry, LedgerLine, Vendor, Expense, FranchiseRoyalty,
-  TeacherPay, TeacherHours. Append-only ledger — once written, never updated or deleted.
-- **T2 – PII**: User, Parent, Student, Enrollment, Invoice, Payment, NotificationLog.
-- **T3 – Operational**: Term, Room, Lead, Trial, ClassGroup, Session, Attendance, Activity.
-- **T4 – Reference**: Branch, Course, TuitionPlan.
+  TeacherPay, TeacherHours, BudgetTarget, FixedAsset, BuildOutProject, SubFranchiseRoyalty,
+  FranchiseObligation. Append-only ledger — once written, never updated or deleted.
+- **T2 – PII**: User, Parent, Student, Enrollment, Invoice, Payment, NotificationLog, Document,
+  SubFranchisee, SelfEmployedTeacher.
+- **T3 – Operational**: Term, Room, Lead, Trial, ClassGroup, Session, Attendance, Activity, Ttc,
+  MarketingCampaign, MinimumGoal.
+- **T4 – Reference**: Branch, Course, TuitionPlan, BackpackInventory.
 - **T4-RO – Analytics**: ChannelPerformance. Never written by the app (nightly automation owns it).
+
+> Tables 28–39 (the last entries in each tier above) were adopted 2026-08-06. The machine-readable
+> source of truth for table ID → tier → Prisma model is now `lib/table-registry.mjs`;
+> `config/rbac-matrix.json` remains authoritative for access decisions and the two are asserted
+> to agree by `tests/table-registry.test.mjs`. Adoption record: `docs/schema-adoption-guide.md`.
+>
+> **SubFranchisee, SubFranchiseRoyalty, SelfEmployedTeacher, MinimumGoal and FranchiseObligation
+> have no `branchIds` column** — they are HQ/franchise-level records and are deliberately not
+> branch-scoped. Access is governed by tier alone, so keep their role grants tight.
 
 ---
 
@@ -102,6 +114,45 @@ Never attempt a write to a computed field or a load-bearing constraint:
 - **Ledger Lines → Amount (signed)** — double-entry sign formula (Debit − Credit).
 - **Teacher Pay → Computed Pay** — auto-calculated.
 - **Channel Performance → KPI Metrics** — automation-owned, read-only.
+
+### 5.1 Computed fields on tables 28–39 (live base, not yet in the frozen baseline)
+
+These are `formula` / `rollup` / `count` fields in the live base. They are recorded here so the
+registry is complete regardless of when the baseline is re-frozen (gate #6). Never write to them.
+
+| Table | Computed fields | Type |
+| :--- | :--- | :--- |
+| 28 Backpack Inventory | Remaining · Gross Profit per Backpack (KGS) · Related Services Royalty 8% (KGS) · Net Profit per Backpack (KGS) | `formula` |
+| 29 TTCs | Total Revenue (KGS) · Net Revenue (KGS) | `formula` |
+| 30 Budget & Targets | Variance (KGS) · Variance % | `formula` |
+| 31 Fixed Assets | Book Value (KGS) · Annual Depreciation (KGS) | `formula` |
+| 32 Build-Out Projects | Variance (KGS) | `formula` |
+| 33 Marketing Campaigns | Leads Generated | `count` |
+| 33 Marketing Campaigns | Cost per Lead (KGS) | `formula` |
+| 34 Documents | Days to Renewal | `formula` |
+| 35 Sub-Franchisees | Actual Fixed Royalty (Annual, KGS) · MF Fee Share to HQ (EUR) · In Grace Period? | `formula` |
+| 36 Sub-Franchise Royalties | Balance (KGS) · HQ Share (KGS) | `formula` |
+| 38 Minimum Goals | Total Area Students · Gap to Goal · % of Goal · Status | `formula` |
+| 39 Franchise Obligations | Days to Due | `formula` |
+
+### 5.2 Computed fields added to existing tables (live base, not yet in the frozen baseline)
+
+| Table | Field | Type |
+| :--- | :--- | :--- |
+| 04 Tuition Plans | Net Amount (KGS) / Итого к оплате (сом) | `formula` |
+| 10 Students | First Enroll Date / Дата первого зачисления | `rollup` |
+| 10 Students | Cohort Month / Месяц когорты | `formula` |
+| 10 Students | Age at Withdrawal / Возраст при отчислении | `formula` |
+| 11 Class Groups | Enrolled Count / Зачислено | `count` |
+| 11 Class Groups | Utilisation % / Заполненность % | `formula` |
+| 12 Enrollments | Tenure (months) / Длительность (мес.) | `formula` |
+| 15 Invoices | Amount Paid (KGS) / Оплачено (сом) | `rollup` |
+| 15 Invoices | Balance (KGS) / Остаток (сом) | `formula` |
+| 17 Chart of Accounts | Balance (KGS) / Баланс (сом) | `rollup` |
+| 22 Franchise Royalties | Total Due HQ (EUR) / Итого к оплате HQ (EUR) | `formula` |
+
+> 35 computed fields total across §5.1 and §5.2. Source: `docs/schema-drift-2026-08-06.md`
+> (verified against the live base 2026-08-06). Adoption sequence: `docs/schema-adoption-guide.md`.
 
 **Ledger rules (append-only):** financial ledger records are append-only. Every Journal Entry
 must balance: Σ(Debit − Credit) = 0 across its linked Ledger Lines. Posted entries are locked;
