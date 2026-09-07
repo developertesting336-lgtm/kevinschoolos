@@ -108,13 +108,12 @@ export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
                   <td className="p-3 text-center">
                     <Badge
                       variant="outline"
-                      className={`text-[9px] py-0.5 px-2.5 font-bold capitalize select-none ${
-                        row.status?.toLowerCase() === "paid"
+                      className={`text-[9px] py-0.5 px-2.5 font-bold capitalize select-none ${row.status?.toLowerCase() === "paid"
                           ? "bg-emerald-500/5 text-emerald-600 border-emerald-500/10"
                           : row.status?.toLowerCase() === "approved"
-                          ? "bg-blue-500/5 text-blue-600 border-blue-500/10"
-                          : "bg-amber-500/5 text-amber-600 border-amber-500/10"
-                      }`}
+                            ? "bg-blue-500/5 text-blue-600 border-blue-500/10"
+                            : "bg-amber-500/5 text-amber-600 border-amber-500/10"
+                        }`}
                     >
                       {row.status || "Draft"}
                     </Badge>

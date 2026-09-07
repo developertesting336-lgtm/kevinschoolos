@@ -113,22 +113,20 @@ export default function BillingPage() {
       <div className="flex border-b border-border">
         <Link
           href="/dashboard/billing?tab=invoices"
-          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
-            activeTab === "invoices"
+          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${activeTab === "invoices"
               ? "border-primary text-primary"
               : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <FileText className="h-4 w-4" />
           Invoices
         </Link>
         <Link
           href="/dashboard/billing?tab=payments"
-          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
-            activeTab === "payments"
+          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${activeTab === "payments"
               ? "border-primary text-primary"
               : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <CreditCard className="h-4 w-4" />
           Payments Log
@@ -194,8 +192,8 @@ export default function BillingPage() {
                               invoice.status?.toLowerCase() === "paid"
                                 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 font-medium capitalize"
                                 : invoice.status?.toLowerCase() === "unpaid" || invoice.status?.toLowerCase() === "overdue"
-                                ? "bg-destructive/10 border-destructive/20 text-destructive font-medium capitalize"
-                                : "bg-muted text-muted-foreground border-border font-medium capitalize"
+                                  ? "bg-destructive/10 border-destructive/20 text-destructive font-medium capitalize"
+                                  : "bg-muted text-muted-foreground border-border font-medium capitalize"
                             }
                           >
                             {invoice.status || "Unpaid"}

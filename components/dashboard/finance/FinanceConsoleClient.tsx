@@ -42,7 +42,7 @@ export function FinanceConsoleClient({
   userEmail,
 }: FinanceConsoleClientProps) {
   const dispatch = useAppDispatch();
-  
+
   // Redux hooks
   const stats = useAppSelector(selectFinanceStats);
   const loading = useAppSelector(selectFinanceLoading);
@@ -274,44 +274,40 @@ export function FinanceConsoleClient({
         <div className="flex border-b border-border gap-1 overflow-x-auto pb-px">
           <button
             onClick={() => setActiveTab("ledger")}
-            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === "ledger"
+            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${activeTab === "ledger"
                 ? "border-primary text-primary bg-primary/2"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            }`}
+              }`}
           >
             <BookOpen className="h-4 w-4" />
             Journal Entries & Ledger
           </button>
           <button
             onClick={() => setActiveTab("royalties")}
-            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === "royalties"
+            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${activeTab === "royalties"
                 ? "border-primary text-primary bg-primary/2"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            }`}
+              }`}
           >
             <Percent className="h-4 w-4" />
             Royalty Pack
           </button>
           <button
             onClick={() => setActiveTab("teacher-pay")}
-            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === "teacher-pay"
+            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${activeTab === "teacher-pay"
                 ? "border-primary text-primary bg-primary/2"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            }`}
+              }`}
           >
             <Users className="h-4 w-4" />
             Teacher Pay Summary
           </button>
           <button
             onClick={() => setActiveTab("expenses")}
-            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === "expenses"
+            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${activeTab === "expenses"
                 ? "border-primary text-primary bg-primary/2"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            }`}
+              }`}
           >
             <CreditCard className="h-4 w-4" />
             Expense List

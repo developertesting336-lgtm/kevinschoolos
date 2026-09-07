@@ -3,12 +3,19 @@ import prisma from "@/lib/prisma";
 import crypto from "crypto";
 import { logRequest } from "@/lib/logger";
 import { generateRequestId, REQUEST_ID_HEADER } from "@/lib/request-id";
+import { verifyCsrfToken } from "@/lib/csrf";
 
 const UNAUTHENTICATED_PATHS = [
   "/healthz",
   "/readyz",
   "/api/auth/login",
   "/login",
+  "/forgot-password",
+  "/reset-password",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
+  "/api/auth/verify-reset-token",
+  "/api/auth/csrf",
 ];
 
 function hashToken(token: string): string {
@@ -54,6 +61,19 @@ export default async function proxy(req: NextRequest) {
     return res;
   }
 
+  // 1.5. CSRF Check: Validate state-changing HTTP requests
+  const STATE_CHANGING_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
+  if (STATE_CHANGING_METHODS.includes(req.method)) {
+    if (!verifyCsrfToken(req)) {
+      const res = NextResponse.json(
+        { error: "Forbidden: Invalid or missing CSRF token." },
+        { status: 403 }
+      );
+      res.headers.set(REQUEST_ID_HEADER, requestId);
+      return res;
+    }
+  }
+
   // 2. Auth Phase: get session cookie
   if (!sessionToken) {
     if (path.startsWith("/api/")) {
@@ -67,6 +87,8 @@ export default async function proxy(req: NextRequest) {
     res.headers.set(REQUEST_ID_HEADER, requestId);
     return res;
   }
+
+const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes idle timeout
 
   // 3. Database session validation directly via Prisma
   const hashedToken = hashToken(sessionToken);
@@ -87,7 +109,19 @@ export default async function proxy(req: NextRequest) {
     return res;
   }
 
-  if (!sessionRecord || sessionRecord.expiresAt < new Date()) {
+  const nowMs = Date.now();
+  const lastActiveMs = sessionRecord?.lastActiveAt
+    ? new Date(sessionRecord.lastActiveAt).getTime()
+    : nowMs;
+  const isExpired = !sessionRecord || (sessionRecord.expiresAt && new Date(sessionRecord.expiresAt).getTime() < nowMs);
+  const isIdle = (nowMs - lastActiveMs) > IDLE_TIMEOUT_MS;
+
+  if (isExpired || isIdle) {
+    // Delete expired session from database
+    if (sessionRecord) {
+      await prisma.userSession.deleteMany({ where: { id: hashedToken } }).catch(() => {});
+    }
+
     const responseTimeMs = Math.round(performance.now() - start);
     logRequest({ requestId, method: req.method, url: path, statusCode: 401, responseTimeMs });
     if (path.startsWith("/api/")) {
@@ -95,7 +129,11 @@ export default async function proxy(req: NextRequest) {
       res.headers.set(REQUEST_ID_HEADER, requestId);
       return res;
     }
-    const response = NextResponse.redirect(new URL("/login", publicOrigin));
+    const loginUrl = new URL("/login", publicOrigin);
+    if (isIdle) {
+      loginUrl.searchParams.set("reason", "timeout");
+    }
+    const response = NextResponse.redirect(loginUrl);
     response.cookies.delete("session");
     response.headers.set(REQUEST_ID_HEADER, requestId);
     return response;
@@ -103,12 +141,14 @@ export default async function proxy(req: NextRequest) {
 
   // Get user details directly via Prisma
   let dbUser = null;
-  try {
-    dbUser = await prisma.user.findUnique({
-      where: { id: sessionRecord.userId },
-    });
-  } catch (err) {
-    logRequest({ requestId, method: req.method, url: path, statusCode: 500, responseTimeMs: Math.round(performance.now() - start), error: err instanceof Error ? err : new Error("DB user query failed") });
+  if (sessionRecord?.userId) {
+    try {
+      dbUser = await prisma.user.findUnique({
+        where: { id: sessionRecord.userId },
+      });
+    } catch (err) {
+      logRequest({ requestId, method: req.method, url: path, statusCode: 500, responseTimeMs: Math.round(performance.now() - start), error: err instanceof Error ? err : new Error("DB user query failed") });
+    }
   }
 
   if (!dbUser) {

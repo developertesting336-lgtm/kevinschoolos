@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 
 export interface SessionData {
   id: string;
@@ -172,7 +173,7 @@ export const saveEnrollmentsForGroup = createAsyncThunk(
     try {
       const res = await fetch("/api/dashboard/groups/enroll", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           classGroupId: params.classGroupId,
           studentIds: params.studentIds,

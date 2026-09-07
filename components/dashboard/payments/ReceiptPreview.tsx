@@ -26,15 +26,15 @@ export function ReceiptPreview({
 }: ReceiptPreviewProps) {
   const formattedDate = date
     ? new Date(date).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
     : "—";
 
   return (
     <div className="border border-dashed border-border/80 bg-muted/10 rounded-2xl p-6 space-y-5 relative select-none">
-      
+
       {/* Decorative Top receipt notches */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-border/25 flex justify-between overflow-hidden">
         {Array.from({ length: 24 }).map((_, i) => (

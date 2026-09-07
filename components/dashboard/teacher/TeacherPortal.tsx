@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 import {
   Calendar,
   Clock,
@@ -369,9 +370,9 @@ function RosterDrawer({
       };
       const res = await fetch("/api/teacher/attendance", {
         method: "POST",
-        headers: {
+        headers: getCsrfHeaders({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify(payload),
       });
 

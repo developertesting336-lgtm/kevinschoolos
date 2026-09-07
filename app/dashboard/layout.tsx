@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { validateSession } from "@/lib/auth";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import { SessionTimeoutProvider } from "@/components/auth/SessionTimeoutProvider";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +37,8 @@ export default async function DashboardLayout({
   };
 
   return (
-    <SidebarProvider className="h-screen w-full overflow-hidden bg-background text-foreground font-sans">
+    <SessionTimeoutProvider>
+      <SidebarProvider className="h-screen w-full overflow-hidden bg-background text-foreground font-sans">
       <AppSidebar user={userProp} />
 
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
@@ -55,5 +57,6 @@ export default async function DashboardLayout({
         </main>
       </div>
     </SidebarProvider>
+    </SessionTimeoutProvider>
   );
 }

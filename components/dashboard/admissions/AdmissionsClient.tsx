@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchAdmissionsData, selectAdmissionsLeads, selectAdmissionsParents, selectAdmissionsUsers, selectAdmissionsBranches, selectAdmissionsTrials, selectAdmissionsActivities, selectAdmissionsRooms, selectAdmissionsClassGroups, selectAdmissionsSources, selectAdmissionsPagination, selectAdmissionsLoading, selectAdmissionsFilters, setFilters } from "@/store/slices/admissionsSlice";
@@ -157,9 +158,9 @@ export function AdmissionsClient() {
     if (selectedLead) {
       fetch("/api/admissions/audit", {
         method: "POST",
-        headers: {
+        headers: getCsrfHeaders({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify({ leadId: selectedLead.id }),
       }).catch((err) => {
         console.error("[Audit Service] Failed to trigger admissions audit endpoint", err);

@@ -113,14 +113,14 @@ export function PaymentDrawer({
     recoStatus = "Reconciled";
   }
 
-  const period = payment.date 
-    ? format(new Date(payment.date), "MMMM yyyy") 
+  const period = payment.date
+    ? format(new Date(payment.date), "MMMM yyyy")
     : "—";
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent className="w-full sm:max-w-xl p-0 flex flex-col h-full bg-background border-l border-border/80">
-        
+
         {/* Header section */}
         <div className="p-6 border-b border-border/50 shrink-0">
           <SheetHeader className="space-y-1">
@@ -170,7 +170,7 @@ export function PaymentDrawer({
         {/* Scrollable body content */}
         <ScrollArea className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-6">
-            
+
             {/* Duplicate Banner */}
             <DuplicateWarning isDuplicate={payment.possibleDuplicate} />
 

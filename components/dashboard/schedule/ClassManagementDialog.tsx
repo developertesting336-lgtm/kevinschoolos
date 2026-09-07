@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 import { X, Calendar, BookOpen, User, Home, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 
@@ -91,7 +92,7 @@ export default function ClassManagementDialog({ onClose, onSuccess }: ClassManag
     try {
       const res = await fetch("/api/dashboard/groups", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           groupName,
           branchId,

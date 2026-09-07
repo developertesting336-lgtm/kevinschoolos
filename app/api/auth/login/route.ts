@@ -47,9 +47,16 @@ export async function POST(request: Request) {
 
     // Check lockout
     if (secret.lockoutUntil && secret.lockoutUntil > now) {
-      const minutesLeft = Math.ceil((secret.lockoutUntil.getTime() - now.getTime()) / (60 * 1000));
+      const remainingMs = secret.lockoutUntil.getTime() - now.getTime();
+      const minutesLeft = Math.ceil(remainingMs / (60 * 1000));
+      const remainingSeconds = Math.ceil(remainingMs / 1000);
       auditService.log({ actorId: user.id, actorEmail: user.email, role: user.role, action: "LOGIN", result: "FAIL", details: "Account locked." }, request);
-      return NextResponse.json({ error: `Account locked. Try again in ${minutesLeft} minutes.` }, { status: 403 });
+      return NextResponse.json({
+        error: `Account locked. Try again in ${minutesLeft} minutes.`,
+        isLocked: true,
+        lockoutUntil: secret.lockoutUntil.toISOString(),
+        remainingSeconds,
+      }, { status: 403 });
     }
 
     // Verify password (CPU-intensive but unavoidable)
@@ -68,7 +75,13 @@ export async function POST(request: Request) {
       auditService.log({ actorId: user.id, actorEmail: user.email, role: user.role, action: "LOGIN", result: "FAIL", details: lockoutUntil ? "Account locked." : "Invalid password." }, request);
 
       if (lockoutUntil) {
-        return NextResponse.json({ error: "Too many failed attempts. Account locked for 15 minutes." }, { status: 403 });
+        const remainingSeconds = Math.ceil(LOCKOUT_DURATION_MS / 1000);
+        return NextResponse.json({
+          error: "Too many failed attempts. Account locked for 15 minutes.",
+          isLocked: true,
+          lockoutUntil: lockoutUntil.toISOString(),
+          remainingSeconds,
+        }, { status: 403 });
       }
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }

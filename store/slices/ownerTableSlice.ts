@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 
 interface OwnerTableState {
   data: any[];
@@ -87,9 +88,9 @@ export const createTuitionPlanThunk = createAsyncThunk(
     try {
       const res = await fetch("/api/tuition-plans", {
         method: "POST",
-        headers: {
+        headers: getCsrfHeaders({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify(planData),
       });
 
@@ -110,9 +111,9 @@ export const updateTuitionPlanThunk = createAsyncThunk(
     try {
       const res = await fetch(`/api/tuition-plans/${id}`, {
         method: "PATCH",
-        headers: {
+        headers: getCsrfHeaders({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify(planData),
       });
 

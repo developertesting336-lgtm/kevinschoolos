@@ -1,10 +1,23 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 
 interface AuthState {
   userId: string | null;
   role: string | null;
   loading: boolean;
   error: string | null;
+  // Password reset state
+  forgotPasswordLoading: boolean;
+  forgotPasswordSuccess: boolean;
+  forgotPasswordMessage: string | null;
+  forgotPasswordError: string | null;
+  resetPasswordLoading: boolean;
+  resetPasswordSuccess: boolean;
+  resetPasswordError: string | null;
+  resetPasswordValidationErrors: string[];
+  verifyTokenLoading: boolean;
+  verifyTokenValid: boolean | null;
+  verifyTokenError: string | null;
 }
 
 const initialState: AuthState = {
@@ -12,6 +25,17 @@ const initialState: AuthState = {
   role: null,
   loading: false,
   error: null,
+  forgotPasswordLoading: false,
+  forgotPasswordSuccess: false,
+  forgotPasswordMessage: null,
+  forgotPasswordError: null,
+  resetPasswordLoading: false,
+  resetPasswordSuccess: false,
+  resetPasswordError: null,
+  resetPasswordValidationErrors: [],
+  verifyTokenLoading: false,
+  verifyTokenValid: null,
+  verifyTokenError: null,
 };
 
 // Async thunk to login
@@ -28,6 +52,9 @@ export const loginThunk = createAsyncThunk(
       const data = await response.json();
 
       if (!response.ok) {
+        if (data && data.isLocked) {
+          return rejectWithValue(data);
+        }
         throw new Error(data.error || "Login failed. Please check credentials.");
       }
 
@@ -45,6 +72,7 @@ export const logoutThunk = createAsyncThunk(
     try {
       const response = await fetch("/api/auth/logout", {
         method: "POST",
+        headers: getCsrfHeaders(),
       });
       if (!response.ok) {
         throw new Error("Logout failed");
@@ -72,6 +100,102 @@ export const validateSessionThunk = createAsyncThunk(
   }
 );
 
+// Async thunk to touch session (keep active session alive)
+export const touchSessionThunk = createAsyncThunk(
+  "auth/touchSession",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch("/api/auth/touch", {
+        method: "POST",
+        headers: getCsrfHeaders(),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Session touch failed");
+      }
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to touch session");
+    }
+  }
+);
+
+// Async thunk to request password reset email
+export const forgotPasswordThunk = createAsyncThunk(
+  "auth/forgotPassword",
+  async ({ email }: { email: string }, { rejectWithValue }) => {
+    try {
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send reset link.");
+      }
+
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to request password reset.");
+    }
+  }
+);
+
+// Async thunk to verify reset token
+export const verifyResetTokenThunk = createAsyncThunk(
+  "auth/verifyResetToken",
+  async (token: string, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`/api/auth/verify-reset-token?token=${encodeURIComponent(token)}`);
+      const data = await response.json();
+
+      if (!response.ok || !data.valid) {
+        return rejectWithValue(data.error || "Invalid or expired reset link.");
+      }
+
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to verify reset token.");
+    }
+  }
+);
+
+// Async thunk to set new password using reset token
+export const resetPasswordThunk = createAsyncThunk(
+  "auth/resetPassword",
+  async (
+    { token, newPassword }: { token: string; newPassword: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, newPassword }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue({
+          error: data.error || "Failed to reset password.",
+          errors: data.errors || [],
+        });
+      }
+
+      return data;
+    } catch (error: any) {
+      return rejectWithValue({
+        error: error.message || "Failed to reset password.",
+        errors: [],
+      });
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -91,6 +215,21 @@ const authSlice = createSlice({
     setAuthError: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
       state.loading = false;
+    },
+    resetForgotPasswordState: (state) => {
+      state.forgotPasswordLoading = false;
+      state.forgotPasswordSuccess = false;
+      state.forgotPasswordMessage = null;
+      state.forgotPasswordError = null;
+    },
+    resetResetPasswordState: (state) => {
+      state.resetPasswordLoading = false;
+      state.resetPasswordSuccess = false;
+      state.resetPasswordError = null;
+      state.resetPasswordValidationErrors = [];
+      state.verifyTokenLoading = false;
+      state.verifyTokenValid = null;
+      state.verifyTokenError = null;
     },
   },
   extraReducers: (builder) => {
@@ -133,11 +272,77 @@ const authSlice = createSlice({
         state.role = null;
         state.loading = false;
         state.error = action.payload as string;
+      })
+      // Touch session
+      .addCase(touchSessionThunk.rejected, (state) => {
+        state.userId = null;
+        state.role = null;
+      })
+      // Forgot password
+      .addCase(forgotPasswordThunk.pending, (state) => {
+        state.forgotPasswordLoading = true;
+        state.forgotPasswordError = null;
+        state.forgotPasswordSuccess = false;
+        state.forgotPasswordMessage = null;
+      })
+      .addCase(forgotPasswordThunk.fulfilled, (state, action) => {
+        state.forgotPasswordLoading = false;
+        state.forgotPasswordSuccess = true;
+        state.forgotPasswordMessage = action.payload.message || "If that email exists, a reset link has been sent.";
+        state.forgotPasswordError = null;
+      })
+      .addCase(forgotPasswordThunk.rejected, (state, action) => {
+        state.forgotPasswordLoading = false;
+        state.forgotPasswordSuccess = false;
+        state.forgotPasswordError = action.payload as string;
+      })
+      // Verify reset token
+      .addCase(verifyResetTokenThunk.pending, (state) => {
+        state.verifyTokenLoading = true;
+        state.verifyTokenError = null;
+        state.verifyTokenValid = null;
+      })
+      .addCase(verifyResetTokenThunk.fulfilled, (state) => {
+        state.verifyTokenLoading = false;
+        state.verifyTokenValid = true;
+        state.verifyTokenError = null;
+      })
+      .addCase(verifyResetTokenThunk.rejected, (state, action) => {
+        state.verifyTokenLoading = false;
+        state.verifyTokenValid = false;
+        state.verifyTokenError = action.payload as string;
+      })
+      // Reset password
+      .addCase(resetPasswordThunk.pending, (state) => {
+        state.resetPasswordLoading = true;
+        state.resetPasswordError = null;
+        state.resetPasswordValidationErrors = [];
+        state.resetPasswordSuccess = false;
+      })
+      .addCase(resetPasswordThunk.fulfilled, (state) => {
+        state.resetPasswordLoading = false;
+        state.resetPasswordSuccess = true;
+        state.resetPasswordError = null;
+        state.resetPasswordValidationErrors = [];
+      })
+      .addCase(resetPasswordThunk.rejected, (state, action) => {
+        state.resetPasswordLoading = false;
+        state.resetPasswordSuccess = false;
+        const payload = action.payload as { error?: string; errors?: string[] } | undefined;
+        state.resetPasswordError = payload?.error || "Failed to reset password.";
+        state.resetPasswordValidationErrors = payload?.errors || [];
       });
   },
 });
 
-export const { setSession, clearSession, setAuthError } = authSlice.actions;
+export const {
+  setSession,
+  clearSession,
+  setAuthError,
+  resetForgotPasswordState,
+  resetResetPasswordState,
+} = authSlice.actions;
+
 export default authSlice.reducer;
 
 // Selectors
@@ -145,3 +350,17 @@ export const selectAuthUserId = (state: { auth: AuthState }) => state.auth.userI
 export const selectAuthRole = (state: { auth: AuthState }) => state.auth.role;
 export const selectAuthLoading = (state: { auth: AuthState }) => state.auth.loading;
 export const selectAuthError = (state: { auth: AuthState }) => state.auth.error;
+
+export const selectForgotPasswordLoading = (state: { auth: AuthState }) => state.auth.forgotPasswordLoading;
+export const selectForgotPasswordSuccess = (state: { auth: AuthState }) => state.auth.forgotPasswordSuccess;
+export const selectForgotPasswordMessage = (state: { auth: AuthState }) => state.auth.forgotPasswordMessage;
+export const selectForgotPasswordError = (state: { auth: AuthState }) => state.auth.forgotPasswordError;
+
+export const selectResetPasswordLoading = (state: { auth: AuthState }) => state.auth.resetPasswordLoading;
+export const selectResetPasswordSuccess = (state: { auth: AuthState }) => state.auth.resetPasswordSuccess;
+export const selectResetPasswordError = (state: { auth: AuthState }) => state.auth.resetPasswordError;
+export const selectResetPasswordValidationErrors = (state: { auth: AuthState }) => state.auth.resetPasswordValidationErrors;
+
+export const selectVerifyTokenLoading = (state: { auth: AuthState }) => state.auth.verifyTokenLoading;
+export const selectVerifyTokenValid = (state: { auth: AuthState }) => state.auth.verifyTokenValid;
+export const selectVerifyTokenError = (state: { auth: AuthState }) => state.auth.verifyTokenError;

@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAppDispatch } from "@/store/hooks";
+import { logoutThunk } from "@/store/slices/authSlice";
 import { normalizeRole } from "@/lib/roles";
 import {
   LayoutDashboard,
@@ -279,8 +281,15 @@ interface AppSidebarProps {
 
 export function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const initial = user.name ? user.name.charAt(0).toUpperCase() : "U";
   const userRole = normalizeRole(user.role || "staff");
+
+  const handleLogout = async () => {
+    await dispatch(logoutThunk());
+    router.push("/login");
+  };
 
   // Define allowed nav items per role
   const rolePermissions: Record<string, string[]> = {
@@ -427,15 +436,14 @@ export function AppSidebar({ user }: AppSidebarProps) {
           </div>
         </div>
 
-        <form action="/api/auth/logout" method="POST" className="shrink-0">
-          <button
-            type="submit"
-            title="Sign Out"
-            className="p-1.5 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20 transition-colors cursor-pointer"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={handleLogout}
+          title="Sign Out"
+          className="p-1.5 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20 transition-colors cursor-pointer"
+        >
+          <LogOut className="h-4 w-4" />
+        </button>
       </SidebarFooter>
     </Sidebar>
   );

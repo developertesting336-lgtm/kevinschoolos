@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School OS - Browser Defects Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 40px 30px;
+        }
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        .header .subtitle {
+            font-size: 0.95em;
+            opacity: 0.95;
+        }
+        .content {
+            padding: 40px;
+        }
+        .summary-box {
+            background: #fff5f5;
+            border-left: 5px solid #e74c3c;
+            padding: 20px;
+            margin-bottom: 40px;
+            border-radius: 6px;
+        }
+        .summary-box h3 {
+            color: #e74c3c;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .summary-box p {
+            color: #555;
+            margin: 8px 0;
+        }
+        .reported-by {
+            background: #f0f4ff;
+            border-left: 3px solid #667eea;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .defect-list {
+            margin-top: 30px;
+        }
+        .defect-item {
+            background: #fff9f5;
+            border-left: 5px solid #e74c3c;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            display: flex;
+            gap: 15px;
+        }
+        .defect-checkbox {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: #e74c3c;
+        }
+        .defect-content {
+            flex: 1;
+        }
+        .defect-title {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .defect-number {
+            background: #e74c3c;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+        .defect-description {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .defect-impact {
+            background: rgba(231, 76, 60, 0.05);
+            border-left: 3px solid #e74c3c;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+        .defect-impact strong {
+            color: #e74c3c;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-right: 10px;
+        }
+        .severity-critical {
+            background: #fadbd8;
+            color: #78281f;
+        }
+        .severity-high {
+            background: #f5b7b1;
+            color: #7b241c;
+        }
+        .severity-medium {
+            background: #fdebd0;
+            color: #7d6608;
+        }
+        .location-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            background: #e8f4f8;
+            color: #0c5460;
+            margin-right: 8px;
+        }
+        footer {
+            background: #f0f4ff;
+            padding: 25px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+        .footer-note {
+            font-size: 0.9em;
+            color: #999;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐛 Browser Defects Report</h1>
+            <p class="subtitle">Aggregated display issues found during testing</p>
+        </div>
+
+        <div class="content">
+            <div class="summary-box">
+                <h3>📊 Report Summary</h3>
+                <p><strong>Total Defects Found:</strong> 5</p>
+                <p><strong>Critical Issues:</strong> 3</p>
+                <p><strong>High Priority:</strong> 2</p>
+                <p><strong>Status:</strong> Reported by Kevin</p>
+                <p><strong>Scope:</strong> Aggregated data only (no personal data exposed)</p>
+                <div class="reported-by">
+                    <strong>Reported By:</strong> Kevin<br>
+                    <strong>Date:</strong> Testing Session<br>
+                    <strong>Note:</strong> All defects are display/calculation issues in aggregated metrics and UI elements
+                </div>
+            </div>
+
+            <div class="defect-list">
+                <!-- DEFECT 1 -->
+                <div class="defect-item">
+                    <input type="checkbox" class="defect-checkbox">
+                    <div class="defect-content">
+                        <div class="defect-title">
+                            <span class="defect-number">1</span>
+                            Incorrect Conversion Rate Calculations
+                        </div>
+                        <div class="defect-description">
+                            Trial-to-enrollment conversion ratio displays as 10050% and channel close rate shows 300%. Both metrics are using the wrong denominator in the calculation, resulting in values that exceed 100%.
+                        </div>
+                        <div class="defect-impact">
+                            <strong>Impact:</strong> Misleading business metrics. Stakeholders cannot trust conversion funnel data. Reports show impossible percentage values.
+                        </div>
+                        <div>
+                            <span class="severity-badge severity-critical">CRITICAL</span>
+                            <span class="location-badge">Channel Performance Page</span>
+                            <span class="location-badge">Analytics Dashboard</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEFECT 2 -->
+                <div class="defect-item">
+                    <input type="checkbox" class="defect-checkbox">
+                    <div class="defect-content">
+                        <div class="defect-title">
+                            <span class="defect-number">2</span>
+                            Currency Formatting Inconsistency
+                        </div>
+                        <div class="defect-description">
+                            KGS (Kyrgyzstani Som) amounts display with $ prefix instead of the correct currency symbol. Monthly revenue calculation appears to equal total revenue instead of showing month-specific totals.
+                        </div>
+                        <div class="defect-impact">
+                            <strong>Impact:</strong> Confusing currency display for finance team. Users may misinterpret amounts as USD instead of KGS. Revenue breakdowns appear incorrect.
+                        </div>
+                        <div>
+                            <span class="severity-badge severity-high">HIGH</span>
+                            <span class="location-badge">Finance Console</span>
+                            <span class="location-badge">Dashboard KPIs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEFECT 3 -->
+                <div class="defect-item">
+                    <input type="checkbox" class="defect-checkbox">
+                    <div class="defect-content">
+                        <div class="defect-title">
+                            <span class="defect-number">3</span>
+                            Incorrect Role Label Display
+                        </div>
+                        <div class="defect-description">
+                            Channel Performance page labels the owner/HQ user as "Office Administrator" instead of "Owner" or the correct role. This is a display-level issue where the wrong role string is being rendered.
+                        </div>
+                        <div class="defect-impact">
+                            <strong>Impact:</strong> Confusion about user permissions and responsibility. Incorrect audit trail labeling. Users may be unsure about actual authorization level.
+                        </div>
+                        <div>
+                            <span class="severity-badge severity-critical">CRITICAL</span>
+                            <span class="location-badge">Channel Performance Page</span>
+                            <span class="location-badge">User Display</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEFECT 4 -->
+                <div class="defect-item">
+                    <input type="checkbox" class="defect-checkbox">
+                    <div class="defect-content">
+                        <div class="defect-title">
+                            <span class="defect-number">4</span>
+                            Unclear Access Denial Error Message
+                        </div>
+                        <div class="defect-description">
+                            When a teacher attempts to open a restricted dashboard page they don't have permission to access, the error message reads "Failed to load dashboard metrics" instead of displaying a clear access restriction message like "You do not have permission to access this page".
+                        </div>
+                        <div class="defect-impact">
+                            <strong>Impact:</strong> Confusing UX. Users unsure if it's a system error or permission issue. May create unnecessary support tickets.
+                        </div>
+                        <div>
+                            <span class="severity-badge severity-high">HIGH</span>
+                            <span class="location-badge">Dashboard Access</span>
+                            <span class="location-badge">Error Handling</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEFECT 5 -->
+                <div class="defect-item">
+                    <input type="checkbox" class="defect-checkbox">
+                    <div class="defect-content">
+                        <div class="defect-title">
+                            <span class="defect-number">5</span>
+                            Incorrect Browser Tab Title
+                        </div>
+                        <div class="defect-description">
+                            The browser tab title displays as "Helon Doron School" instead of "School OS" or the configured school name. This appears to be a hardcoded or incorrectly templated page title.
+                        </div>
+                        <div class="defect-impact">
+                            <strong>Impact:</strong> Branding inconsistency. Users opening multiple tabs see confusing/incorrect school name. Poor first impression of the application.
+                        </div>
+                        <div>
+                            <span class="severity-badge severity-medium">MEDIUM</span>
+                            <span class="location-badge">All Pages</span>
+                            <span class="location-badge">Branding</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>School OS — Browser Defects Report</strong></p>
+            <p style="margin-top: 15px;">Critical: 3 | High: 2 | Medium: 1</p>
+            <div class="footer-note">
+                <p style="margin-top: 15px;">✓ All defects are aggregated display/calculation issues</p>
+                <p>✓ No personal data (PII) exposed or reviewed</p>
+                <p>✓ Issues identified during browser testing session</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

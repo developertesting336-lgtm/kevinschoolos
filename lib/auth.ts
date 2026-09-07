@@ -2,6 +2,7 @@ import crypto from "crypto";
 import argon2 from "argon2";
 import { cookies } from "next/headers";
 import prisma from "./prisma";
+import { generateCsrfToken, CSRF_COOKIE_NAME } from "./csrf";
 
 // Expiry configuration
 const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes idle timeout
@@ -27,8 +28,8 @@ export async function verifyPassword(
   }
 }
 
-// Generate secure SHA-256 hash of a session token
-function hashToken(token: string): string {
+// Generate secure SHA-256 hash of a token (sessions & password reset tokens)
+export function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
@@ -50,10 +51,20 @@ export async function createSession(userId: string): Promise<void> {
     },
   });
 
-  // Set httpOnly secure cookie
+  // Set httpOnly secure cookie for session
   const cookieStore = await cookies();
   cookieStore.set("session", token, {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    expires: expiresAt,
+    path: "/",
+  });
+
+  // Set CSRF token cookie (readable by JS to attach X-CSRF-Token header)
+  const csrfToken = generateCsrfToken();
+  cookieStore.set(CSRF_COOKIE_NAME, csrfToken, {
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     expires: expiresAt,
@@ -92,7 +103,8 @@ export async function validateSession(): Promise<{
     }
 
     // Verify idle timeout
-    if (now.getTime() - session.lastActiveAt.getTime() > IDLE_TIMEOUT_MS) {
+    const lastActiveMs = session.lastActiveAt ? new Date(session.lastActiveAt).getTime() : now.getTime();
+    if (now.getTime() - lastActiveMs > IDLE_TIMEOUT_MS) {
       await destroySession();
       return null;
     }
@@ -156,6 +168,14 @@ export async function destroySession(): Promise<void> {
 
     cookieStore.set("session", "", {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 0,
+      path: "/",
+    });
+
+    cookieStore.set(CSRF_COOKIE_NAME, "", {
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 0,

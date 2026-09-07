@@ -149,20 +149,24 @@ export async function GET(request: NextRequest) {
         where: {
           ...attendanceScope,
           status: { equals: "Present", mode: "insensitive" },
-          sessionIds: { hasSome: (await prisma.session.findMany({
-            where: { ...sessionScope, dateTime: { gte: startOfToday, lte: endOfToday } },
-            select: { id: true },
-          })).map(s => s.id) },
+          sessionIds: {
+            hasSome: (await prisma.session.findMany({
+              where: { ...sessionScope, dateTime: { gte: startOfToday, lte: endOfToday } },
+              select: { id: true },
+            })).map(s => s.id)
+          },
         },
       });
 
       const totalAttendance = await prisma.attendance.count({
         where: {
           ...attendanceScope,
-          sessionIds: { hasSome: (await prisma.session.findMany({
-            where: { ...sessionScope, dateTime: { gte: startOfToday, lte: endOfToday } },
-            select: { id: true },
-          })).map(s => s.id) },
+          sessionIds: {
+            hasSome: (await prisma.session.findMany({
+              where: { ...sessionScope, dateTime: { gte: startOfToday, lte: endOfToday } },
+              select: { id: true },
+            })).map(s => s.id)
+          },
         },
       });
 
@@ -191,7 +195,7 @@ export async function GET(request: NextRequest) {
 
       kpis.channelPerformance = channelData;
       kpis.trialToEnrollmentConversion = channelData.length > 0 && channelData[0].trialsAttended
-        ? Math.round((channelData[0].enrolled / channelData[0].trialsAttended) * 100)
+        ? Math.min(100, Math.round((channelData[0].enrolled / channelData[0].trialsAttended) * 100))
         : null;
     } else {
       // Owner/office_admin: compute from raw data
@@ -208,7 +212,7 @@ export async function GET(request: NextRequest) {
       });
       const enrolled = await prisma.enrollment.count({ where: enrollmentScope });
 
-      kpis.trialToEnrollmentConversion = trialsAttended > 0 ? Math.round((enrolled / trialsAttended) * 100) : 0;
+      kpis.trialToEnrollmentConversion = trialsAttended > 0 ? Math.min(100, Math.round((enrolled / trialsAttended) * 100)) : 0;
       kpis.leadsCount = totalLeads;
       kpis.trialsBooked = trialsBooked;
       kpis.trialsAttended = trialsAttended;
@@ -324,9 +328,10 @@ export async function GET(request: NextRequest) {
 
       const enrichedChannelData = channelData.map(row => ({
         ...row,
-        trialBookedRate: row.leads ? Math.round(((row.trialsBooked || 0) / row.leads) * 1000) / 10 : null,
-        showRate: row.trialsBooked ? Math.round(((row.trialsAttended || 0) / row.trialsBooked) * 1000) / 10 : null,
-        closeRate: row.trialsAttended ? Math.round(((row.enrolled || 0) / row.trialsAttended) * 1000) / 10 : null,
+        // Calculate rates as percentages (0-100), with defensive checks for already-calculated percentages
+        trialBookedRate: row.leads ? Math.min(100, Math.round(((row.trialsBooked || 0) / row.leads) * 1000) / 10) : null,
+        showRate: row.trialsBooked ? Math.min(100, Math.round(((row.trialsAttended || 0) / row.trialsBooked) * 1000) / 10) : null,
+        closeRate: row.trialsAttended ? Math.min(100, Math.round(((row.enrolled || 0) / row.trialsAttended) * 1000) / 10) : null,
       }));
 
       channelPerformance = {

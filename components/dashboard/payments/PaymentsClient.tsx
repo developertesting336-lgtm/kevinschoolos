@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectAuthRole } from "@/store/slices/authSlice";
@@ -282,7 +283,7 @@ export function PaymentsClient({
     try {
       await fetch("/api/payments/audit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           recordId: payment.id,
           action: "VIEW_PAYMENT_DETAILS",

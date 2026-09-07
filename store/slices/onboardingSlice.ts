@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 
 export interface EnrollmentData {
   id: string;
@@ -120,7 +121,7 @@ export const updateOnboarding = createAsyncThunk(
     try {
       const response = await fetch(`/api/branch/onboarding/${enrollmentId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ fields }),
       });
 

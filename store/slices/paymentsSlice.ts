@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 
 export interface Payment {
   id: string;
@@ -142,9 +143,9 @@ export const createPaymentThunk = createAsyncThunk(
     try {
       const res = await fetch("/api/payments", {
         method: "POST",
-        headers: {
+        headers: getCsrfHeaders({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify(paymentData),
       });
 

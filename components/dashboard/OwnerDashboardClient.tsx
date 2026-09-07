@@ -109,13 +109,13 @@ type ExpandedSection = "financial" | "payroll" | "channel" | null;
 // ─── Component ────────────────────────────────────────────────────────────
 export function OwnerDashboardClient() {
   const dispatch = useAppDispatch();
-  
+
   // Redux state
   const data = useAppSelector(selectDashboardData);
   const loading = useAppSelector(selectDashboardLoading);
   const error = useAppSelector(selectDashboardError);
   const filters = useAppSelector(selectDashboardFilters);
-  
+
   const [expandedSection, setExpandedSection] = useState<ExpandedSection>(null);
 
   // Local Input State (Prevents reloading/skeletons on every keystroke)
@@ -184,11 +184,18 @@ export function OwnerDashboardClient() {
   }
 
   if (error || !data) {
+    const isForbiddenError = error && (error.includes("403") || error.includes("Forbidden") || error.includes("denied"));
     return (
       <div className="p-8 max-w-lg mx-auto text-center">
         <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-3" />
-        <h2 className="text-lg font-bold text-foreground mb-1">Unable to Load Dashboard</h2>
-        <p className="text-sm text-muted-foreground">{error || "No data available."}</p>
+        <h2 className="text-lg font-bold text-foreground mb-1">
+          {isForbiddenError ? "Access Restricted" : "Unable to Load Dashboard"}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {isForbiddenError
+            ? "You do not have permission to access this dashboard. Please contact your administrator if you believe this is an error."
+            : error || "Unable to load dashboard metrics. Please try refreshing the page."}
+        </p>
       </div>
     );
   }
@@ -314,8 +321,8 @@ export function OwnerDashboardClient() {
               <DollarSign className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
-              <div className="text-xl font-extrabold text-foreground">${kpis.monthlyRevenue.toLocaleString()}</div>
-              <p className="text-[8px] text-muted-foreground font-medium mt-0.5">KGS collected</p>
+              <div className="text-xl font-extrabold text-foreground">{kpis.monthlyRevenue.toLocaleString()} KGS</div>
+              <p className="text-[8px] text-muted-foreground font-medium mt-0.5">Monthly revenue collected</p>
             </CardContent>
           </Card>
         )}
@@ -327,7 +334,7 @@ export function OwnerDashboardClient() {
               <Wallet className="h-3.5 w-3.5 text-primary/75" />
             </CardHeader>
             <CardContent className="p-4 pt-0">
-              <div className="text-xl font-extrabold text-foreground">${kpis.receivables.toLocaleString()}</div>
+              <div className="text-xl font-extrabold text-foreground">{kpis.receivables.toLocaleString()} KGS</div>
               <p className="text-[8px] text-muted-foreground font-medium mt-0.5">Outstanding invoices</p>
             </CardContent>
           </Card>
@@ -441,15 +448,15 @@ export function OwnerDashboardClient() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Total Revenue</div>
-                    <div className="text-lg font-extrabold text-foreground">${financialSnapshot.totalRevenue.toLocaleString()}</div>
+                    <div className="text-lg font-extrabold text-foreground">{financialSnapshot.totalRevenue.toLocaleString()} KGS</div>
                   </div>
                   <div>
                     <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Total Expenses</div>
-                    <div className="text-lg font-extrabold text-foreground">${financialSnapshot.totalExpenses.toLocaleString()}</div>
+                    <div className="text-lg font-extrabold text-foreground">{financialSnapshot.totalExpenses.toLocaleString()} KGS</div>
                   </div>
                   <div>
                     <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Net Profit</div>
-                    <div className="text-lg font-extrabold text-foreground">${financialSnapshot.netProfit.toLocaleString()}</div>
+                    <div className="text-lg font-extrabold text-foreground">{financialSnapshot.netProfit.toLocaleString()} KGS</div>
                   </div>
                   <div>
                     <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Pending Invoices</div>

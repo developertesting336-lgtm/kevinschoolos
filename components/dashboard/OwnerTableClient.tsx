@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import { TableConfig } from "@/lib/owner-schema";
 import { PaginationControls } from "./PaginationControls";
+import { AccountLockoutModal } from "./AccountLockoutModal";
 
 interface OwnerTableClientProps {
   data: any[];
@@ -84,6 +85,7 @@ export function OwnerTableClient({
   const normRole = (userRole || "").toLowerCase().trim();
   const isManager = ["owner", "office_admin", "office/admin", "office admin"].includes(normRole);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLockoutModalOpen, setIsLockoutModalOpen] = useState(false);
 
   // Courses list for Tuition Plan form dropdown
   const [coursesList, setCoursesList] = useState<any[]>([]);
@@ -818,6 +820,16 @@ export function OwnerTableClient({
                   Create Tuition Plan
                 </Button>
               )}
+              {(config.modelName === "user" || config.label.toLowerCase() === "users") && isManager && (
+                <Button
+                  onClick={() => setIsLockoutModalOpen(true)}
+                  variant="outline"
+                  className="h-8 text-xs font-bold gap-1.5 rounded-lg border-destructive/30 bg-destructive/5 hover:bg-destructive/10 text-destructive shadow-xs cursor-pointer"
+                >
+                  <Lock className="h-3.5 w-3.5" />
+                  Account Lockout Manager
+                </Button>
+              )}
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase">Page size:</span>
                 <NativeSelect
@@ -842,9 +854,8 @@ export function OwnerTableClient({
                     {displayColumns.map((col) => (
                       <TableHead
                         key={col.key}
-                        className={`px-5 py-3.5 font-bold text-xs text-muted-foreground uppercase select-none ${
-                          col.sortable ? "cursor-pointer hover:bg-muted/30 hover:text-foreground" : ""
-                        }`}
+                        className={`px-5 py-3.5 font-bold text-xs text-muted-foreground uppercase select-none ${col.sortable ? "cursor-pointer hover:bg-muted/30 hover:text-foreground" : ""
+                          }`}
                         onClick={() => col.sortable && handleSort(col.key)}
                       >
                         <div className="flex items-center">
@@ -965,11 +976,10 @@ export function OwnerTableClient({
                 return (
                   <div
                     key={col.key}
-                    className={`space-y-1.5 p-2.5 rounded-lg border border-border/30 bg-muted/20 ${
-                      isArray || col.key === "notes" || col.key === "medicalNotes" || col.key === "address"
+                    className={`space-y-1.5 p-2.5 rounded-lg border border-border/30 bg-muted/20 ${isArray || col.key === "notes" || col.key === "medicalNotes" || col.key === "address"
                         ? "col-span-2"
                         : "col-span-1"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground/90">
                       <span>{col.label}</span>
@@ -1416,6 +1426,14 @@ export function OwnerTableClient({
           </form>
         </DialogContent>
       </Dialog>
+
+      <AccountLockoutModal
+        open={isLockoutModalOpen}
+        onOpenChange={setIsLockoutModalOpen}
+        onUnlockedSuccess={() => {
+          dispatch(fetchOwnerTableData({ table: config.modelName || "user", page: "1", limit: "10", search: "", sortBy: config.defaultSortBy || "", sortOrder: config.defaultSortOrder || "asc", branchId: "", extraFilters: {} }));
+        }}
+      />
     </div>
   );
 }

@@ -487,6 +487,18 @@ model UserSession {
   createdAt    DateTime @default(now())
 }
 
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  requestIp String?
+
+  @@index([userId])
+}
+
 model AuditLog {
   id         Int      @id @default(autoincrement())
   actorEmail String   @map("actor_email")  // NOT NULL in DB; use empty string as fallback

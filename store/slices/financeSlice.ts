@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 
 export interface Branch {
   id: string;
@@ -292,7 +293,7 @@ export const createExpense = createAsyncThunk(
     try {
       const res = await fetch("/api/dashboard/office-admin/expenses", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(expenseData),
       });
       const data = await res.json();
@@ -312,7 +313,7 @@ export const updateExpenseApprovalStatus = createAsyncThunk(
     try {
       const res = await fetch("/api/dashboard/finance/expenses", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -440,7 +441,7 @@ export const createJournalEntry = createAsyncThunk(
     try {
       const res = await fetch("/api/dashboard/finance/journal-entries", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -460,7 +461,7 @@ export const reverseJournalEntry = createAsyncThunk(
     try {
       const res = await fetch("/api/dashboard/finance/journal-entries/reverse", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(payload),
       });
       const data = await res.json();

@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 
 export interface LeadData {
   id: string;
@@ -234,7 +235,7 @@ export const createLeadThunk = createAsyncThunk(
     try {
       const response = await fetch("/api/admissions/lead", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(leadData),
       });
       const data = await response.json();
@@ -264,7 +265,7 @@ export const createActivityThunk = createAsyncThunk(
     try {
       const response = await fetch("/api/admissions/activity", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(activityData),
       });
       const data = await response.json();
@@ -296,7 +297,7 @@ export const updateTrialOutcomeThunk = createAsyncThunk(
     try {
       const response = await fetch("/api/admissions/trial", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(payload),
       });
       const data = await response.json();
@@ -329,7 +330,7 @@ export const createTrialThunk = createAsyncThunk(
     try {
       const response = await fetch("/api/admissions/trial", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(trialData),
       });
       const data = await response.json();
@@ -363,7 +364,7 @@ export const convertLeadThunk = createAsyncThunk(
     try {
       const response = await fetch("/api/admissions/convert", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(payload),
       });
       const data = await response.json();

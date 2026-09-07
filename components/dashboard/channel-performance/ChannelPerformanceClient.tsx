@@ -247,7 +247,7 @@ export function ChannelPerformanceClient({
             <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin text-primary" : ""}`} />
           </button>
           <Badge variant="outline" className="bg-primary/5 text-primary border-primary/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
-            Role: {userRole === "owner" ? "Owner" : userRole === "smm" ? "Marketing Specialist" : "Office Administrator"}
+            Role: {userRole === "owner" ? "Owner" : userRole === "smm" ? "Marketing Specialist" : userRole === "office_admin" ? "Office Administrator" : userRole}
           </Badge>
         </div>
       </div>

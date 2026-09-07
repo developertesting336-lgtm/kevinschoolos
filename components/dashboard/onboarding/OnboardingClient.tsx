@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { getCsrfHeaders } from "@/lib/csrf-client";
 import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchOnboardingData, selectOnboardingEnrollments, selectOnboardingStudents, selectOnboardingParents, selectOnboardingUsers, selectOnboardingBranches, selectOnboardingCourses, selectOnboardingClassGroups, selectOnboardingPagination, selectOnboardingLoading, selectOnboardingFilters } from "@/store/slices/onboardingSlice";
@@ -57,9 +58,9 @@ export function OnboardingClient() {
     if (selectedEnrollment) {
       fetch("/api/onboarding/audit", {
         method: "POST",
-        headers: {
+        headers: getCsrfHeaders({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify({ enrollmentId: selectedEnrollment.id }),
       }).catch((err) => {
         console.error("[Audit Service] Failed to trigger onboarding audit endpoint", err);

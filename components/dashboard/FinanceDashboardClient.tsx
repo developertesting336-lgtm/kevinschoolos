@@ -382,11 +382,10 @@ export function FinanceDashboardClient() {
                         <span className="font-semibold text-xs text-foreground font-mono">{inv.invoiceNo}</span>
                         <Badge
                           variant="outline"
-                          className={`text-[8px] py-0 px-1.5 capitalize font-bold ${
-                            inv.status?.toLowerCase() === "paid"
+                          className={`text-[8px] py-0 px-1.5 capitalize font-bold ${inv.status?.toLowerCase() === "paid"
                               ? "bg-emerald-500/5 text-emerald-600 border-emerald-500/10"
                               : "bg-amber-500/5 text-amber-600 border-amber-500/10"
-                          }`}
+                            }`}
                         >
                           {inv.status || "Draft"}
                         </Badge>
@@ -427,11 +426,10 @@ export function FinanceDashboardClient() {
                         <span className="font-semibold text-xs text-foreground font-mono">{exp.expenseNo}</span>
                         <Badge
                           variant="outline"
-                          className={`text-[8px] py-0 px-1.5 capitalize font-bold ${
-                            exp.paid
+                          className={`text-[8px] py-0 px-1.5 capitalize font-bold ${exp.paid
                               ? "bg-emerald-500/5 text-emerald-600 border-emerald-500/10"
                               : "bg-rose-500/5 text-rose-600 border-rose-500/10"
-                          }`}
+                            }`}
                         >
                           {exp.paid ? "Paid" : "Unpaid"}
                         </Badge>

@@ -105,11 +105,10 @@ export function RoyaltyViewer({ branchId }: RoyaltyViewerProps) {
                   <td className="p-3 text-center">
                     <Badge
                       variant="outline"
-                      className={`text-[9px] py-0.5 px-2.5 font-bold capitalize select-none ${
-                        row.status?.toLowerCase() === "paid"
+                      className={`text-[9px] py-0.5 px-2.5 font-bold capitalize select-none ${row.status?.toLowerCase() === "paid"
                           ? "bg-emerald-500/5 text-emerald-600 border-emerald-500/10"
                           : "bg-amber-500/5 text-amber-600 border-amber-500/10"
-                      }`}
+                        }`}
                     >
                       {row.status || "Pending"}
                     </Badge>
