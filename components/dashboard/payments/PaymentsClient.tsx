@@ -809,21 +809,6 @@ Thank you for your payment!
                     <option value="Card">Card</option>
                   </NativeSelect>
                 </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-muted-foreground">Payment Type *</Label>
-                  <NativeSelect
-                    value={paymentTypeVal}
-                    onChange={(e) => setPaymentTypeVal(e.target.value)}
-                    size="sm"
-                  >
-                    <option value="Tuition / Абонемент">Tuition / Абонемент</option>
-                    <option value="Play room / Игровая">Play room / Игровая</option>
-                    <option value="Masterclass / Мастер-класс">Masterclass / Мастер-класс</option>
-                    <option value="Merchandise / Товары">Merchandise / Товары</option>
-                    <option value="Other / Прочее">Other / Прочее</option>
-                  </NativeSelect>
-                </div>
               </div>
 
               <DialogFooter className="border-t border-border pt-3">
@@ -880,10 +865,6 @@ Thank you for your payment!
                 <div className="flex justify-between py-1 border-b border-border/40">
                   <span className="text-muted-foreground font-semibold">Date Received:</span>
                   <span className="font-bold text-foreground font-mono">{receiptDetails.date}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-border/40">
-                  <span className="text-muted-foreground font-semibold">Payment Type:</span>
-                  <span className="font-bold text-foreground">{receiptDetails.paymentType}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-border/40">
                   <span className="text-muted-foreground font-semibold">Method:</span>

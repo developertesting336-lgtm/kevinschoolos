@@ -473,11 +473,11 @@ export function NewJournalEntryModal({
                 <div className="flex items-center gap-6 font-mono text-xs font-extrabold">
                   <div>
                     <span className="text-muted-foreground text-[10px] uppercase font-sans mr-2">Total Debit:</span>
-                    <span className="text-rose-600">${totalDebit.toFixed(2)}</span>
+                    <span className="text-rose-600">{totalDebit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} KGS</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground text-[10px] uppercase font-sans mr-2">Total Credit:</span>
-                    <span className="text-emerald-600">${totalCredit.toFixed(2)}</span>
+                    <span className="text-emerald-600">{totalCredit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} KGS</span>
                   </div>
                 </div>
               </div>

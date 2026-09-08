@@ -31,10 +31,10 @@ export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
 
   const formatCurrency = (val: number | null) => {
     if (val === null || val === undefined) return "—";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(val);
+    return `${val.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })} KGS`;
   };
 
   const formatDate = (dateStr: string | null) => {
@@ -94,13 +94,13 @@ export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
                     {row.hours != null ? row.hours.toFixed(1) : "—"}
                   </td>
                   <td className="p-3 text-right font-mono font-semibold text-muted-foreground">
-                    {row.rate != null ? `$${row.rate.toFixed(2)}` : "—"}
+                    {row.rate != null ? `${row.rate.toLocaleString("en-US", { minimumFractionDigits: 2 })} KGS` : "—"}
                   </td>
                   <td className="p-3 text-right font-mono font-bold text-foreground">
                     {formatCurrency((row.hours || 0) * (row.rate || 0))}
                   </td>
                   <td className={`p-3 text-right font-mono font-bold ${row.adjustments < 0 ? "text-rose-600" : row.adjustments > 0 ? "text-emerald-600" : "text-muted-foreground"}`}>
-                    {row.adjustments !== 0 ? `${row.adjustments < 0 ? "-" : ""}$${Math.abs(row.adjustments).toFixed(2)}` : "$0.00"}
+                    {row.adjustments !== 0 ? `${row.adjustments < 0 ? "-" : ""}${Math.abs(row.adjustments).toLocaleString("en-US", { minimumFractionDigits: 2 })} KGS` : "0.00 KGS"}
                   </td>
                   <td className="p-3 text-right font-mono font-bold text-primary">
                     {formatCurrency(row.finalPay)}

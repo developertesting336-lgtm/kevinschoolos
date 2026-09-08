@@ -84,21 +84,18 @@ const navItems = [
 
 const ownerGroups = [
   {
-    label: "PII Data (T2)",
+    label: "PII Data",
     items: [
       { title: "Users", url: "/dashboard/owner/user", icon: Users },
       { title: "Parents", url: "/dashboard/owner/parent", icon: UserCheck },
-      { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
-      { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
-      { title: "Notifications Center", url: "/dashboard/notifications", icon: Bell },
+      { title: "Students", url: "/dashboard/students", icon: GraduationCap },
     ],
   },
   {
-    label: "Operations (T3)",
+    label: "Operations",
     items: [
       { title: "Admissions", url: "/dashboard/admissions", icon: LayoutDashboard },
       { title: "Onboarding", url: "/dashboard/onboarding", icon: ClipboardCheck },
-      { title: "Payments & Receipts", url: "/dashboard/payments", icon: Wallet },
       { title: "Schedule Console", url: "/dashboard/schedule", icon: Calendar },
       { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
       { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
@@ -110,44 +107,17 @@ const ownerGroups = [
     ],
   },
   {
-    label: "Financial Data (T1)",
+    label: "Financial Data",
     items: [
       { title: "Finance Console", url: "/dashboard/finance", icon: Landmark },
     ],
   },
   {
-    label: "Reference & Analytics (T4)",
+    label: "Reference & Analytics",
     items: [
       { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
-      { title: "Backpack Inventory", url: "/dashboard/owner/backpackinventory", icon: Receipt },
-      { title: "Channel Performance", url: "/dashboard/channel-performance", icon: TrendingUp },
-      { title: "Schema Diagnostics", url: "/dashboard/admin/schema-diagnostics", icon: Shield },
-    ],
-  },
-  {
-    // Tables 28-39, adopted 2026-08-06. Owner-only for now: these links are NOT
-    // filtered by checkRBAC, so adding them to another role's group would render
-    // a link that lands on "Access Restricted".
-    label: "Franchise & Expansion",
-    items: [
-      { title: "Sub-Franchisees", url: "/dashboard/owner/subfranchisee", icon: Building2 },
-      { title: "Sub-Franchise Royalties", url: "/dashboard/owner/subfranchiseroyalty", icon: Landmark },
-      { title: "Franchise Obligations", url: "/dashboard/owner/franchiseobligation", icon: Shield },
-      { title: "Self-Employed Teachers", url: "/dashboard/owner/selfemployedteacher", icon: Award },
-      { title: "Build-Out Projects", url: "/dashboard/owner/buildoutproject", icon: Building2 },
-      { title: "Fixed Assets", url: "/dashboard/owner/fixedasset", icon: Receipt },
-      { title: "Documents", url: "/dashboard/owner/document", icon: Shield },
-    ],
-  },
-  {
-    label: "Planning & Growth",
-    items: [
-      { title: "Budget & Targets", url: "/dashboard/owner/budgettarget", icon: Landmark },
-      { title: "Minimum Goals", url: "/dashboard/owner/minimumgoal", icon: TrendingUp },
-      { title: "Marketing Campaigns", url: "/dashboard/owner/marketingcampaign", icon: TrendingUp },
-      { title: "TTCs", url: "/dashboard/owner/ttc", icon: Award },
     ],
   },
 ];
@@ -162,7 +132,7 @@ const teacherGroups = [
   {
     label: "My Students & CRM",
     items: [
-      { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
+      { title: "Students", url: "/dashboard/students", icon: GraduationCap },
       { title: "Assigned Leads", url: "/dashboard/owner/lead", icon: PhoneCall },
     ],
   },
@@ -188,21 +158,18 @@ const teacherGroups = [
 
 const officeAdminGroups = [
   {
-    label: "PII Data (T2)",
+    label: "PII Data",
     items: [
       { title: "Users", url: "/dashboard/owner/user", icon: Users },
       { title: "Parents", url: "/dashboard/owner/parent", icon: UserCheck },
-      { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
-      { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
-      { title: "Notifications Center", url: "/dashboard/notifications", icon: Bell },
+      { title: "Students", url: "/dashboard/students", icon: GraduationCap },
     ],
   },
   {
-    label: "Operations (T3)",
+    label: "Operations",
     items: [
       { title: "Admissions", url: "/dashboard/admissions", icon: LayoutDashboard },
       { title: "Onboarding", url: "/dashboard/onboarding", icon: ClipboardCheck },
-      { title: "Payments & Receipts", url: "/dashboard/payments", icon: Wallet },
       { title: "Expenses", url: "/dashboard/office-admin/expenses", icon: Receipt },
       { title: "Schedule Console", url: "/dashboard/schedule", icon: Calendar },
       { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
@@ -215,12 +182,11 @@ const officeAdminGroups = [
     ],
   },
   {
-    label: "Reference & Analytics (T4)",
+    label: "Reference & Analytics",
     items: [
       { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
       { title: "Tuition Plans", url: "/dashboard/owner/tuitionplan", icon: Receipt },
-      { title: "Channel Performance", url: "/dashboard/channel-performance", icon: TrendingUp },
     ],
   },
 ];
@@ -248,22 +214,19 @@ const smmGroups = [
 
 const financeGroups = [
   {
-    label: "Financial Registry (T1)",
+    label: "Financial Registry",
     items: [
       { title: "Finance Console", url: "/dashboard/finance", icon: Landmark },
     ],
   },
   {
-    label: "Student & Billing (T2)",
+    label: "Student & Billing",
     items: [
-      { title: "Students", url: "/dashboard/owner/student", icon: GraduationCap },
-      { title: "Invoices", url: "/dashboard/owner/invoice", icon: FileText },
-      { title: "Payments", url: "/dashboard/payments", icon: Wallet },
-      { title: "Payments Module", url: "/dashboard/payments", icon: Wallet },
+      { title: "Students", url: "/dashboard/students", icon: GraduationCap },
     ],
   },
   {
-    label: "Academic & Reference (T4)",
+    label: "Academic & Reference",
     items: [
       { title: "Branches", url: "/dashboard/branches", icon: Building2 },
       { title: "Courses", url: "/dashboard/owner/course", icon: Award },
@@ -340,8 +303,8 @@ export function AppSidebar({ user }: AppSidebarProps) {
                         </Link>
                       }
                       className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${pathname === "/dashboard"
-                          ? "bg-primary/10 text-primary font-semibold"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        ? "bg-primary/10 text-primary font-semibold"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         }`}
                     />
                   </SidebarMenuItem>
@@ -373,8 +336,8 @@ export function AppSidebar({ user }: AppSidebarProps) {
                               </Link>
                             }
                             className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${isActive
-                                ? "bg-primary/10 text-primary font-semibold"
-                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                              ? "bg-primary/10 text-primary font-semibold"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
                               }`}
                           />
                         </SidebarMenuItem>
@@ -408,8 +371,8 @@ export function AppSidebar({ user }: AppSidebarProps) {
                           </Link>
                         }
                         className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition-colors ${isActive
-                            ? "bg-primary/10 text-primary font-semibold"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          ? "bg-primary/10 text-primary font-semibold"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
                           }`}
                       />
                     </SidebarMenuItem>

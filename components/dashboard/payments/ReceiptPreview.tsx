@@ -113,9 +113,9 @@ export function ReceiptPreview({
         <span className="text-xs uppercase font-extrabold text-muted-foreground tracking-wider">
           Total Settled
         </span>
-        <span className="text-xl font-black text-foreground flex items-center gap-0.5">
-          <span className="text-sm font-semibold text-muted-foreground mr-0.5">$</span>
+        <span className="text-xl font-black text-foreground flex items-center gap-1">
           {amount !== null ? amount.toFixed(2) : "0.00"}
+          <span className="text-xs font-semibold text-muted-foreground ml-0.5">KGS</span>
         </span>
       </div>
 

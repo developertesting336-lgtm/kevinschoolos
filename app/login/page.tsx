@@ -132,15 +132,8 @@ export default function LoginPage() {
               </div>
 
               <div className="pt-1 flex flex-col gap-2">
-                <Link
-                  href="/forgot-password"
-                  className="w-full inline-flex text-white items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-destructive text-destructive-foreground text-xs font-bold hover:bg-destructive/90 transition-colors shadow-xs"
-                >
-                  Reset Password to Unlock Immediately
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
                 <p className="text-[11px] text-muted-foreground text-center">
-                  Or contact your <strong>Owner</strong> / <strong>Office Admin</strong> to manually unlock your account.
+                  Contact your <strong>Owner</strong> / <strong>Office Admin</strong> to manually unlock your account.
                 </p>
               </div>
             </div>
@@ -168,12 +161,6 @@ export default function LoginPage() {
                 <Label htmlFor="password" className="text-xs font-semibold text-muted-foreground">
                   Password
                 </Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-primary hover:underline font-medium"
-                >
-                  Forgot password?
-                </Link>
               </div>
               <div className="relative">
                 <Input
@@ -206,8 +193,8 @@ export default function LoginPage() {
               {isLoading
                 ? "Processing..."
                 : lockoutData && lockoutData.remainingSeconds > 0
-                ? "Account Locked"
-                : "Access Dashboard"}
+                  ? "Account Locked"
+                  : "Access Dashboard"}
             </Button>
           </form>
         </CardContent>

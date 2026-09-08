@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { getCsrfHeaders, ensureCsrfToken } from "@/lib/csrf-client";
 
 export interface Student {
   id: string;
@@ -8,6 +9,7 @@ export interface Student {
   status: string | null;
   notes: string | null;
   branchIds: string[];
+  parentIds?: string[];
   medicalNotes?: string | null;
   grade?: string | null;
 }
@@ -15,6 +17,15 @@ export interface Student {
 export interface BranchData {
   id: string;
   name: string;
+}
+
+export interface StudentFeeRecord {
+  status: "Paid" | "Unpaid";
+  amount?: number;
+  paymentRef?: string;
+  date?: string;
+  method?: string;
+  paymentId?: string;
 }
 
 interface StudentsState {
@@ -27,7 +38,16 @@ interface StudentsState {
   loading: boolean;
   error: string | null;
   isForbidden: boolean;
+  selectedMonth: string;
+  monthlyFeeRecords: Record<string, StudentFeeRecord>;
+  feeRecordsLoading: boolean;
+  submittingFeeStudentId: string | null;
 }
+
+const getCurrentMonthString = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+};
 
 const initialState: StudentsState = {
   students: [],
@@ -39,6 +59,10 @@ const initialState: StudentsState = {
   loading: true,
   error: null,
   isForbidden: false,
+  selectedMonth: getCurrentMonthString(),
+  monthlyFeeRecords: {},
+  feeRecordsLoading: false,
+  submittingFeeStudentId: null,
 };
 
 export const fetchStudentsData = createAsyncThunk(
@@ -86,6 +110,106 @@ export const fetchStudentsData = createAsyncThunk(
   }
 );
 
+export const fetchStudentFeeStatuses = createAsyncThunk(
+  "students/fetchStudentFeeStatuses",
+  async (month: string, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`/api/students/fees?month=${encodeURIComponent(month)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch fee statuses: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return {
+        month: data.month || month,
+        feeRecords: data.feeRecords || {},
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to load fee statuses");
+    }
+  }
+);
+
+export const submitStudentFee = createAsyncThunk(
+  "students/submitStudentFee",
+  async (
+    payload: {
+      studentId: string;
+      amount: number;
+      date: string;
+      method: string;
+      month: string;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      await ensureCsrfToken();
+      const response = await fetch("/api/students/fees", {
+        method: "POST",
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to submit student fee");
+      }
+
+      return {
+        studentId: payload.studentId,
+        month: payload.month,
+        amount: payload.amount,
+        date: payload.date,
+        method: payload.method,
+        paymentRef: data.payment?.paymentRef,
+        paymentId: data.payment?.id,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to submit student fee");
+    }
+  }
+);
+
+export const updateStudentFee = createAsyncThunk(
+  "students/updateStudentFee",
+  async (
+    payload: {
+      paymentId: string;
+      studentId: string;
+      amount: number;
+      date: string;
+      method: string;
+      month: string;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      await ensureCsrfToken();
+      const response = await fetch("/api/students/fees", {
+        method: "PATCH",
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to update student fee");
+      }
+
+      return {
+        studentId: payload.studentId,
+        month: payload.month,
+        amount: payload.amount,
+        date: payload.date,
+        method: payload.method,
+        paymentRef: data.payment?.paymentRef,
+        paymentId: data.payment?.id,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to update student fee");
+    }
+  }
+);
+
 const studentsSlice = createSlice({
   name: "students",
   initialState,
@@ -94,6 +218,9 @@ const studentsSlice = createSlice({
       state.students = [];
       state.error = null;
       state.isForbidden = false;
+    },
+    setSelectedMonth: (state, action) => {
+      state.selectedMonth = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -119,11 +246,59 @@ const studentsSlice = createSlice({
         const payload = action.payload as { isForbidden?: boolean; message?: string } | undefined;
         state.isForbidden = payload?.isForbidden || false;
         state.error = payload?.message || "Failed to fetch students data";
+      })
+      // Fee status extra reducers
+      .addCase(fetchStudentFeeStatuses.pending, (state) => {
+        state.feeRecordsLoading = true;
+      })
+      .addCase(fetchStudentFeeStatuses.fulfilled, (state, action) => {
+        state.selectedMonth = action.payload.month;
+        state.monthlyFeeRecords = action.payload.feeRecords;
+        state.feeRecordsLoading = false;
+      })
+      .addCase(fetchStudentFeeStatuses.rejected, (state) => {
+        state.feeRecordsLoading = false;
+      })
+      // Submit fee extra reducers
+      .addCase(submitStudentFee.pending, (state, action) => {
+        state.submittingFeeStudentId = action.meta.arg.studentId;
+      })
+      .addCase(submitStudentFee.fulfilled, (state, action) => {
+        state.submittingFeeStudentId = null;
+        state.monthlyFeeRecords[action.payload.studentId] = {
+          status: "Paid",
+          amount: action.payload.amount,
+          date: action.payload.date,
+          method: action.payload.method,
+          paymentRef: action.payload.paymentRef,
+          paymentId: action.payload.paymentId,
+        };
+      })
+      .addCase(submitStudentFee.rejected, (state) => {
+        state.submittingFeeStudentId = null;
+      })
+      // Update fee extra reducers
+      .addCase(updateStudentFee.pending, (state, action) => {
+        state.submittingFeeStudentId = action.meta.arg.studentId;
+      })
+      .addCase(updateStudentFee.fulfilled, (state, action) => {
+        state.submittingFeeStudentId = null;
+        state.monthlyFeeRecords[action.payload.studentId] = {
+          status: "Paid",
+          amount: action.payload.amount,
+          date: action.payload.date,
+          method: action.payload.method,
+          paymentRef: action.payload.paymentRef,
+          paymentId: action.payload.paymentId,
+        };
+      })
+      .addCase(updateStudentFee.rejected, (state) => {
+        state.submittingFeeStudentId = null;
       });
   },
 });
 
-export const { clearStudents } = studentsSlice.actions;
+export const { clearStudents, setSelectedMonth } = studentsSlice.actions;
 export default studentsSlice.reducer;
 
 // Selectors
@@ -136,3 +311,7 @@ export const selectStudentsLimit = (state: any) => state.students?.limit || 10;
 export const selectStudentsLoading = (state: any) => state.students?.loading !== false;
 export const selectStudentsError = (state: any) => state.students?.error;
 export const selectStudentsIsForbidden = (state: any) => state.students?.isForbidden || false;
+export const selectSelectedMonth = (state: any) => state.students?.selectedMonth || getCurrentMonthString();
+export const selectMonthlyFeeRecords = (state: any) => state.students?.monthlyFeeRecords || {};
+export const selectFeeRecordsLoading = (state: any) => state.students?.feeRecordsLoading || false;
+export const selectSubmittingFeeStudentId = (state: any) => state.students?.submittingFeeStudentId || null;

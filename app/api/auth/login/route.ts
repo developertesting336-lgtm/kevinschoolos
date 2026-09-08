@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyPassword, createSession } from "@/lib/auth";
 import { auditService } from "@/lib/audit";
+import { generateCsrfToken, attachCsrfCookie } from "@/lib/csrf";
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
@@ -98,11 +99,15 @@ export async function POST(request: Request) {
     // Fire-and-forget audit
     auditService.log({ actorId: user.id, actorEmail: user.email, role: user.role, branchIds: user.branchIds, action: "LOGIN", result: "SUCCESS", details: "Login successful." }, request);
 
-    // OPTIMIZATION: Return minimal payload — no full user object
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "Successfully logged in.",
     });
+
+    const csrfToken = generateCsrfToken();
+    attachCsrfCookie(response, csrfToken);
+
+    return response;
   } catch (error: any) {
     console.error("[Login API Error]", error);
     auditService.logFailure(undefined, "LOGIN", undefined, `Login error: ${error.message}`, request);

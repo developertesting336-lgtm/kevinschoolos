@@ -37,7 +37,7 @@ export function attachCsrfCookie(res: NextResponse, token: string): void {
   res.cookies.set(CSRF_COOKIE_NAME, token, {
     httpOnly: false, // Must be readable by client JavaScript to attach to request headers
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     path: "/",
   });
 }

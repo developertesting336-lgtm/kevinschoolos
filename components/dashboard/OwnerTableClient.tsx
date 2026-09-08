@@ -49,6 +49,7 @@ import {
 import { TableConfig } from "@/lib/owner-schema";
 import { PaginationControls } from "./PaginationControls";
 import { AccountLockoutModal } from "./AccountLockoutModal";
+import { UserManagementModal } from "./UserManagementModal";
 
 interface OwnerTableClientProps {
   data: any[];
@@ -86,6 +87,8 @@ export function OwnerTableClient({
   const isManager = ["owner", "office_admin", "office/admin", "office admin"].includes(normRole);
   const [isSaving, setIsSaving] = useState(false);
   const [isLockoutModalOpen, setIsLockoutModalOpen] = useState(false);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<any>(null);
 
   // Courses list for Tuition Plan form dropdown
   const [coursesList, setCoursesList] = useState<any[]>([]);
@@ -821,14 +824,26 @@ export function OwnerTableClient({
                 </Button>
               )}
               {(config.modelName === "user" || config.label.toLowerCase() === "users") && isManager && (
-                <Button
-                  onClick={() => setIsLockoutModalOpen(true)}
-                  variant="outline"
-                  className="h-8 text-xs font-bold gap-1.5 rounded-lg border-destructive/30 bg-destructive/5 hover:bg-destructive/10 text-destructive shadow-xs cursor-pointer"
-                >
-                  <Lock className="h-3.5 w-3.5" />
-                  Account Lockout Manager
-                </Button>
+                <>
+                  <Button
+                    onClick={() => {
+                      setUserToEdit(null);
+                      setIsUserModalOpen(true);
+                    }}
+                    className="h-8 text-xs font-bold gap-1 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm cursor-pointer"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Create User
+                  </Button>
+                  <Button
+                    onClick={() => setIsLockoutModalOpen(true)}
+                    variant="outline"
+                    className="h-8 text-xs font-bold gap-1.5 rounded-lg border-destructive/30 bg-destructive/5 hover:bg-destructive/10 text-destructive shadow-xs cursor-pointer"
+                  >
+                    <Lock className="h-3.5 w-3.5" />
+                    Account Lockout Manager
+                  </Button>
+                </>
               )}
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase">Page size:</span>
@@ -851,9 +866,9 @@ export function OwnerTableClient({
               <Table className="min-w-full">
                 <TableHeader className="sticky top-0 bg-card z-10 border-b border-border shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
                   <TableRow className="hover:bg-transparent">
-                    {displayColumns.map((col) => (
+                    {displayColumns.map((col, colIdx) => (
                       <TableHead
-                        key={col.key}
+                        key={`${col.key}-${colIdx}`}
                         className={`px-5 py-3.5 font-bold text-xs text-muted-foreground uppercase select-none ${col.sortable ? "cursor-pointer hover:bg-muted/30 hover:text-foreground" : ""
                           }`}
                         onClick={() => col.sortable && handleSort(col.key)}
@@ -931,6 +946,20 @@ export function OwnerTableClient({
                                   {row.active ? <ToggleRight className="h-5.5 w-5.5" /> : <ToggleLeft className="h-5.5 w-5.5" />}
                                 </Button>
                               </>
+                            )}
+                            {(config.modelName === "user" || config.label.toLowerCase() === "users") && isManager && (
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="hover:bg-amber-500/10 hover:text-amber-500 rounded-lg cursor-pointer"
+                                onClick={() => {
+                                  setUserToEdit(row);
+                                  setIsUserModalOpen(true);
+                                }}
+                                title="Edit User Account"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
                             )}
                           </div>
                         </TableCell>
@@ -1431,6 +1460,16 @@ export function OwnerTableClient({
         open={isLockoutModalOpen}
         onOpenChange={setIsLockoutModalOpen}
         onUnlockedSuccess={() => {
+          dispatch(fetchOwnerTableData({ table: config.modelName || "user", page: "1", limit: "10", search: "", sortBy: config.defaultSortBy || "", sortOrder: config.defaultSortOrder || "asc", branchId: "", extraFilters: {} }));
+        }}
+      />
+
+      <UserManagementModal
+        open={isUserModalOpen}
+        onOpenChange={setIsUserModalOpen}
+        userToEdit={userToEdit}
+        branches={branches}
+        onSuccess={() => {
           dispatch(fetchOwnerTableData({ table: config.modelName || "user", page: "1", limit: "10", search: "", sortBy: config.defaultSortBy || "", sortOrder: config.defaultSortOrder || "asc", branchId: "", extraFilters: {} }));
         }}
       />

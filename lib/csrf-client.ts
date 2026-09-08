@@ -28,8 +28,11 @@ export async function ensureCsrfToken(): Promise<string | null> {
 }
 
 // Helper to return headers record containing X-CSRF-Token if available
-export function getCsrfHeaders(customHeaders: Record<string, string> = {}): Record<string, string> {
-  const token = getCsrfTokenFromCookie();
+export function getCsrfHeaders(
+  customHeaders: Record<string, string> = {},
+  tokenOverride?: string | null
+): Record<string, string> {
+  const token = tokenOverride || getCsrfTokenFromCookie();
   if (token) {
     return {
       ...customHeaders,
@@ -38,3 +41,4 @@ export function getCsrfHeaders(customHeaders: Record<string, string> = {}): Reco
   }
   return customHeaders;
 }
+

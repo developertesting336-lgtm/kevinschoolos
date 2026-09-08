@@ -31,10 +31,10 @@ export function RoyaltyViewer({ branchId }: RoyaltyViewerProps) {
 
   const formatCurrency = (val: number | null) => {
     if (val === null || val === undefined) return "—";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(val);
+    return `${val.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })} KGS`;
   };
 
   const formatDate = (dateStr: string | null) => {

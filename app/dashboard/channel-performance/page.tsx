@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchChannelPerformanceData, selectChannelLoading, selectChannelError, selectChannelBranches, selectChannelUserRole, selectChannelUserName } from "@/store/slices/channelPerformanceSlice";
 import { validateSessionThunk } from "@/store/slices/authSlice";
 import { ChannelPerformanceClient } from "@/components/dashboard/channel-performance/ChannelPerformanceClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { normalizeRole } from "@/lib/roles";
 
 export default function ChannelPerformancePage() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const loading = useAppSelector(selectChannelLoading);
   const error = useAppSelector(selectChannelError);
   const branches = useAppSelector(selectChannelBranches);
@@ -20,14 +23,21 @@ export default function ChannelPerformancePage() {
     dispatch(validateSessionThunk()).then((result: any) => {
       if (result.meta.requestStatus === "fulfilled") {
         const { role, userId } = result.payload;
+        const normRole = normalizeRole(role || "");
+        if (normRole !== "smm") {
+          router.replace("/dashboard");
+          return;
+        }
         dispatch(fetchChannelPerformanceData({
           page: 1,
           userRole: role || "",
           userName: userId || "",
         }));
+      } else {
+        router.replace("/dashboard");
       }
     });
-  }, [dispatch]);
+  }, [dispatch, router]);
 
   if (loading) {
     return (

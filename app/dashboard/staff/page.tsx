@@ -21,10 +21,13 @@ import { validateSessionThunk, selectAuthRole } from "@/store/slices/authSlice";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Users, ArrowLeft, ShieldAlert } from "lucide-react";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import { PaginationControls } from "@/components/dashboard/PaginationControls";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Users, ArrowLeft, ShieldAlert, Plus, Pencil } from "lucide-react";
+import { useState } from "react";
+import { UserManagementModal } from "@/components/dashboard/UserManagementModal";
 
 export default function StaffPage() {
   const dispatch = useAppDispatch();
@@ -44,6 +47,12 @@ export default function StaffPage() {
 
   const pageParam = searchParams.get("page") || "1";
   const searchParam = searchParams.get("search") || "";
+
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<any>(null);
+
+  const normRole = (userRole || "").toLowerCase().trim();
+  const canManageUsers = normRole === "owner" || normRole === "office_admin" || normRole === "office/admin" || normRole === "office admin";
 
   useEffect(() => {
     dispatch(validateSessionThunk());
@@ -170,14 +179,28 @@ export default function StaffPage() {
             Directory of staff, instructors, and system operators
           </p>
         </div>
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back Overview
-        </Link>
-      </div>
+          <div className="flex items-center gap-2">
+            {canManageUsers && (
+              <Button
+                onClick={() => {
+                  setUserToEdit(null);
+                  setIsUserModalOpen(true);
+                }}
+                className="h-9 px-4 text-xs font-bold gap-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm cursor-pointer"
+              >
+                <Plus className="h-4 w-4" />
+                Create User
+              </Button>
+            )}
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back Overview
+            </Link>
+          </div>
+        </div>
 
       {errorMsg ? (
         <Card className="border-destructive/20 bg-destructive/5 text-destructive p-4 text-sm font-medium">
@@ -202,6 +225,9 @@ export default function StaffPage() {
                   <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase">Language</TableHead>
                   <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase">Status</TableHead>
                   <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase">Assigned Branches</TableHead>
+                  {canManageUsers && (
+                    <TableHead className="px-6 py-3 font-semibold text-xs text-muted-foreground uppercase text-right w-20">Actions</TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-border">
@@ -260,6 +286,22 @@ export default function StaffPage() {
                         <TableCell className="px-6 py-4 text-sm text-muted-foreground max-w-xs truncate" title={assignedBranches}>
                           {assignedBranches}
                         </TableCell>
+                        {canManageUsers && (
+                          <TableCell className="px-6 py-4 text-right">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="hover:bg-amber-500/10 hover:text-amber-500 rounded-lg cursor-pointer"
+                              onClick={() => {
+                                setUserToEdit(staff);
+                                setIsUserModalOpen(true);
+                              }}
+                              title="Edit User Account"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        )}
                       </TableRow>
                     );
                   })
@@ -275,6 +317,16 @@ export default function StaffPage() {
           </CardContent>
         </Card>
       )}
+
+      <UserManagementModal
+        open={isUserModalOpen}
+        onOpenChange={setIsUserModalOpen}
+        userToEdit={userToEdit}
+        branches={branchesList}
+        onSuccess={() => {
+          dispatch(fetchStaffData({ page: pageParam, search: searchParam }));
+        }}
+      />
     </div>
   );
 }

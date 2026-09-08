@@ -160,10 +160,10 @@ export function ViewJournalEntryModal({
                       Totals:
                     </td>
                     <td className="p-3 text-right text-rose-600">
-                      ${totalDebit.toFixed(2)} KGS
+                      {totalDebit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} KGS
                     </td>
                     <td className="p-3 text-right text-emerald-600">
-                      ${totalCredit.toFixed(2)} KGS
+                      {totalCredit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} KGS
                     </td>
                   </tr>
                 </tfoot>

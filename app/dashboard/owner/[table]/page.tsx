@@ -47,6 +47,11 @@ export default async function OwnerTablePage({
   // 3. Resolve target table configuration
   const { table } = await params;
   const normalizedTable = table.toLowerCase();
+
+  if (normalizedTable === "student" || normalizedTable === "invoice") {
+    redirect("/dashboard/students");
+  }
+
   const config = ownerTablesConfig[normalizedTable];
 
   if (!config) {

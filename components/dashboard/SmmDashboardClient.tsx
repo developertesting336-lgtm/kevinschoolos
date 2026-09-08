@@ -105,7 +105,7 @@ export function SmmDashboardClient() {
         { name: "Branches Config", url: "/dashboard/owner/branch", count: stats.branchesCount, icon: Building2 },
         { name: "Courses Catalog", url: "/dashboard/owner/course", count: stats.coursesCount, icon: Award },
         { name: "Tuition Plans", url: "/dashboard/owner/tuitionplan", count: null, icon: Receipt },
-        { name: "Channel Performance", url: "/dashboard/owner/channelperformance", count: null, icon: TrendingUp },
+        { name: "Channel Performance", url: "/dashboard/channel-performance", count: null, icon: TrendingUp },
       ],
     },
   ];

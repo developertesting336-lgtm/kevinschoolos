@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
   Percent,
-  DollarSign,
+  Banknote,
   CreditCard,
   BookOpen,
   Wallet,
@@ -71,11 +71,10 @@ export function FinanceConsoleClient({
   };
 
   const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return `${(val || 0).toLocaleString("en-US", {
       minimumFractionDigits: 2,
-    }).format(val);
+      maximumFractionDigits: 2,
+    })} KGS`;
   };
 
   return (
@@ -184,7 +183,7 @@ export function FinanceConsoleClient({
               Teacher Payroll
             </span>
             <div className="h-6 w-6 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600">
-              <DollarSign className="h-3.5 w-3.5" />
+              <Banknote className="h-3.5 w-3.5" />
             </div>
           </CardHeader>
           <CardContent className="p-4 pt-0">

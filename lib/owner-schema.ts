@@ -324,7 +324,6 @@ export const ownerTablesConfig: Record<string, TableConfig> = {
       { key: "planName", label: "Plan Name", type: "string", sortable: true },
       { key: "courseIds", label: "Course", type: "array" },
       { key: "amount", label: "Amount (KGS)", type: "number", sortable: true },
-      { key: "netAmount", label: "Net Amount (KGS)", type: "number", sortable: true },
       { key: "billingPeriod", label: "Billing Period", type: "string", sortable: true },
       { key: "discount", label: "Discount", type: "boolean", sortable: true },
       { key: "active", label: "Active", type: "boolean", sortable: true },

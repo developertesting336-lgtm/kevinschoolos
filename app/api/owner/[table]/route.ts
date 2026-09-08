@@ -153,8 +153,8 @@ export async function GET(
     const sortBy = searchParams.get("sortBy") || config.defaultSortBy;
     const sortOrder = (searchParams.get("sortOrder") || config.defaultSortOrder) as "asc" | "desc";
 
-    // 4. Build Select clause (Return only fields required by the UI)
-    const selectObj: Record<string, boolean> = {};
+    // 4. Build Select clause (Return only fields required by the UI + id)
+    const selectObj: Record<string, boolean> = { id: true };
     config.columns.forEach((col) => {
       selectObj[col.key] = true;
     });
