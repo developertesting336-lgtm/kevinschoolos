@@ -31,9 +31,11 @@ import { ReverseEntryModal } from "@/components/dashboard/finance/ReverseEntryMo
 
 interface LedgerViewerProps {
   branchId?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
-export function LedgerViewer({ branchId }: LedgerViewerProps) {
+export function LedgerViewer({ branchId, startDate, endDate }: LedgerViewerProps) {
   const dispatch = useAppDispatch();
 
   // Redux selectors
@@ -61,8 +63,21 @@ export function LedgerViewer({ branchId }: LedgerViewerProps) {
   }, [search]);
 
   useEffect(() => {
-    dispatch(fetchJournalEntriesList({ page, search: debouncedSearch, posted: postedFilter, branchId }));
-  }, [dispatch, page, debouncedSearch, postedFilter, branchId]);
+    setPage(1);
+  }, [branchId, debouncedSearch, postedFilter, startDate, endDate]);
+
+  useEffect(() => {
+    dispatch(
+      fetchJournalEntriesList({
+        page,
+        search: debouncedSearch,
+        posted: postedFilter,
+        branchId,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      })
+    );
+  }, [dispatch, page, debouncedSearch, postedFilter, branchId, startDate, endDate]);
 
   const handleRefresh = () => {
     dispatch(fetchJournalEntriesList({ page, search: debouncedSearch, posted: postedFilter, branchId }));

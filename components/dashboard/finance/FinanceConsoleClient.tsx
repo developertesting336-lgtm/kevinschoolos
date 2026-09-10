@@ -13,6 +13,9 @@ import {
   Filter,
   RefreshCw,
   TrendingUp,
+  GraduationCap,
+  Calendar,
+  X,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchFinanceData, selectFinanceStats, selectFinanceLoading } from "@/store/slices/financeSlice";
@@ -20,6 +23,7 @@ import { LedgerViewer } from "@/components/dashboard/finance/LedgerViewer";
 import { RoyaltyViewer } from "@/components/dashboard/finance/RoyaltyViewer";
 import { TeacherPayViewer } from "@/components/dashboard/finance/TeacherPayViewer";
 import { ExpenseList } from "@/components/dashboard/finance/ExpenseList";
+import { StudentFeesViewer } from "@/components/dashboard/finance/StudentFeesViewer";
 
 interface Branch {
   id: string;
@@ -33,7 +37,7 @@ interface FinanceConsoleClientProps {
   userEmail: string | null;
 }
 
-type ActiveTab = "ledger" | "royalties" | "teacher-pay" | "expenses";
+type ActiveTab = "ledger" | "royalties" | "teacher-pay" | "expenses" | "student-fees";
 
 export function FinanceConsoleClient({
   initialBranches,
@@ -48,26 +52,43 @@ export function FinanceConsoleClient({
   const loading = useAppSelector(selectFinanceLoading);
 
   const [selectedBranch, setSelectedBranch] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const [activeTab, setActiveTab] = useState<ActiveTab>("ledger");
+
+  const fetchStats = (bId = selectedBranch, sDate = startDate, eDate = endDate) => {
+    dispatch(fetchFinanceData({
+      branchId: bId || undefined,
+      userRole,
+      userName,
+      userEmail,
+      startDate: sDate || undefined,
+      endDate: eDate || undefined,
+    }));
+  };
 
   const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setSelectedBranch(val);
-    dispatch(fetchFinanceData({
-      branchId: val || undefined,
-      userRole,
-      userName,
-      userEmail,
-    }));
+    fetchStats(val, startDate, endDate);
   };
 
-  const fetchStats = () => {
-    dispatch(fetchFinanceData({
-      branchId: selectedBranch || undefined,
-      userRole,
-      userName,
-      userEmail,
-    }));
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setStartDate(val);
+    fetchStats(selectedBranch, val, endDate);
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setEndDate(val);
+    fetchStats(selectedBranch, startDate, val);
+  };
+
+  const handleClearDates = () => {
+    setStartDate("");
+    setEndDate("");
+    fetchStats(selectedBranch, "", "");
   };
 
   const formatCurrency = (val: number) => {
@@ -97,6 +118,35 @@ export function FinanceConsoleClient({
 
         {/* Filters and Context controls */}
         <div className="flex flex-wrap items-center gap-3">
+          {/* Global Date Filter */}
+          <div className="flex items-center gap-1.5 bg-card border border-border px-3 py-1.5 rounded-xl shadow-sm hover:border-primary/20 transition-all duration-300">
+            <Calendar className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+            <input
+              type="date"
+              value={startDate}
+              onChange={handleStartDateChange}
+              className="bg-transparent border-0 text-xs font-semibold text-foreground focus:ring-0 focus:outline-none cursor-pointer"
+              title="Start Date"
+            />
+            <span className="text-[10px] text-muted-foreground font-semibold">to</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={handleEndDateChange}
+              className="bg-transparent border-0 text-xs font-semibold text-foreground focus:ring-0 focus:outline-none cursor-pointer"
+              title="End Date"
+            />
+            {(startDate || endDate) && (
+              <button
+                onClick={handleClearDates}
+                className="p-1 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors cursor-pointer"
+                title="Clear Dates"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
           {/* Branch filter wrapper */}
           <div className="flex items-center gap-2 bg-card border border-border px-3 py-1.5 rounded-xl shadow-sm hover:border-primary/20 transition-all duration-300">
             <Filter className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
@@ -117,7 +167,7 @@ export function FinanceConsoleClient({
           </div>
 
           <button
-            onClick={fetchStats}
+            onClick={() => fetchStats()}
             disabled={loading}
             className="p-2 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground hover:shadow-sm active:scale-95 transition-all cursor-pointer shrink-0 disabled:opacity-50"
             title="Refresh Metrics"
@@ -311,14 +361,25 @@ export function FinanceConsoleClient({
             <CreditCard className="h-4 w-4" />
             Expense List
           </button>
+          <button
+            onClick={() => setActiveTab("student-fees")}
+            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${activeTab === "student-fees"
+                ? "border-primary text-primary bg-primary/2"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+              }`}
+          >
+            <GraduationCap className="h-4 w-4" />
+            Student Fees
+          </button>
         </div>
 
         {/* Tab contents */}
         <div className="bg-card border border-border rounded-2xl shadow-sm p-6 overflow-hidden">
-          {activeTab === "ledger" && <LedgerViewer branchId={selectedBranch} />}
-          {activeTab === "royalties" && <RoyaltyViewer branchId={selectedBranch} />}
-          {activeTab === "teacher-pay" && <TeacherPayViewer branchId={selectedBranch} />}
-          {activeTab === "expenses" && <ExpenseList branchId={selectedBranch} />}
+          {activeTab === "ledger" && <LedgerViewer branchId={selectedBranch} startDate={startDate} endDate={endDate} />}
+          {activeTab === "royalties" && <RoyaltyViewer branchId={selectedBranch} startDate={startDate} endDate={endDate} />}
+          {activeTab === "teacher-pay" && <TeacherPayViewer branchId={selectedBranch} startDate={startDate} endDate={endDate} />}
+          {activeTab === "expenses" && <ExpenseList branchId={selectedBranch} startDate={startDate} endDate={endDate} />}
+          {activeTab === "student-fees" && <StudentFeesViewer branchId={selectedBranch} startDate={startDate} endDate={endDate} />}
         </div>
       </div>
     </div>

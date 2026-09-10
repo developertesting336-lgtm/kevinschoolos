@@ -10,6 +10,7 @@ import {
   selectStudentsTotalPages,
   selectStudentsLoading,
   selectMonthlyFeeRecords,
+  selectFeeStatusFilter,
   Student,
   StudentFeeRecord,
 } from "@/store/slices/studentsSlice";
@@ -69,6 +70,7 @@ export const StudentTableSection = memo(function StudentTableSection({
   const totalPages = useAppSelector(selectStudentsTotalPages);
   const loading = useAppSelector(selectStudentsLoading);
   const monthlyFeeRecords = useAppSelector(selectMonthlyFeeRecords);
+  const feeStatusFilter = useAppSelector(selectFeeStatusFilter);
 
   // Role-based fee visibility
   const isTeacher = (userRole || "").toLowerCase().trim() === "teacher";
@@ -99,21 +101,49 @@ export const StudentTableSection = memo(function StudentTableSection({
     branchesList.map((b: any) => [b.id, b.name])
   );
 
+  // Filter students based on Fee Status dropdown (all, paid, unpaid)
+  const filteredStudents = React.useMemo(() => {
+    if (isTeacher || feeStatusFilter === "all") return studentsList;
+    if (feeStatusFilter === "paid") {
+      return studentsList.filter((s: Student) => monthlyFeeRecords[s.id]?.status === "Paid");
+    }
+    if (feeStatusFilter === "unpaid") {
+      return studentsList.filter((s: Student) => !monthlyFeeRecords[s.id] || monthlyFeeRecords[s.id]?.status !== "Paid");
+    }
+    return studentsList;
+  }, [studentsList, monthlyFeeRecords, feeStatusFilter, isTeacher]);
+
+  const PAGE_SIZE = 10;
+  const totalStudentsCount = filteredStudents.length;
+  const calculatedTotalPages = Math.ceil(totalStudentsCount / PAGE_SIZE) || 1;
+
+  // Auto-reset page to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedQuery, feeStatusFilter]);
+
+  const activePage = Math.min(currentPage, calculatedTotalPages);
+
+  const displayedStudents = React.useMemo(() => {
+    const start = (activePage - 1) * PAGE_SIZE;
+    return filteredStudents.slice(start, start + PAGE_SIZE);
+  }, [filteredStudents, activePage]);
+
   const isSearching = searchQuery !== debouncedQuery;
 
   // ── Pagination helpers ──────────────────────────────────────────────────────
   const goToPage = useCallback((p: number) => {
-    if (p < 1 || p > totalPages) return;
+    if (p < 1 || p > calculatedTotalPages) return;
     setCurrentPage(p);
-  }, [totalPages]);
+  }, [calculatedTotalPages]);
 
   const pageRange = 1;
   const pages: (number | string)[] = [];
-  for (let i = 1; i <= totalPages; i++) {
+  for (let i = 1; i <= calculatedTotalPages; i++) {
     if (
       i === 1 ||
-      i === totalPages ||
-      (i >= currentPage - pageRange && i <= currentPage + pageRange)
+      i === calculatedTotalPages ||
+      (i >= activePage - pageRange && i <= activePage + pageRange)
     ) {
       pages.push(i);
     } else if (pages[pages.length - 1] !== "...") {
@@ -155,7 +185,7 @@ export const StudentTableSection = memo(function StudentTableSection({
       {/* ── Card Header: count + search ────────────────────────────────────── */}
       <div className="border-b border-border py-3.5 px-6 bg-muted/10 flex flex-col md:flex-row md:items-center justify-between space-y-3 md:space-y-0 gap-4">
         <span className="text-sm font-bold text-foreground">
-          ALL STUDENTS ({totalCount})
+          ALL STUDENTS ({totalStudentsCount})
         </span>
 
         {/* Debounced search — does NOT touch the URL */}
@@ -209,19 +239,21 @@ export const StudentTableSection = memo(function StudentTableSection({
         </TableHeader>
 
         <TableBody className="divide-y divide-border">
-          {studentsList.length === 0 ? (
+          {displayedStudents.length === 0 ? (
             <TableRow>
               <TableCell
                 colSpan={isTeacher ? 6 : 8}
-                className="h-32 text-center text-xs text-muted-foreground"
+                className="h-32 text-center text-xs text-muted-foreground font-medium"
               >
                 {debouncedQuery
                   ? `No students found for "${debouncedQuery}".`
+                  : feeStatusFilter !== "all"
+                  ? `No ${feeStatusFilter} students found for ${selectedMonth}.`
                   : "No students found."}
               </TableCell>
             </TableRow>
           ) : (
-            studentsList.map((student: Student) => {
+            displayedStudents.map((student: Student) => {
               const assignedBranches =
                 student.branchIds
                   ?.map((id) => branchIdToNameMap.get(id) || id)

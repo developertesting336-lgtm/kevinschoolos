@@ -38,6 +38,8 @@ export async function GET(request: NextRequest) {
     const limit = Math.max(1, parseInt(searchParams.get("limit") || "10", 10));
     const skip = (page - 1) * limit;
     const branchFilter = searchParams.get("branchId") || searchParams.get("branch");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     // Build filters
     const whereConditions: any[] = [];
@@ -46,6 +48,12 @@ export async function GET(request: NextRequest) {
     }
     if (branchFilter) {
       whereConditions.push({ branchIds: { has: branchFilter } });
+    }
+    if (startDate || endDate) {
+      const periodCond: any = {};
+      if (startDate) periodCond.gte = new Date(`${startDate}T00:00:00.000Z`);
+      if (endDate) periodCond.lte = new Date(`${endDate}T23:59:59.999Z`);
+      whereConditions.push({ period: periodCond });
     }
 
     const where = whereConditions.length > 0 ? { AND: whereConditions } : {};

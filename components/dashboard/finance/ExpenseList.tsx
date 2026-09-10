@@ -19,9 +19,11 @@ import { toast } from "sonner";
 
 interface ExpenseListProps {
   branchId?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
-export function ExpenseList({ branchId }: ExpenseListProps) {
+export function ExpenseList({ branchId, startDate, endDate }: ExpenseListProps) {
   const dispatch = useAppDispatch();
 
   // Redux hooks
@@ -56,7 +58,7 @@ export function ExpenseList({ branchId }: ExpenseListProps) {
 
   useEffect(() => {
     setPage(1);
-  }, [branchId]);
+  }, [branchId, startDate, endDate]);
 
   // Debounce search term
   useEffect(() => {
@@ -68,8 +70,16 @@ export function ExpenseList({ branchId }: ExpenseListProps) {
   }, [searchTerm]);
 
   useEffect(() => {
-    dispatch(fetchExpensesList({ page, branchId, search: debouncedSearch }));
-  }, [dispatch, page, branchId, debouncedSearch]);
+    dispatch(
+      fetchExpensesList({
+        page,
+        branchId,
+        search: debouncedSearch,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      })
+    );
+  }, [dispatch, page, branchId, debouncedSearch, startDate, endDate]);
 
   const handleApprovalAction = useCallback(
     async (expenseId: string, status: "Approved" | "Rejected") => {

@@ -8,9 +8,11 @@ import { fetchRoyaltiesList, selectRoyaltiesList, selectRoyaltiesPagination, sel
 
 interface RoyaltyViewerProps {
   branchId?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
-export function RoyaltyViewer({ branchId }: RoyaltyViewerProps) {
+export function RoyaltyViewer({ branchId, startDate, endDate }: RoyaltyViewerProps) {
   const dispatch = useAppDispatch();
 
   // Redux hooks
@@ -23,11 +25,18 @@ export function RoyaltyViewer({ branchId }: RoyaltyViewerProps) {
 
   useEffect(() => {
     setPage(1);
-  }, [branchId]);
+  }, [branchId, startDate, endDate]);
 
   useEffect(() => {
-    dispatch(fetchRoyaltiesList({ page, branchId }));
-  }, [dispatch, page, branchId]);
+    dispatch(
+      fetchRoyaltiesList({
+        page,
+        branchId,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      })
+    );
+  }, [dispatch, page, branchId, startDate, endDate]);
 
   const formatCurrency = (val: number | null) => {
     if (val === null || val === undefined) return "—";

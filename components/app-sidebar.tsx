@@ -89,6 +89,7 @@ const ownerGroups = [
       { title: "Users", url: "/dashboard/owner/user", icon: Users },
       { title: "Parents", url: "/dashboard/owner/parent", icon: UserCheck },
       { title: "Students", url: "/dashboard/students", icon: GraduationCap },
+      { title: "Staff Payroll", url: "/dashboard/staff-payroll", icon: Wallet },
     ],
   },
   {
@@ -142,16 +143,6 @@ const teacherGroups = [
       { title: "Classes", url: "/dashboard/owner/classgroup", icon: Users },
       { title: "Attendance", url: "/dashboard/owner/attendance", icon: FileCheck },
       { title: "Trials", url: "/dashboard/owner/trial", icon: Play },
-      { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
-    ],
-  },
-  {
-    label: "School & Directory",
-    items: [
-      { title: "Branches", url: "/dashboard/branches", icon: Building2 },
-      { title: "Courses", url: "/dashboard/owner/course", icon: Award },
-      { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
-      { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
     ],
   },
 ];
@@ -163,6 +154,7 @@ const officeAdminGroups = [
       { title: "Users", url: "/dashboard/owner/user", icon: Users },
       { title: "Parents", url: "/dashboard/owner/parent", icon: UserCheck },
       { title: "Students", url: "/dashboard/students", icon: GraduationCap },
+      { title: "Staff Payroll", url: "/dashboard/staff-payroll", icon: Wallet },
     ],
   },
   {

@@ -48,6 +48,8 @@ export async function GET(request: NextRequest) {
     // Branch filter check
     const searchParams = request.nextUrl.searchParams;
     const branchFilter = searchParams.get("branchId") || searchParams.get("branch");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     let branchScopedFilter: any = {};
     if (userRole === "finance") {
@@ -58,7 +60,6 @@ export async function GET(request: NextRequest) {
     if (branchFilter) {
       if (userRole === "finance") {
         if (!userBranchIds.includes(branchFilter)) {
-          // If Finance queries a branch they don't have access to, restrict it to the intersection
           finalFilter = {
             AND: [
               branchScopedFilter,
@@ -71,6 +72,25 @@ export async function GET(request: NextRequest) {
       } else {
         finalFilter = { branchIds: { has: branchFilter } };
       }
+    }
+
+    // Build specific date filters for different models
+    let paymentFilter = { ...finalFilter };
+    let expenseFilter = { ...finalFilter };
+    let teacherPayFilter = { ...finalFilter };
+    let royaltyFilter = { ...finalFilter };
+    let invoiceFilter = { ...finalFilter };
+
+    if (startDate || endDate) {
+      const dateCond: any = {};
+      if (startDate) dateCond.gte = new Date(`${startDate}T00:00:00.000Z`);
+      if (endDate) dateCond.lte = new Date(`${endDate}T23:59:59.999Z`);
+
+      paymentFilter = { AND: [finalFilter, { date: dateCond }] };
+      expenseFilter = { AND: [finalFilter, { date: dateCond }] };
+      teacherPayFilter = { AND: [finalFilter, { period: dateCond }] };
+      royaltyFilter = { AND: [finalFilter, { period: dateCond }] };
+      invoiceFilter = { AND: [finalFilter, { issueDate: dateCond }] };
     }
 
     // Parallel fetch recent invoices, payments, expenses, and accounts
@@ -87,17 +107,17 @@ export async function GET(request: NextRequest) {
       activeTerm
     ] = await Promise.all([
       prisma.invoice.findMany({
-        where: finalFilter,
+        where: invoiceFilter,
         orderBy: { issueDate: "desc" },
         take: 4,
       }),
       prisma.payment.findMany({
-        where: finalFilter,
+        where: paymentFilter,
         orderBy: { date: "desc" },
         take: 4,
       }),
       prisma.expense.findMany({
-        where: finalFilter,
+        where: expenseFilter,
         orderBy: { date: "desc" },
         take: 4,
       }),
@@ -108,25 +128,25 @@ export async function GET(request: NextRequest) {
       }),
       prisma.payment.aggregate({
         _sum: { amount: true },
-        where: finalFilter,
+        where: paymentFilter,
       }),
       prisma.expense.aggregate({
         _sum: { amount: true },
-        where: finalFilter,
+        where: expenseFilter,
       }),
       prisma.teacherPay.aggregate({
         _sum: { grossPay: true },
-        where: finalFilter,
+        where: teacherPayFilter,
       }),
       prisma.franchiseRoyalty.findMany({
-        where: finalFilter,
+        where: royaltyFilter,
         select: { revenueBase: true, royaltyPercent: true },
       }),
       prisma.invoice.aggregate({
         _sum: { amount: true },
         where: {
           AND: [
-            finalFilter,
+            invoiceFilter,
             { status: { not: "Paid" } }
           ]
         }

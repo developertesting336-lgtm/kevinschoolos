@@ -2,15 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Users, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Users, Loader2, ChevronLeft, ChevronRight, Calendar, X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchTeacherPayList, selectTeacherPayList, selectTeacherPayPagination, selectTeacherPayLoading, selectTeacherPayError } from "@/store/slices/financeSlice";
 
 interface TeacherPayViewerProps {
   branchId?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
-export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
+export function TeacherPayViewer({ branchId, startDate: propStartDate = "", endDate: propEndDate = "" }: TeacherPayViewerProps) {
   const dispatch = useAppDispatch();
 
   // Redux hooks
@@ -20,14 +22,28 @@ export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
   const error = useAppSelector(selectTeacherPayError);
 
   const [page, setPage] = useState(1);
+  const [startDate, setStartDate] = useState(propStartDate);
+  const [endDate, setEndDate] = useState(propEndDate);
+
+  useEffect(() => {
+    setStartDate(propStartDate);
+    setEndDate(propEndDate);
+  }, [propStartDate, propEndDate]);
 
   useEffect(() => {
     setPage(1);
-  }, [branchId]);
+  }, [branchId, startDate, endDate]);
 
   useEffect(() => {
-    dispatch(fetchTeacherPayList({ page, branchId }));
-  }, [dispatch, page, branchId]);
+    dispatch(
+      fetchTeacherPayList({
+        page,
+        branchId,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      })
+    );
+  }, [dispatch, page, branchId, startDate, endDate]);
 
   const formatCurrency = (val: number | null) => {
     if (val === null || val === undefined) return "—";
@@ -45,15 +61,55 @@ export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
     });
   };
 
+  const hasActiveFilters = Boolean(startDate || endDate);
+
+  const handleClearFilters = () => {
+    setStartDate("");
+    setEndDate("");
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between border-b border-border/40 pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-4">
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-primary" />
           <h3 className="text-sm font-bold text-foreground">Teacher Pay Summary</h3>
           <Badge variant="outline" className="text-[8px] py-0 px-1.5 font-mono">
             {pagination.total} records
           </Badge>
+        </div>
+
+        {/* Date Filter Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5 bg-card border border-border px-2.5 py-1 rounded-xl shadow-xs">
+            <Calendar className="h-3 w-3 text-muted-foreground shrink-0" />
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="bg-transparent border-0 text-[11px] font-semibold text-foreground focus:ring-0 focus:outline-none cursor-pointer"
+              title="Start Period"
+            />
+            <span className="text-[10px] text-muted-foreground font-semibold">to</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="bg-transparent border-0 text-[11px] font-semibold text-foreground focus:ring-0 focus:outline-none cursor-pointer"
+              title="End Period"
+            />
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              onClick={handleClearFilters}
+              className="p-1.5 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer text-xs flex items-center gap-1 font-semibold"
+              title="Clear Date Filters"
+            >
+              <X className="h-3 w-3" />
+              <span className="text-[10px]">Clear</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -80,7 +136,6 @@ export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase text-right">Teaching Hours</th>
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase text-right">Hourly Rate</th>
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase text-right">Gross Pay</th>
-                <th className="p-3 font-semibold tracking-tight text-[10px] uppercase text-right">Adjustments</th>
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase text-right">Final Pay</th>
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase text-center">Payroll Status</th>
               </tr>
@@ -98,9 +153,6 @@ export function TeacherPayViewer({ branchId }: TeacherPayViewerProps) {
                   </td>
                   <td className="p-3 text-right font-mono font-bold text-foreground">
                     {formatCurrency((row.hours || 0) * (row.rate || 0))}
-                  </td>
-                  <td className={`p-3 text-right font-mono font-bold ${row.adjustments < 0 ? "text-rose-600" : row.adjustments > 0 ? "text-emerald-600" : "text-muted-foreground"}`}>
-                    {row.adjustments !== 0 ? `${row.adjustments < 0 ? "-" : ""}${Math.abs(row.adjustments).toLocaleString("en-US", { minimumFractionDigits: 2 })} KGS` : "0.00 KGS"}
                   </td>
                   <td className="p-3 text-right font-mono font-bold text-primary">
                     {formatCurrency(row.finalPay)}

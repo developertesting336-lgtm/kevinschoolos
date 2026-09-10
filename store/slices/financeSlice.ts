@@ -79,6 +79,13 @@ interface FinanceState {
     loading: boolean;
     error: string | null;
   };
+  studentFeesList: {
+    data: any[];
+    pagination: { total: number; page: number; limit: number; totalPages: number };
+    totalAmount: number;
+    loading: boolean;
+    error: string | null;
+  };
   ledgerList: {
     data: any[];
     pagination: { total: number; page: number; limit: number; totalPages: number };
@@ -142,6 +149,13 @@ const initialState: FinanceState = {
     loading: true,
     error: null,
   },
+  studentFeesList: {
+    data: [],
+    pagination: { total: 0, page: 1, limit: 10, totalPages: 1 },
+    totalAmount: 0,
+    loading: true,
+    error: null,
+  },
   ledgerList: {
     data: [],
     pagination: { total: 0, page: 1, limit: 10, totalPages: 1 },
@@ -189,15 +203,20 @@ const initialState: FinanceState = {
 
 export const fetchFinanceData = createAsyncThunk(
   "finance/fetchFinanceData",
-  async (params: { branchId?: string; userRole?: string; userName?: string; userEmail?: string | null }, { rejectWithValue }) => {
+  async (params: { branchId?: string; userRole?: string; userName?: string; userEmail?: string | null; startDate?: string; endDate?: string }, { rejectWithValue }) => {
     try {
       // Fetch branches
       const branchesRes = await fetch("/api/data/branch").then((r) => r.json()).catch(() => []);
       const branches = Array.isArray(branchesRes) ? branchesRes : (branchesRes.data || []);
 
       // Fetch finance stats
-      let url = "/api/dashboard/finance";
-      if (params.branchId) url += `?branchId=${encodeURIComponent(params.branchId)}`;
+      let url = "/api/dashboard/finance?";
+      const queryParts: string[] = [];
+      if (params.branchId) queryParts.push(`branchId=${encodeURIComponent(params.branchId)}`);
+      if (params.startDate) queryParts.push(`startDate=${encodeURIComponent(params.startDate)}`);
+      if (params.endDate) queryParts.push(`endDate=${encodeURIComponent(params.endDate)}`);
+      url += queryParts.join("&");
+
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to load dashboard metrics");
       const json = await res.json();
@@ -222,12 +241,18 @@ export const fetchFinanceData = createAsyncThunk(
 
 export const fetchExpensesList = createAsyncThunk(
   "finance/fetchExpensesList",
-  async (params: { page?: number; branchId?: string; search?: string }, { rejectWithValue }) => {
+  async (params: { page?: number; branchId?: string; search?: string; startDate?: string; endDate?: string }, { rejectWithValue }) => {
     try {
       const page = params.page || 1;
       let url = `/api/dashboard/finance/expenses?page=${page}&limit=10`;
       if (params.branchId) {
         url += `&branchId=${encodeURIComponent(params.branchId)}`;
+      }
+      if (params.startDate) {
+        url += `&startDate=${encodeURIComponent(params.startDate)}`;
+      }
+      if (params.endDate) {
+        url += `&endDate=${encodeURIComponent(params.endDate)}`;
       }
       if (params.search && params.search.trim()) {
         url += `&search=${encodeURIComponent(params.search.trim())}`;
@@ -243,12 +268,18 @@ export const fetchExpensesList = createAsyncThunk(
 
 export const fetchRoyaltiesList = createAsyncThunk(
   "finance/fetchRoyaltiesList",
-  async (params: { page?: number; branchId?: string }, { rejectWithValue }) => {
+  async (params: { page?: number; branchId?: string; startDate?: string; endDate?: string }, { rejectWithValue }) => {
     try {
       const page = params.page || 1;
       let url = `/api/dashboard/finance/royalties?page=${page}&limit=10`;
       if (params.branchId) {
         url += `&branchId=${encodeURIComponent(params.branchId)}`;
+      }
+      if (params.startDate) {
+        url += `&startDate=${encodeURIComponent(params.startDate)}`;
+      }
+      if (params.endDate) {
+        url += `&endDate=${encodeURIComponent(params.endDate)}`;
       }
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -261,18 +292,51 @@ export const fetchRoyaltiesList = createAsyncThunk(
 
 export const fetchTeacherPayList = createAsyncThunk(
   "finance/fetchTeacherPayList",
-  async (params: { page?: number; branchId?: string }, { rejectWithValue }) => {
+  async (params: { page?: number; branchId?: string; startDate?: string; endDate?: string }, { rejectWithValue }) => {
     try {
       const page = params.page || 1;
       let url = `/api/dashboard/finance/teacher-pay?page=${page}&limit=10`;
       if (params.branchId) {
         url += `&branchId=${encodeURIComponent(params.branchId)}`;
       }
+      if (params.startDate) {
+        url += `&startDate=${encodeURIComponent(params.startDate)}`;
+      }
+      if (params.endDate) {
+        url += `&endDate=${encodeURIComponent(params.endDate)}`;
+      }
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch teacher pay runs");
+    }
+  }
+);
+
+export const fetchStudentFeesList = createAsyncThunk(
+  "finance/fetchStudentFeesList",
+  async (params: { page?: number; branchId?: string; startDate?: string; endDate?: string; search?: string }, { rejectWithValue }) => {
+    try {
+      const page = params.page || 1;
+      let url = `/api/dashboard/finance/student-fees?page=${page}&limit=10`;
+      if (params.branchId) {
+        url += `&branchId=${encodeURIComponent(params.branchId)}`;
+      }
+      if (params.startDate) {
+        url += `&startDate=${encodeURIComponent(params.startDate)}`;
+      }
+      if (params.endDate) {
+        url += `&endDate=${encodeURIComponent(params.endDate)}`;
+      }
+      if (params.search && params.search.trim()) {
+        url += `&search=${encodeURIComponent(params.search.trim())}`;
+      }
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch student fees");
     }
   }
 );
@@ -394,7 +458,7 @@ export const fetchLedgerList = createAsyncThunk(
 
 export const fetchJournalEntriesList = createAsyncThunk(
   "finance/fetchJournalEntriesList",
-  async (params: { page?: number; search?: string; posted?: string; branchId?: string }, { rejectWithValue }) => {
+  async (params: { page?: number; search?: string; posted?: string; branchId?: string; startDate?: string; endDate?: string }, { rejectWithValue }) => {
     try {
       const page = params.page || 1;
       let url = `/api/dashboard/finance/journal-entries?page=${page}&limit=10`;
@@ -406,6 +470,12 @@ export const fetchJournalEntriesList = createAsyncThunk(
       }
       if (params.branchId) {
         url += `&branchId=${encodeURIComponent(params.branchId)}`;
+      }
+      if (params.startDate) {
+        url += `&startDate=${encodeURIComponent(params.startDate)}`;
+      }
+      if (params.endDate) {
+        url += `&endDate=${encodeURIComponent(params.endDate)}`;
       }
       const res = await fetch(url);
       if (!res.ok) {
@@ -580,6 +650,21 @@ const financeSlice = createSlice({
         state.teacherPayList.loading = false;
         state.teacherPayList.error = action.payload as string;
       })
+      // fetchStudentFeesList
+      .addCase(fetchStudentFeesList.pending, (state) => {
+        state.studentFeesList.loading = true;
+        state.studentFeesList.error = null;
+      })
+      .addCase(fetchStudentFeesList.fulfilled, (state, action) => {
+        state.studentFeesList.data = action.payload.data || [];
+        state.studentFeesList.pagination = action.payload.pagination || initialState.studentFeesList.pagination;
+        state.studentFeesList.totalAmount = action.payload.totalAmount || 0;
+        state.studentFeesList.loading = false;
+      })
+      .addCase(fetchStudentFeesList.rejected, (state, action) => {
+        state.studentFeesList.loading = false;
+        state.studentFeesList.error = action.payload as string;
+      })
       // fetchExpenseFormData
       .addCase(fetchExpenseFormData.pending, (state) => {
         state.expenseForm.loading = true;
@@ -711,6 +796,12 @@ export const selectTeacherPayList = (state: any) => state.finance.teacherPayList
 export const selectTeacherPayPagination = (state: any) => state.finance.teacherPayList.pagination;
 export const selectTeacherPayLoading = (state: any) => state.finance.teacherPayList.loading;
 export const selectTeacherPayError = (state: any) => state.finance.teacherPayList.error;
+
+export const selectStudentFeesList = (state: any) => state.finance.studentFeesList.data;
+export const selectStudentFeesPagination = (state: any) => state.finance.studentFeesList.pagination;
+export const selectStudentFeesTotalAmount = (state: any) => state.finance.studentFeesList.totalAmount;
+export const selectStudentFeesLoading = (state: any) => state.finance.studentFeesList.loading;
+export const selectStudentFeesError = (state: any) => state.finance.studentFeesList.error;
 
 export const selectLedgerList = (state: any) => state.finance.ledgerList.data;
 export const selectLedgerPagination = (state: any) => state.finance.ledgerList.pagination;

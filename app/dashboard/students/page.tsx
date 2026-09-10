@@ -6,9 +6,11 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchStudentFeeStatuses,
   setSelectedMonth,
+  setFeeStatusFilter,
   selectStudentsError,
   selectStudentsIsForbidden,
   selectSelectedMonth,
+  selectFeeStatusFilter,
   selectFeeRecordsLoading,
   Student,
   StudentFeeRecord,
@@ -18,7 +20,7 @@ import {
   Card,
   CardContent,
 } from "@/components/ui/card";
-import { GraduationCap, ArrowLeft, ShieldAlert, Calendar, Loader2 } from "lucide-react";
+import { GraduationCap, ArrowLeft, ShieldAlert, Calendar, Loader2, Filter } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StudentTableSection } from "@/components/dashboard/students/StudentTableSection";
 import { FeeSubmissionModal } from "@/components/dashboard/students/FeeSubmissionModal";
@@ -32,8 +34,9 @@ export default function StudentsPage() {
   const userRole = useAppSelector(selectAuthRole);
   const isTeacher = (userRole || "").toLowerCase().trim() === "teacher";
 
-  // Month filter selectors
+  // Month & Fee Status filter selectors
   const selectedMonth = useAppSelector(selectSelectedMonth);
+  const feeStatusFilter = useAppSelector(selectFeeStatusFilter);
   const feeRecordsLoading = useAppSelector(selectFeeRecordsLoading);
 
   // Modal state — lifted here so it survives table re-renders without resetting
@@ -140,9 +143,9 @@ export default function StudentsPage() {
 
       {/* ── Main Card ────────────────────────────────────────────────────── */}
       <Card className="bg-card border-border shadow-md overflow-hidden">
-        {/* Month filter — hidden for teachers (no fee access) */}
+        {/* Month & Fee Status filters — hidden for teachers (no fee access) */}
         {!isTeacher && (
-          <div className="border-b border-border py-3.5 px-6 bg-muted/10 flex items-center gap-3">
+          <div className="border-b border-border py-3.5 px-6 bg-muted/10 flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 bg-background border border-border px-3 py-1 rounded-lg text-xs font-medium shadow-xs">
               <Calendar className="h-3.5 w-3.5 text-primary" />
               <span className="text-muted-foreground text-[11px] uppercase tracking-wider font-semibold">
@@ -159,6 +162,23 @@ export default function StudentsPage() {
               {feeRecordsLoading && (
                 <Loader2 className="h-3 w-3 animate-spin text-muted-foreground ml-1" />
               )}
+            </div>
+
+            {/* Fee Status Dropdown Filter */}
+            <div className="flex items-center gap-2 bg-background border border-border px-3 py-1 rounded-lg text-xs font-medium shadow-xs">
+              <Filter className="h-3.5 w-3.5 text-primary" />
+              <span className="text-muted-foreground text-[11px] uppercase tracking-wider font-semibold">
+                Fee Status:
+              </span>
+              <select
+                value={feeStatusFilter}
+                onChange={(e) => dispatch(setFeeStatusFilter(e.target.value as "all" | "paid" | "unpaid"))}
+                className="bg-transparent text-foreground text-xs font-semibold focus:outline-none cursor-pointer pr-2"
+              >
+                <option value="all">All Fee Statuses</option>
+                <option value="paid">Paid Only</option>
+                <option value="unpaid">Unpaid Only</option>
+              </select>
             </div>
           </div>
         )}

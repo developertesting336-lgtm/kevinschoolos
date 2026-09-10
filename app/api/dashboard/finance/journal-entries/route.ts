@@ -150,6 +150,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || "";
     const postedFilter = searchParams.get("posted") || "";
     const branchFilter = searchParams.get("branchId") || searchParams.get("branch");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     const whereConditions: any[] = [];
 
@@ -160,6 +162,13 @@ export async function GET(request: NextRequest) {
 
     if (branchFilter) {
       whereConditions.push({ branchIds: { has: branchFilter } });
+    }
+
+    if (startDate || endDate) {
+      const dateCond: any = {};
+      if (startDate) dateCond.gte = new Date(`${startDate}T00:00:00.000Z`);
+      if (endDate) dateCond.lte = new Date(`${endDate}T23:59:59.999Z`);
+      whereConditions.push({ date: dateCond });
     }
 
     if (search.trim()) {

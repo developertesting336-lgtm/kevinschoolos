@@ -22,6 +22,7 @@ import notificationsSlice from "./slices/notificationsSlice";
 import ownerTableSlice from "./slices/ownerTableSlice";
 import scheduleSlice from "./slices/scheduleSlice";
 import staffSlice from "./slices/staffSlice";
+import staffPayrollSlice from "./slices/staffPayrollSlice";
 
 export const store = configureStore({
   reducer: {
@@ -48,6 +49,7 @@ export const store = configureStore({
     ownerTable: ownerTableSlice,
     schedule: scheduleSlice,
     staff: staffSlice,
+    staffPayroll: staffPayrollSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

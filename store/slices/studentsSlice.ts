@@ -42,6 +42,7 @@ interface StudentsState {
   monthlyFeeRecords: Record<string, StudentFeeRecord>;
   feeRecordsLoading: boolean;
   submittingFeeStudentId: string | null;
+  feeStatusFilter: "all" | "paid" | "unpaid";
 }
 
 const getCurrentMonthString = () => {
@@ -63,6 +64,7 @@ const initialState: StudentsState = {
   monthlyFeeRecords: {},
   feeRecordsLoading: false,
   submittingFeeStudentId: null,
+  feeStatusFilter: "all",
 };
 
 export const fetchStudentsData = createAsyncThunk(
@@ -73,7 +75,7 @@ export const fetchStudentsData = createAsyncThunk(
       const search = params.search || "";
 
       const [studentsResponse, branchesResponse] = await Promise.all([
-        fetch(`/api/data/student?page=${currentPage}&limit=10&search=${encodeURIComponent(search)}`)
+        fetch(`/api/data/student?page=1&limit=1000&search=${encodeURIComponent(search)}`)
           .then((r) => {
             if (!r.ok) {
               if (r.status === 403) throw new Error("Forbidden");
@@ -222,6 +224,9 @@ const studentsSlice = createSlice({
     setSelectedMonth: (state, action) => {
       state.selectedMonth = action.payload;
     },
+    setFeeStatusFilter: (state, action) => {
+      state.feeStatusFilter = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -298,7 +303,7 @@ const studentsSlice = createSlice({
   },
 });
 
-export const { clearStudents, setSelectedMonth } = studentsSlice.actions;
+export const { clearStudents, setSelectedMonth, setFeeStatusFilter } = studentsSlice.actions;
 export default studentsSlice.reducer;
 
 // Selectors
@@ -315,3 +320,4 @@ export const selectSelectedMonth = (state: any) => state.students?.selectedMonth
 export const selectMonthlyFeeRecords = (state: any) => state.students?.monthlyFeeRecords || {};
 export const selectFeeRecordsLoading = (state: any) => state.students?.feeRecordsLoading || false;
 export const selectSubmittingFeeStudentId = (state: any) => state.students?.submittingFeeStudentId || null;
+export const selectFeeStatusFilter = (state: any) => state.students?.feeStatusFilter || "all";
