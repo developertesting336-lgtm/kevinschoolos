@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
       invoiceFilter = { AND: [finalFilter, { issueDate: dateCond }] };
     }
 
-    // Parallel fetch recent invoices, payments, expenses, and accounts
+    // Parallel fetch recent invoices, payments, expenses, accounts, and aggregates
     const [
       invoices,
       payments,
@@ -101,6 +101,8 @@ export async function GET(request: NextRequest) {
       accounts,
       totalRevenueAgg,
       totalExpensesAgg,
+      paidExpensesAgg,
+      unpaidExpensesAgg,
       totalTeacherPayAgg,
       royaltiesList,
       outstandingAgg,
@@ -134,6 +136,14 @@ export async function GET(request: NextRequest) {
         _sum: { amount: true },
         where: expenseFilter,
       }),
+      prisma.expense.aggregate({
+        _sum: { amount: true },
+        where: { AND: [expenseFilter, { paid: true }] },
+      }),
+      prisma.expense.aggregate({
+        _sum: { amount: true },
+        where: { AND: [expenseFilter, { paid: false }] },
+      }),
       prisma.teacherPay.aggregate({
         _sum: { grossPay: true },
         where: teacherPayFilter,
@@ -158,6 +168,8 @@ export async function GET(request: NextRequest) {
 
     const totalRevenue = totalRevenueAgg._sum.amount || 0;
     const totalExpenses = totalExpensesAgg._sum.amount || 0;
+    const paidExpenses = paidExpensesAgg._sum.amount || 0;
+    const unpaidExpenses = unpaidExpensesAgg._sum.amount || 0;
     const totalTeacherPayroll = totalTeacherPayAgg._sum.grossPay || 0;
     const totalRoyalties = royaltiesList.reduce((sum, r) => sum + ((r.revenueBase || 0) * (r.royaltyPercent || 0)) / 100, 0);
     const outstandingPayments = outstandingAgg._sum.amount || 0;
@@ -172,6 +184,8 @@ export async function GET(request: NextRequest) {
       stats: {
         totalRevenue,
         totalExpenses,
+        paidExpenses,
+        unpaidExpenses,
         totalTeacherPayroll,
         totalRoyalties,
         outstandingPayments,

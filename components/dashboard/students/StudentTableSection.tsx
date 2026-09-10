@@ -101,16 +101,21 @@ export const StudentTableSection = memo(function StudentTableSection({
     branchesList.map((b: any) => [b.id, b.name])
   );
 
-  // Filter students based on Fee Status dropdown (all, paid, unpaid)
+  // Filter students to active only, then based on Fee Status dropdown (all, paid, unpaid)
   const filteredStudents = React.useMemo(() => {
-    if (isTeacher || feeStatusFilter === "all") return studentsList;
+    const activeStudents = studentsList.filter((s: Student) => {
+      const status = (s.status || "Active").toLowerCase().trim();
+      return status === "active";
+    });
+
+    if (isTeacher || feeStatusFilter === "all") return activeStudents;
     if (feeStatusFilter === "paid") {
-      return studentsList.filter((s: Student) => monthlyFeeRecords[s.id]?.status === "Paid");
+      return activeStudents.filter((s: Student) => monthlyFeeRecords[s.id]?.status === "Paid");
     }
     if (feeStatusFilter === "unpaid") {
-      return studentsList.filter((s: Student) => !monthlyFeeRecords[s.id] || monthlyFeeRecords[s.id]?.status !== "Paid");
+      return activeStudents.filter((s: Student) => !monthlyFeeRecords[s.id] || monthlyFeeRecords[s.id]?.status !== "Paid");
     }
-    return studentsList;
+    return activeStudents;
   }, [studentsList, monthlyFeeRecords, feeStatusFilter, isTeacher]);
 
   const PAGE_SIZE = 10;

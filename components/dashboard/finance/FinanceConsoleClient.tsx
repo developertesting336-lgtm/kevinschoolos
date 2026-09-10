@@ -37,7 +37,7 @@ interface FinanceConsoleClientProps {
   userEmail: string | null;
 }
 
-type ActiveTab = "ledger" | "royalties" | "teacher-pay" | "expenses" | "student-fees";
+type ActiveTab = "teacher-pay" | "expenses" | "student-fees";
 
 export function FinanceConsoleClient({
   initialBranches,
@@ -54,7 +54,7 @@ export function FinanceConsoleClient({
   const [selectedBranch, setSelectedBranch] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<ActiveTab>("ledger");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("teacher-pay");
 
   const fetchStats = (bId = selectedBranch, sDate = startDate, eDate = endDate) => {
     dispatch(fetchFinanceData({
@@ -112,7 +112,7 @@ export function FinanceConsoleClient({
             Finance Console
           </h1>
           <p className="text-muted-foreground text-xs mt-1 max-w-xl leading-relaxed font-medium">
-            Review accounting ledger entries, operating expenses, teacher hours runs, and franchise royalty reports.
+            Review operating expenses, teacher hours runs, and student fee payments.
           </p>
         </div>
 
@@ -213,15 +213,24 @@ export function FinanceConsoleClient({
               <CreditCard className="h-3.5 w-3.5" />
             </div>
           </CardHeader>
-          <CardContent className="p-4 pt-0">
+          <CardContent className="p-4 pt-0 space-y-1.5">
             {loading ? (
               <div className="h-7 w-24 bg-muted animate-pulse rounded" />
             ) : (
-              <div className="text-xl font-extrabold text-foreground tracking-tight font-mono">
-                {formatCurrency(stats.totalExpenses)}
-              </div>
+              <>
+                <div className="text-xl font-extrabold text-foreground tracking-tight font-mono">
+                  {formatCurrency(stats.totalExpenses)}
+                </div>
+                <div className="flex flex-col gap-1 pt-1.5 border-t border-border/40 text-[9px] font-bold">
+                  <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 w-fit">
+                    Paid: {formatCurrency(stats.paidExpenses)}
+                  </span>
+                  <span className="text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 w-fit">
+                    Unpaid: {formatCurrency(stats.unpaidExpenses)}
+                  </span>
+                </div>
+              </>
             )}
-            <p className="text-[8px] text-muted-foreground font-semibold mt-1">All posted expenses</p>
           </CardContent>
         </Card>
 
@@ -322,26 +331,6 @@ export function FinanceConsoleClient({
       <div className="space-y-6">
         <div className="flex border-b border-border gap-1 overflow-x-auto pb-px">
           <button
-            onClick={() => setActiveTab("ledger")}
-            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${activeTab === "ledger"
-                ? "border-primary text-primary bg-primary/2"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-              }`}
-          >
-            <BookOpen className="h-4 w-4" />
-            Journal Entries & Ledger
-          </button>
-          <button
-            onClick={() => setActiveTab("royalties")}
-            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${activeTab === "royalties"
-                ? "border-primary text-primary bg-primary/2"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-              }`}
-          >
-            <Percent className="h-4 w-4" />
-            Royalty Pack
-          </button>
-          <button
             onClick={() => setActiveTab("teacher-pay")}
             className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 tracking-tight transition-all cursor-pointer whitespace-nowrap ${activeTab === "teacher-pay"
                 ? "border-primary text-primary bg-primary/2"
@@ -375,8 +364,6 @@ export function FinanceConsoleClient({
 
         {/* Tab contents */}
         <div className="bg-card border border-border rounded-2xl shadow-sm p-6 overflow-hidden">
-          {activeTab === "ledger" && <LedgerViewer branchId={selectedBranch} startDate={startDate} endDate={endDate} />}
-          {activeTab === "royalties" && <RoyaltyViewer branchId={selectedBranch} startDate={startDate} endDate={endDate} />}
           {activeTab === "teacher-pay" && <TeacherPayViewer branchId={selectedBranch} startDate={startDate} endDate={endDate} />}
           {activeTab === "expenses" && <ExpenseList branchId={selectedBranch} startDate={startDate} endDate={endDate} />}
           {activeTab === "student-fees" && <StudentFeesViewer branchId={selectedBranch} startDate={startDate} endDate={endDate} />}

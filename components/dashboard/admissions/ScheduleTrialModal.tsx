@@ -47,13 +47,17 @@ export function ScheduleTrialModal({
   const [notes, setNotes] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Filter class groups based on lead's branch if possible
-  const filteredClassGroups = classGroups.filter((cg: any) => {
-    if (!leadBranchIds || leadBranchIds.length === 0) return true;
-    if (!cg.branchIds || cg.branchIds.length === 0) return true;
-    return cg.branchIds.some((bid: string) => leadBranchIds.includes(bid));
+  // Filter active class groups based on lead's branch if possible
+  const activeClassGroups = (classGroups || []).filter((cg: any) => {
+    const matchesBranch = (!leadBranchIds || leadBranchIds.length === 0)
+      ? true
+      : (!cg.branchIds || cg.branchIds.length === 0 || cg.branchIds.some((bid: string) => leadBranchIds.includes(bid)));
+    const isActive = cg.status ? cg.status.toLowerCase() === "active" : true;
+    return matchesBranch && isActive;
   });
-  const displayClassGroups = filteredClassGroups.length > 0 ? filteredClassGroups : classGroups;
+  const displayClassGroups = activeClassGroups.length > 0
+    ? activeClassGroups
+    : (classGroups || []).filter((cg: any) => cg.status ? cg.status.toLowerCase() === "active" : true);
 
   // Filter teachers (role contains teacher, or fallback to all users)
   const teacherUsers = users.filter((u: any) => {
@@ -122,7 +126,7 @@ export function ScheduleTrialModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && !saving && onClose()}>
-      <DialogContent className="max-w-3xl sm:max-w-3xl w-[95vw] lg:w-[calc(100vw-38rem)] xl:w-full lg:max-w-[calc(100vw-38rem)] xl:max-w-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xl p-6 sm:p-8 rounded-3xl select-none max-h-[90vh] overflow-y-auto left-1/2 lg:left-6 xl:left-12 -translate-x-1/2 lg:translate-x-0">
+      <DialogContent className="max-w-3xl sm:max-w-3xl w-[95vw] sm:w-[90vw] md:w-full bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xl p-6 sm:p-8 rounded-3xl select-none max-h-[90vh] overflow-y-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <DialogHeader className="space-y-1.5 pb-2 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/20 shrink-0">

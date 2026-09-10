@@ -8,7 +8,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { convertLeadThunk, selectAdmissionsClassGroups, selectAdmissionsBranches, selectAdmissionsParents, fetchAdmissionsData } from "@/store/slices/admissionsSlice";
+import { convertLeadThunk, selectAdmissionsClassGroups, selectAdmissionsBranches, selectAdmissionsParents, selectAdmissionsCourses, selectAdmissionsTuitionPlans, fetchAdmissionsData } from "@/store/slices/admissionsSlice";
 import { fetchOnboardingData } from "@/store/slices/onboardingSlice";
 import { fetchStudentsData } from "@/store/slices/studentsSlice";
 import { fetchEnrollments } from "@/store/slices/enrollmentsSlice";
@@ -53,9 +53,11 @@ const STEPS = [
 
 export function ConvertLeadModal({ lead, isOpen, onClose, onSuccess }: ConvertLeadModalProps) {
   const dispatch = useAppDispatch();
-  const classGroups = useAppSelector(selectAdmissionsClassGroups);
-  const branches = useAppSelector(selectAdmissionsBranches);
-  const parents = useAppSelector(selectAdmissionsParents);
+  const classGroups = useAppSelector(selectAdmissionsClassGroups) || [];
+  const branches = useAppSelector(selectAdmissionsBranches) || [];
+  const parents = useAppSelector(selectAdmissionsParents) || [];
+  const reduxCourses = useAppSelector(selectAdmissionsCourses) || [];
+  const reduxTuitionPlans = useAppSelector(selectAdmissionsTuitionPlans) || [];
 
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
@@ -110,28 +112,40 @@ export function ConvertLeadModal({ lead, isOpen, onClose, onSuccess }: ConvertLe
     }
   }, [lead, isOpen]);
 
-  // Fetch courses and tuition plans when modal opens
+  // Sync courses and tuition plans from Redux or fetch fallback
   useEffect(() => {
     if (isOpen) {
-      fetch("/api/data/course")
-        .then((res) => res.json())
-        .then((data) => setCourses(Array.isArray(data) ? data : []))
-        .catch((err) => console.error("Error fetching courses:", err));
+      if (Array.isArray(reduxCourses) && reduxCourses.length > 0) {
+        setCourses(reduxCourses);
+      } else {
+        fetch("/api/data/course")
+          .then((res) => res.json())
+          .then((data) => setCourses(Array.isArray(data) ? data : []))
+          .catch((err) => console.error("Error fetching courses:", err));
+      }
 
-      fetch("/api/data/tuitionplan")
-        .then((res) => res.json())
-        .then((data) => setTuitionPlans(Array.isArray(data) ? data : []))
-        .catch((err) => console.error("Error fetching tuition plans:", err));
+      if (Array.isArray(reduxTuitionPlans) && reduxTuitionPlans.length > 0) {
+        setTuitionPlans(reduxTuitionPlans);
+      } else {
+        fetch("/api/data/tuitionplan")
+          .then((res) => res.json())
+          .then((data) => setTuitionPlans(Array.isArray(data) ? data : []))
+          .catch((err) => console.error("Error fetching tuition plans:", err));
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, reduxCourses, reduxTuitionPlans]);
 
   if (!lead) return null;
 
-  // Filter class group options by selected Course and Branch
-  const classGroupOptions = classGroups.filter((cg: any) => {
+  // Active courses only
+  const activeCourses = (courses || []).filter((c: any) => c.active === true);
+
+  // Filter class group options by selected Course and Branch, active status only
+  const classGroupOptions = (classGroups || []).filter((cg: any) => {
     const matchesBranch = selectedBranchId ? cg.branchIds?.includes(selectedBranchId) : true;
     const matchesCourse = selectedCourseId ? cg.courseIds?.includes(selectedCourseId) : true;
-    return matchesBranch && matchesCourse;
+    const isActive = cg.status ? cg.status.toLowerCase() === "active" : true;
+    return matchesBranch && matchesCourse && isActive;
   });
 
   const handleNext = () => {
@@ -198,9 +212,9 @@ export function ConvertLeadModal({ lead, isOpen, onClose, onSuccess }: ConvertLe
         const responseData = data.data || data;
         
         // Build a detailed success message including invoice info
-        let successMsg = "Lead converted successfully!";
+        let successMsg = "Lead enrolled successfully and student data is created now!";
         if (responseData.invoiceNo) {
-          successMsg += ` Invoice ${responseData.invoiceNo} created (${responseData.invoiceAmount?.toLocaleString() || "—"} KGS).`;
+          successMsg += ` Invoice ${responseData.invoiceNo} generated (${responseData.invoiceAmount?.toLocaleString() || "—"} KGS).`;
         }
         
         toast.success(successMsg, {
@@ -382,7 +396,7 @@ export function ConvertLeadModal({ lead, isOpen, onClose, onSuccess }: ConvertLe
             }}
           >
             <option value="">Select a course...</option>
-            {courses.map((c: any) => (
+            {activeCourses.map((c: any) => (
               <option key={c.id} value={c.id}>
                 {c.courseName}
               </option>
@@ -437,26 +451,14 @@ export function ConvertLeadModal({ lead, isOpen, onClose, onSuccess }: ConvertLe
               ))}
             </NativeSelect>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-muted-foreground">Start Date</Label>
-              <input
-                type="date"
-                value={enrollDate}
-                onChange={(e) => setEnrollDate(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg border border-border bg-background text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-muted-foreground">Status</Label>
-              <NativeSelect
-                value={enrollmentStatus}
-                onChange={(e) => setEnrollmentStatus(e.target.value)}
-              >
-                <option value="Active">Active</option>
-                <option value="Pending">Pending</option>
-              </NativeSelect>
-            </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-muted-foreground">Start Date</Label>
+            <input
+              type="date"
+              value={enrollDate}
+              onChange={(e) => setEnrollDate(e.target.value)}
+              className="w-full h-9 px-3 rounded-lg border border-border bg-background text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            />
           </div>
           <div className="flex items-center justify-between pt-2 border-t border-border/40">
             <div>

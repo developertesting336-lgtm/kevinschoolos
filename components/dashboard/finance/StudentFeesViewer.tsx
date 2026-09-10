@@ -111,7 +111,7 @@ export function StudentFeesViewer({ branchId, startDate: propStartDate = "", end
             <Search className="h-3 w-3 absolute left-2.5 text-muted-foreground pointer-events-none" />
             <input
               type="text"
-              placeholder="Search reference..."
+              placeholder="Search student name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-7 pr-3 py-1 text-xs bg-card border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-primary w-36 md:w-44 text-foreground placeholder:text-muted-foreground/60 font-medium"

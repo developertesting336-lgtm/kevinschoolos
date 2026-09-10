@@ -9,6 +9,8 @@ export interface Branch {
 interface FinanceStats {
   totalRevenue: number;
   totalExpenses: number;
+  paidExpenses: number;
+  unpaidExpenses: number;
   totalTeacherPayroll: number;
   totalRoyalties: number;
   outstandingPayments: number;
@@ -23,8 +25,10 @@ interface Option {
 interface ExpenseFormState {
   vendors: Option[];
   accounts: Option[];
+  branches: Option[];
   userBranchId: string;
   userBranchName: string;
+  nextExpenseNo: string;
   loading: boolean;
   error: string | null;
 }
@@ -115,6 +119,8 @@ const initialState: FinanceState = {
   stats: {
     totalRevenue: 0,
     totalExpenses: 0,
+    paidExpenses: 0,
+    unpaidExpenses: 0,
     totalTeacherPayroll: 0,
     totalRoyalties: 0,
     outstandingPayments: 0,
@@ -172,8 +178,10 @@ const initialState: FinanceState = {
   expenseForm: {
     vendors: [],
     accounts: [],
+    branches: [],
     userBranchId: "",
     userBranchName: "",
+    nextExpenseNo: "EXP-0001",
     loading: false,
     error: null,
   },
@@ -241,12 +249,15 @@ export const fetchFinanceData = createAsyncThunk(
 
 export const fetchExpensesList = createAsyncThunk(
   "finance/fetchExpensesList",
-  async (params: { page?: number; branchId?: string; search?: string; startDate?: string; endDate?: string }, { rejectWithValue }) => {
+  async (params: { page?: number; branchId?: string; search?: string; paid?: string; startDate?: string; endDate?: string }, { rejectWithValue }) => {
     try {
       const page = params.page || 1;
       let url = `/api/dashboard/finance/expenses?page=${page}&limit=10`;
       if (params.branchId) {
         url += `&branchId=${encodeURIComponent(params.branchId)}`;
+      }
+      if (params.paid && params.paid !== "all") {
+        url += `&paid=${encodeURIComponent(params.paid)}`;
       }
       if (params.startDate) {
         url += `&startDate=${encodeURIComponent(params.startDate)}`;
@@ -371,6 +382,37 @@ export const createExpense = createAsyncThunk(
   }
 );
 
+export const updateExpense = createAsyncThunk(
+  "finance/updateExpense",
+  async (expenseData: {
+    id: string;
+    date: string;
+    description: string;
+    amount: number;
+    paymentMethod: string;
+    vendorId: string;
+    expenseAccountId: string;
+    branchId: string;
+    paid: boolean;
+    notes?: string;
+  }, { rejectWithValue }) => {
+    try {
+      const res = await fetch("/api/dashboard/office-admin/expenses", {
+        method: "PUT",
+        headers: getCsrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify(expenseData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update expense");
+      }
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to update expense");
+    }
+  }
+);
+
 export const updateExpenseApprovalStatus = createAsyncThunk(
   "finance/updateExpenseApprovalStatus",
   async (payload: { expenseId: string; status: "Approved" | "Rejected"; rejectionReason?: string }, { rejectWithValue }) => {
@@ -393,12 +435,24 @@ export const updateExpenseApprovalStatus = createAsyncThunk(
 
 export const fetchOfficeAdminExpensesList = createAsyncThunk(
   "finance/fetchOfficeAdminExpensesList",
-  async (params: { page?: number; search?: string }, { rejectWithValue }) => {
+  async (params: { page?: number; search?: string; paid?: string; startDate?: string; endDate?: string; branchId?: string }, { rejectWithValue }) => {
     try {
       const page = params.page || 1;
       let url = `/api/dashboard/office-admin/expenses?page=${page}&limit=10`;
       if (params.search && params.search.trim()) {
         url += `&search=${encodeURIComponent(params.search.trim())}`;
+      }
+      if (params.paid && params.paid !== "all") {
+        url += `&paid=${encodeURIComponent(params.paid)}`;
+      }
+      if (params.startDate) {
+        url += `&startDate=${encodeURIComponent(params.startDate)}`;
+      }
+      if (params.endDate) {
+        url += `&endDate=${encodeURIComponent(params.endDate)}`;
+      }
+      if (params.branchId && params.branchId !== "all") {
+        url += `&branchId=${encodeURIComponent(params.branchId)}`;
       }
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -421,8 +475,10 @@ export const fetchExpenseFormData = createAsyncThunk(
       return {
         userBranchId: json.userBranchId || "",
         userBranchName: json.userBranchName || "Main Branch",
+        branches: json.branches || [],
         vendors: json.vendors || [],
         accounts: json.accounts || [],
+        nextExpenseNo: json.nextExpenseNo || "EXP-0001",
       };
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to load expense form data");
@@ -673,8 +729,10 @@ const financeSlice = createSlice({
       .addCase(fetchExpenseFormData.fulfilled, (state, action) => {
         state.expenseForm.vendors = action.payload.vendors;
         state.expenseForm.accounts = action.payload.accounts;
+        state.expenseForm.branches = action.payload.branches;
         state.expenseForm.userBranchId = action.payload.userBranchId;
         state.expenseForm.userBranchName = action.payload.userBranchName;
+        state.expenseForm.nextExpenseNo = action.payload.nextExpenseNo;
         state.expenseForm.loading = false;
         state.expenseForm.error = null;
       })
@@ -811,8 +869,10 @@ export const selectLedgerError = (state: any) => state.finance.ledgerList.error;
 // Expense form selectors
 export const selectExpenseFormVendors = (state: any) => state.finance.expenseForm.vendors;
 export const selectExpenseFormAccounts = (state: any) => state.finance.expenseForm.accounts;
+export const selectExpenseFormBranches = (state: any) => state.finance.expenseForm.branches;
 export const selectExpenseFormBranchId = (state: any) => state.finance.expenseForm.userBranchId;
 export const selectExpenseFormBranchName = (state: any) => state.finance.expenseForm.userBranchName;
+export const selectExpenseFormNextNo = (state: any) => state.finance.expenseForm.nextExpenseNo;
 export const selectExpenseFormLoading = (state: any) => state.finance.expenseForm.loading;
 
 // Journal Entries selectors

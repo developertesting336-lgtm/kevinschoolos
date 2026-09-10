@@ -34,10 +34,10 @@ export function PipelineBoard({
       if (columnTitle === "Contacted") {
         return s === "contacted";
       }
-      if (columnTitle === "Trial Scheduled") {
+      if (columnTitle === "Trial Booked" || columnTitle === "Trial Scheduled") {
         return s === "trial booked" || s === "trial scheduled";
       }
-      if (columnTitle === "Trial Completed") {
+      if (columnTitle === "Trial Done" || columnTitle === "Trial Completed") {
         return s === "trial done" || s === "trial completed" || s === "follow-up";
       }
       if (columnTitle === "Won") {
@@ -53,8 +53,8 @@ export function PipelineBoard({
   const columns = [
     { title: "New", statusKey: "New" },
     { title: "Contacted", statusKey: "Contacted" },
-    { title: "Trial Scheduled", statusKey: "Trial Booked" },
-    { title: "Trial Completed", statusKey: "Trial Done" },
+    { title: "Trial Booked", statusKey: "Trial Booked" },
+    { title: "Trial Done", statusKey: "Trial Done" },
     { title: "Won", statusKey: "Enrolled" },
     { title: "Lost", statusKey: "Lost" },
   ];

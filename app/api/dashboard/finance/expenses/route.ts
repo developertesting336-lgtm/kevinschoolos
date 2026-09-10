@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
     const branchFilter = searchParams.get("branchId") || searchParams.get("branch");
     const search = searchParams.get("search");
+    const paidFilter = searchParams.get("paid");
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
@@ -50,8 +51,13 @@ export async function GET(request: NextRequest) {
     if (userRole === "finance") {
       whereConditions.push(branchScopedFilter);
     }
-    if (branchFilter) {
+    if (branchFilter && branchFilter !== "all") {
       whereConditions.push({ branchIds: { has: branchFilter } });
+    }
+    if (paidFilter === "true" || paidFilter === "paid") {
+      whereConditions.push({ paid: true });
+    } else if (paidFilter === "false" || paidFilter === "unpaid") {
+      whereConditions.push({ paid: false });
     }
     if (startDate || endDate) {
       const dateCond: any = {};
@@ -90,15 +96,22 @@ export async function GET(request: NextRequest) {
     });
     const approvalMap = new Map(approvals.map((a) => [a.expenseId, a]));
 
-    // Fetch related vendors and branches
+    // Fetch related vendors, accounts, and branches
     const vendorIds = Array.from(new Set(expenses.flatMap((e) => e.vendorIds)));
+    const expenseAccountIds = Array.from(new Set(expenses.flatMap((e) => e.expenseAccountIds)));
     const branchIds = Array.from(new Set(expenses.flatMap((e) => e.branchIds)));
 
-    const [vendors, branches] = await Promise.all([
+    const [vendors, accounts, branches] = await Promise.all([
       vendorIds.length > 0
         ? prisma.vendor.findMany({
             where: { id: { in: vendorIds } },
             select: { id: true, vendorName: true, category: true },
+          })
+        : [],
+      expenseAccountIds.length > 0
+        ? prisma.account.findMany({
+            where: { id: { in: expenseAccountIds } },
+            select: { id: true, accountNo: true, accountName: true },
           })
         : [],
       branchIds.length > 0
@@ -110,16 +123,19 @@ export async function GET(request: NextRequest) {
     ]);
 
     const vendorMap = new Map(vendors.map((v) => [v.id, v]));
+    const accountMap = new Map(accounts.map((a) => [a.id, `${a.accountNo} - ${a.accountName}`]));
     const branchMap = new Map(branches.map((b) => [b.id, b.name]));
 
-    // Format data, map vendor name/category, branch names, and approval status
+    // Format data, map vendor name, expense account, branch names, and status
     const data = expenses.map((exp) => {
       const vendor = exp.vendorIds.map((id) => vendorMap.get(id)).filter(Boolean)[0] || null;
+      const accountName = exp.expenseAccountIds.map((id) => accountMap.get(id)).filter(Boolean)[0] || "—";
       const appr = approvalMap.get(exp.id);
       return {
         ...exp,
         vendorName: vendor ? vendor.vendorName : "Unknown Vendor",
         category: vendor ? (vendor.category || "Operational") : "Operational",
+        expenseAccountName: accountName,
         branchName: exp.branchIds.map((id) => branchMap.get(id)).filter(Boolean).join(", ") || "General",
         submittedBy: "Branch Admin",
         approvalStatus: appr ? appr.status : exp.paid ? "Approved" : "Pending Approval",

@@ -3,11 +3,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { CreditCard, Loader2, ChevronLeft, ChevronRight, Check, X, Search } from "lucide-react";
+import { CreditCard, Loader2, ChevronLeft, ChevronRight, CheckCircle2, Clock, Search, X, Calendar } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchExpensesList,
-  updateExpenseApprovalStatus,
   selectExpensesList,
   selectExpensesPagination,
   selectExpensesLoading,
@@ -15,7 +14,6 @@ import {
   selectFinanceUserRole,
 } from "@/store/slices/financeSlice";
 import { normalizeRole } from "@/lib/roles";
-import { toast } from "sonner";
 
 interface ExpenseListProps {
   branchId?: string;
@@ -23,7 +21,7 @@ interface ExpenseListProps {
   endDate?: string;
 }
 
-export function ExpenseList({ branchId, startDate, endDate }: ExpenseListProps) {
+export function ExpenseList({ branchId, startDate: propStartDate, endDate: propEndDate }: ExpenseListProps) {
   const dispatch = useAppDispatch();
 
   // Redux hooks
@@ -35,9 +33,19 @@ export function ExpenseList({ branchId, startDate, endDate }: ExpenseListProps) 
 
   const [page, setPage] = useState(1);
   const [userRole, setUserRole] = useState<string>(reduxUserRole || "");
-  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Filters
+  const [paidFilter, setPaidFilter] = useState<"all" | "paid" | "unpaid">("all");
+  const [localStartDate, setLocalStartDate] = useState<string>(propStartDate || "");
+  const [localEndDate, setLocalEndDate] = useState<string>(propEndDate || "");
+
+  // Sync prop changes if external filter is applied
+  useEffect(() => {
+    if (propStartDate !== undefined) setLocalStartDate(propStartDate || "");
+    if (propEndDate !== undefined) setLocalEndDate(propEndDate || "");
+  }, [propStartDate, propEndDate]);
 
   // Ensure role is retrieved even if accessed directly
   useEffect(() => {
@@ -53,12 +61,9 @@ export function ExpenseList({ branchId, startDate, endDate }: ExpenseListProps) 
     }
   }, [reduxUserRole]);
 
-  const normalizedRole = normalizeRole(userRole);
-  const isAuthorizedToApprove = normalizedRole === "finance" || normalizedRole === "owner";
-
   useEffect(() => {
     setPage(1);
-  }, [branchId, startDate, endDate]);
+  }, [branchId, localStartDate, localEndDate, paidFilter]);
 
   // Debounce search term
   useEffect(() => {
@@ -75,29 +80,12 @@ export function ExpenseList({ branchId, startDate, endDate }: ExpenseListProps) 
         page,
         branchId,
         search: debouncedSearch,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
+        paid: paidFilter === "all" ? undefined : paidFilter,
+        startDate: localStartDate || undefined,
+        endDate: localEndDate || undefined,
       })
     );
-  }, [dispatch, page, branchId, debouncedSearch, startDate, endDate]);
-
-  const handleApprovalAction = useCallback(
-    async (expenseId: string, status: "Approved" | "Rejected") => {
-      setActionLoadingId(expenseId);
-      try {
-        await dispatch(updateExpenseApprovalStatus({ expenseId, status })).unwrap();
-        toast.success(`Expense ${status === "Approved" ? "Approved" : "Rejected"}`, {
-          description: `Status updated to ${status}.`,
-        });
-      } catch (err: any) {
-        const msg = typeof err === "string" ? err : err?.message || "Failed to update status.";
-        toast.error("Action failed", { description: msg });
-      } finally {
-        setActionLoadingId(null);
-      }
-    },
-    [dispatch]
-  );
+  }, [dispatch, page, branchId, debouncedSearch, paidFilter, localStartDate, localEndDate]);
 
   const formatCurrency = (val: number | null) => {
     if (val === null || val === undefined) return "—";
@@ -114,32 +102,105 @@ export function ExpenseList({ branchId, startDate, endDate }: ExpenseListProps) 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/40 pb-4 gap-3">
+      {/* Top Filter and Search Bar */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between border-b border-border/40 pb-4 gap-3">
         <div className="flex items-center gap-2">
           <CreditCard className="h-4 w-4 text-primary" />
           <h3 className="text-sm font-bold text-foreground">Expense List</h3>
-          <Badge variant="outline" className="text-[8px] py-0 px-1.5 font-mono">
+          <Badge variant="outline" className="text-[10px] py-0.5 px-2 font-mono">
             {pagination.total} records
           </Badge>
         </div>
 
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search expense by description..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 pr-8 text-xs h-8 bg-muted/20 border-border"
-          />
-          {searchTerm && (
+        {/* Filter controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Date range filters */}
+          <div className="flex items-center gap-1.5 bg-muted/20 border border-border/60 rounded-xl px-2 py-1">
+            <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            <input
+              type="date"
+              value={localStartDate}
+              onChange={(e) => setLocalStartDate(e.target.value)}
+              className="bg-transparent text-xs text-foreground font-medium focus:outline-none cursor-pointer"
+              title="Start Date"
+            />
+            <span className="text-xs text-muted-foreground font-bold">-</span>
+            <input
+              type="date"
+              value={localEndDate}
+              onChange={(e) => setLocalEndDate(e.target.value)}
+              className="bg-transparent text-xs text-foreground font-medium focus:outline-none cursor-pointer"
+              title="End Date"
+            />
+            {(localStartDate || localEndDate) && (
+              <button
+                onClick={() => {
+                  setLocalStartDate("");
+                  setLocalEndDate("");
+                }}
+                className="text-muted-foreground hover:text-foreground p-0.5"
+                title="Clear date filter"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+
+          {/* Paid / Unpaid Status Pills */}
+          <div className="flex items-center p-0.5 bg-muted/40 rounded-xl border border-border/60">
             <button
-              onClick={() => setSearchTerm("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              onClick={() => setPaidFilter("all")}
+              className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                paidFilter === "all"
+                  ? "bg-card text-foreground shadow-xs border border-border/40"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              <X className="h-3.5 w-3.5" />
+              All
             </button>
-          )}
+            <button
+              onClick={() => setPaidFilter("paid")}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                paidFilter === "paid"
+                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shadow-xs border border-emerald-500/30"
+                  : "text-muted-foreground hover:text-emerald-600"
+              }`}
+            >
+              <CheckCircle2 className="h-3 w-3" />
+              Paid
+            </button>
+            <button
+              onClick={() => setPaidFilter("unpaid")}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                paidFilter === "unpaid"
+                  ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 shadow-xs border border-amber-500/30"
+                  : "text-muted-foreground hover:text-amber-600"
+              }`}
+            >
+              <Clock className="h-3 w-3" />
+              Unpaid
+            </button>
+          </div>
+
+          {/* Search box */}
+          <div className="relative w-full sm:w-56">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 pr-8 text-xs h-8 bg-muted/20 border-border"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -154,7 +215,9 @@ export function ExpenseList({ branchId, startDate, endDate }: ExpenseListProps) 
         </div>
       ) : data.length === 0 ? (
         <div className="py-12 text-center text-xs text-muted-foreground font-medium">
-          {debouncedSearch ? `No expenses matching "${debouncedSearch}".` : "No expenses recorded."}
+          {debouncedSearch
+            ? `No expenses matching "${debouncedSearch}".`
+            : "No expenses recorded for selected criteria."}
         </div>
       ) : (
         <div className="overflow-x-auto border border-border/60 rounded-xl shadow-inner bg-card/40">
@@ -164,71 +227,52 @@ export function ExpenseList({ branchId, startDate, endDate }: ExpenseListProps) 
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase">Expense Date</th>
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase">Vendor</th>
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase">Description</th>
-                <th className="p-3 font-semibold tracking-tight text-[10px] uppercase">Category</th>
+                <th className="p-3 font-semibold tracking-tight text-[10px] uppercase">Payment Method</th>
+                <th className="p-3 font-semibold tracking-tight text-[10px] uppercase">Expense Account</th>
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase text-right">Amount</th>
                 <th className="p-3 font-semibold tracking-tight text-[10px] uppercase">Branch</th>
-                <th className="p-3 font-semibold tracking-tight text-[10px] uppercase">Submitted By</th>
-                <th className="p-3 font-semibold tracking-tight text-[10px] uppercase text-center">Approval Status</th>
+                <th className="p-3 font-semibold tracking-tight text-[10px] uppercase text-center">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
               {data.map((row: any) => {
-                const isPending = row.approvalStatus === "Pending" || row.approvalStatus === "Pending Approval";
-                const isProcessing = actionLoadingId === row.id;
-
+                const isPaid = row.paid === true;
                 return (
                   <tr key={row.id} className="hover:bg-muted/10 transition-colors">
-                    <td className="p-3 text-muted-foreground font-medium">{formatDate(row.date)}</td>
-                    <td className="p-3 font-bold text-foreground/90">{row.vendorName}</td>
+                    <td className="p-3 text-muted-foreground font-medium whitespace-nowrap">
+                      {formatDate(row.date)}
+                    </td>
+                    <td className="p-3 font-bold text-foreground/90 whitespace-nowrap">
+                      {row.vendorName}
+                    </td>
                     <td className="p-3 font-medium text-foreground/90 max-w-xs truncate" title={row.description}>
                       {row.description || "—"}
                     </td>
-                    <td className="p-3 font-medium">
-                      <Badge variant="secondary" className="text-[9px] py-0.5 px-2 bg-muted text-muted-foreground border-none capitalize">
-                        {row.category}
+                    <td className="p-3 font-medium text-muted-foreground">
+                      <Badge variant="outline" className="text-[10px] py-0 px-2 font-normal capitalize bg-muted/30">
+                        {row.paymentMethod || "—"}
                       </Badge>
                     </td>
-                    <td className="p-3 text-right font-mono font-bold text-rose-600">
+                    <td className="p-3 font-medium text-foreground/80 max-w-xs truncate" title={row.expenseAccountName}>
+                      {row.expenseAccountName || "—"}
+                    </td>
+                    <td className="p-3 text-right font-mono font-bold text-rose-600 whitespace-nowrap">
                       {formatCurrency(row.amount)}
                     </td>
-                    <td className="p-3 text-muted-foreground font-medium">{row.branchName}</td>
-                    <td className="p-3 text-muted-foreground font-medium">{row.submittedBy}</td>
-                    <td className="p-3 text-center">
-                      {isAuthorizedToApprove && isPending ? (
-                        <div className="flex items-center justify-center gap-1.5">
-                          {isProcessing ? (
-                            <Loader2 className="h-4 w-4 animate-spin text-primary mx-auto" />
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => handleApprovalAction(row.id, "Approved")}
-                                className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30 text-[10px] font-extrabold py-1 px-2.5 rounded-lg transition-all shadow-xs cursor-pointer active:scale-95"
-                                title="Approve expense"
-                              >
-                                <Check className="h-3 w-3" /> Approve
-                              </button>
-                              <button
-                                onClick={() => handleApprovalAction(row.id, "Rejected")}
-                                className="inline-flex items-center gap-1 bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 hover:bg-rose-500/20 border border-rose-500/30 text-[10px] font-extrabold py-1 px-2.5 rounded-lg transition-all shadow-xs cursor-pointer active:scale-95"
-                                title="Reject expense"
-                              >
-                                <X className="h-3 w-3" /> Reject
-                              </button>
-                            </>
-                          )}
-                        </div>
+                    <td className="p-3 text-muted-foreground font-medium whitespace-nowrap">
+                      {row.branchName}
+                    </td>
+                    <td className="p-3 text-center whitespace-nowrap">
+                      {isPaid ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          <CheckCircle2 className="h-3 w-3" />
+                          Paid
+                        </span>
                       ) : (
-                        <Badge
-                          variant="outline"
-                          className={`text-[9px] py-0.5 px-2.5 font-bold capitalize select-none ${row.approvalStatus === "Approved"
-                              ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 border-emerald-500/20"
-                              : row.approvalStatus === "Rejected"
-                                ? "bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 border-rose-500/20"
-                                : "bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 border-amber-500/20"
-                            }`}
-                        >
-                          {row.approvalStatus}
-                        </Badge>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                          <Clock className="h-3 w-3" />
+                          Unpaid
+                        </span>
                       )}
                     </td>
                   </tr>

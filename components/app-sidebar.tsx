@@ -105,6 +105,7 @@ const ownerGroups = [
       { title: "Classes", url: "/dashboard/owner/classgroup", icon: Users },
       { title: "Attendance", url: "/dashboard/owner/attendance", icon: FileCheck },
       { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
+      { title: "Expenses", url: "/dashboard/expenses", icon: Receipt },
     ],
   },
   {
@@ -162,7 +163,6 @@ const officeAdminGroups = [
     items: [
       { title: "Admissions", url: "/dashboard/admissions", icon: LayoutDashboard },
       { title: "Onboarding", url: "/dashboard/onboarding", icon: ClipboardCheck },
-      { title: "Expenses", url: "/dashboard/office-admin/expenses", icon: Receipt },
       { title: "Schedule Console", url: "/dashboard/schedule", icon: Calendar },
       { title: "Terms", url: "/dashboard/owner/term", icon: CalendarRange },
       { title: "Rooms", url: "/dashboard/owner/room", icon: DoorOpen },
@@ -171,6 +171,7 @@ const officeAdminGroups = [
       { title: "Classes", url: "/dashboard/owner/classgroup", icon: Users },
       { title: "Attendance", url: "/dashboard/owner/attendance", icon: FileCheck },
       { title: "Activities", url: "/dashboard/owner/activity", icon: Activity },
+      { title: "Expenses", url: "/dashboard/expenses", icon: Receipt },
     ],
   },
   {
@@ -248,9 +249,9 @@ export function AppSidebar({ user }: AppSidebarProps) {
 
   // Define allowed nav items per role
   const rolePermissions: Record<string, string[]> = {
-    owner: ["Overview", "Branches", "Staff & Users", "Students", "Schedule", "Billing", "Schema Diagnostics"],
+    owner: ["Overview", "Branches", "Staff & Users", "Students", "Schedule", "Billing", "Expenses", "Schema Diagnostics"],
     finance: ["Overview", "Billing"],
-    office_admin: ["Overview", "Branches", "Staff & Users", "Students", "Schedule", "Billing"],
+    office_admin: ["Overview", "Branches", "Staff & Users", "Students", "Schedule", "Billing", "Expenses"],
     teacher: ["Overview", "Branches", "Students", "Schedule"],
     smm: ["Overview", "Branches", "Students", "Schedule"],
     tech_admin: ["Overview", "Schema Diagnostics"],

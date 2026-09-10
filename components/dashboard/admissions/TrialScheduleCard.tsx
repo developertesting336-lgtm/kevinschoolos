@@ -25,7 +25,7 @@ interface TrialScheduleCardProps {
   roomName: string | null;
 }
 
-const VALID_OUTCOMES = ["Attended", "No-show","Declined", "Rescheduled"];
+const VALID_OUTCOMES = ["Attended", "Rescheduled"];
 
 export function TrialScheduleCard({ trial, teacherName, roomName }: TrialScheduleCardProps) {
   const dispatch = useAppDispatch();

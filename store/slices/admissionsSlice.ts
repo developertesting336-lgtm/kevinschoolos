@@ -79,6 +79,24 @@ export interface ClassGroupData {
   branchIds: string[];
 }
 
+export interface CourseData {
+  id: string;
+  courseName: string;
+  active?: boolean;
+  stage?: string | null;
+  ageBand?: string | null;
+}
+
+export interface TuitionPlanData {
+  id: string;
+  planName: string;
+  amount?: number | null;
+  billingPeriod?: string | null;
+  active?: boolean;
+  courseIds?: string[];
+  nameKyrgyz?: string | null;
+}
+
 interface AdmissionsState {
   leads: LeadData[];
   parents: ParentData[];
@@ -88,6 +106,8 @@ interface AdmissionsState {
   activities: ActivityData[];
   rooms: RoomData[];
   classGroups: ClassGroupData[];
+  courses: CourseData[];
+  tuitionPlans: TuitionPlanData[];
   sources: string[];
   pagination: {
     total: number;
@@ -122,6 +142,8 @@ const initialState: AdmissionsState = {
   activities: [],
   rooms: [],
   classGroups: [],
+  courses: [],
+  tuitionPlans: [],
   sources: [],
   pagination: {
     total: 0,
@@ -167,6 +189,8 @@ export const fetchAdmissionsData = createAsyncThunk(
       let activitiesRes = alreadyHasMetadata ? admissionsState.activities : [];
       let roomsRes = alreadyHasMetadata ? admissionsState.rooms : [];
       let classGroupsRes = alreadyHasMetadata ? admissionsState.classGroups : [];
+      let coursesRes = alreadyHasMetadata ? admissionsState.courses : [];
+      let tuitionPlansRes = alreadyHasMetadata ? admissionsState.tuitionPlans : [];
 
       if (alreadyHasMetadata) {
         leadsResponse = await fetch(`/api/data/lead?${params.toString()}`).then((r) => r.json()).catch(() => ({ data: [], pagination: { total: 0, page: 1, limit: 30, totalPages: 1 } }));
@@ -180,6 +204,8 @@ export const fetchAdmissionsData = createAsyncThunk(
           fetch("/api/data/activity").then((r) => r.json()).catch(() => []),
           fetch("/api/data/room").then((r) => r.json()).catch(() => []),
           fetch("/api/data/classgroup").then((r) => r.json()).catch(() => []),
+          fetch("/api/data/course").then((r) => r.json()).catch(() => []),
+          fetch("/api/data/tuitionplan").then((r) => r.json()).catch(() => []),
         ]);
         leadsResponse = responses[0];
         branchesRes = responses[1];
@@ -189,6 +215,8 @@ export const fetchAdmissionsData = createAsyncThunk(
         activitiesRes = responses[5];
         roomsRes = responses[6];
         classGroupsRes = responses[7];
+        coursesRes = responses[8];
+        tuitionPlansRes = responses[9];
       }
 
       const leads = (leadsResponse as any).data || [];
@@ -204,6 +232,8 @@ export const fetchAdmissionsData = createAsyncThunk(
         activities: Array.isArray(activitiesRes) ? activitiesRes : [],
         rooms: Array.isArray(roomsRes) ? roomsRes : [],
         classGroups: Array.isArray(classGroupsRes) ? classGroupsRes : [],
+        courses: Array.isArray(coursesRes) ? coursesRes : [],
+        tuitionPlans: Array.isArray(tuitionPlansRes) ? tuitionPlansRes : [],
         sources: sources.length > 0 ? sources : ["Instagram", "Facebook", "Web", "WhatsApp", "Recommendation", "Other"],
         pagination,
       };
@@ -408,6 +438,8 @@ const admissionsSlice = createSlice({
         state.activities = action.payload.activities;
         state.rooms = action.payload.rooms;
         state.classGroups = action.payload.classGroups;
+        state.courses = action.payload.courses;
+        state.tuitionPlans = action.payload.tuitionPlans;
         state.sources = action.payload.sources;
         state.pagination = action.payload.pagination;
         state.loading = false;
@@ -471,6 +503,8 @@ export const selectAdmissionsTrials = (state: any) => state.admissions.trials;
 export const selectAdmissionsActivities = (state: any) => state.admissions.activities;
 export const selectAdmissionsRooms = (state: any) => state.admissions.rooms;
 export const selectAdmissionsClassGroups = (state: any) => state.admissions.classGroups;
+export const selectAdmissionsCourses = (state: any) => state.admissions.courses;
+export const selectAdmissionsTuitionPlans = (state: any) => state.admissions.tuitionPlans;
 export const selectAdmissionsSources = (state: any) => state.admissions.sources;
 export const selectAdmissionsPagination = (state: any) => state.admissions.pagination;
 export const selectAdmissionsLoading = (state: any) => state.admissions.loading;

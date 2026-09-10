@@ -56,14 +56,6 @@ export async function GET(request: NextRequest) {
       whereConditions.push({ date: dateFilter });
     }
 
-    // Search filter
-    if (search && search.trim()) {
-      const term = search.trim();
-      whereConditions.push({
-        paymentRef: { contains: term, mode: "insensitive" },
-      });
-    }
-
     const where = whereConditions.length > 0 ? { AND: whereConditions } : {};
 
     // Query candidate payments
@@ -218,12 +210,20 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const total = enrichedPayments.length;
+    let filteredPayments = enrichedPayments;
+    if (search && search.trim()) {
+      const term = search.trim().toLowerCase();
+      filteredPayments = enrichedPayments.filter((item) =>
+        item.studentName.toLowerCase().includes(term)
+      );
+    }
+
+    const total = filteredPayments.length;
     const totalPages = Math.ceil(total / limit) || 1;
-    const totalAmount = enrichedPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const totalAmount = filteredPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
 
     // Apply pagination
-    const paginatedData = enrichedPayments.slice((page - 1) * limit, page * limit);
+    const paginatedData = filteredPayments.slice((page - 1) * limit, page * limit);
 
     return NextResponse.json({
       data: paginatedData,

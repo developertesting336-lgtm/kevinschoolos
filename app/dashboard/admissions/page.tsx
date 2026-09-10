@@ -6,8 +6,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchAdmissionsData, selectAdmissionsLoading, selectAdmissionsError } from "@/store/slices/admissionsSlice";
 import { validateSessionThunk } from "@/store/slices/authSlice";
 import { AdmissionsClient } from "@/components/dashboard/admissions/AdmissionsClient";
-import { Card,  CardContent } from "@/components/ui/card";
-import {  ArrowLeft, TrendingUp } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, TrendingUp } from "lucide-react";
 
 export default function AdmissionsPage() {
   const dispatch = useAppDispatch();
@@ -47,7 +47,7 @@ export default function AdmissionsPage() {
             Admissions
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            CRM Dashboard • Track and manage customer inquiry leads, trials, and conversions
+            Track and manage customer inquiry leads, trials, and conversions
           </p>
         </div>
         <Link
